@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Convert PDF to Word online for free. Best PDF to Word converter to generate editable Word (DOCX) from PDFs instantly.">
+<title>PDF to Word Converter - Free Online Tool</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #1E1E2F;
+        color: #EAEAEA;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .container {
+        width: 90%;
+        max-width: 800px;
+        padding: 20px;
+        background-color: #2B2D42;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+    h1 { margin-bottom: 10px; }
+    p { margin-bottom: 20px; }
+    input, button {
+        margin: 10px 0;
+        padding: 12px;
+        border-radius: 6px;
+        border: none;
+        width: 90%;
+        max-width: 400px;
+    }
+    button {
+        background-color: #FFD700;
+        color: #1E1E2F;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background-color: #e6c200; }
+    #pdfPreview {
+        width: 100%;
+        height: auto;
+        margin-top: 20px;
+        border: 1px solid #EAEAEA;
+        border-radius: 6px;
+    }
+    #downloadLink {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background-color: #FFD700;
+        color: #1E1E2F;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>PDF to Word Converter</h1>
+    <p>Convert PDF to editable Word (DOCX) online for free.</p>
+    <input type="file" id="pdfUpload" accept=".pdf">
+    <button id="convertBtn">Convert to Word</button>
+    <canvas id="pdfPreview"></canvas>
+    <a id="downloadLink" style="display:none;" download="converted.docx">Download Word File</a>
+</div>
+
+<!-- PDF.js for preview -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.230/pdf.min.js"></script>
+<!-- docx.js for generating Word -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.6.0/docx.min.js"></script>
+
+<script>
+const pdfUpload = document.getElementById("pdfUpload");
+const convertBtn = document.getElementById("convertBtn");
+const previewCanvas = document.getElementById("pdfPreview");
+const downloadLink = document.getElementById("downloadLink");
+
+let pdfFile;
+
+pdfUpload.addEventListener("change", (e) => {
+    pdfFile = e.target.files[0];
+    if (pdfFile) previewPDF(pdfFile);
+});
+
+// PDF Preview
+async function previewPDF(file) {
+    const fileReader = new FileReader();
+    fileReader.onload = async function() {
+        const typedarray = new Uint8Array(this.result);
+        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const context = previewCanvas.getContext("2d");
+        previewCanvas.height = viewport.height;
+        previewCanvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+    };
+    fileReader.readAsArrayBuffer(file);
+}
+
+// Convert PDF to Word (basic text extraction)
+convertBtn.addEventListener("click", async () => {
+    if (!pdfFile) return alert("Please upload a PDF first.");
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument(new Uint8Array(arrayBuffer)).promise;
+
+    let fullText = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map(item => item.str).join(" ");
+        fullText += strings + "\n\n";
+    }
+
+    // Generate Word DOCX using docx.js
+    const { Document, Packer, Paragraph, TextRun } = docx;
+    const doc = new Document({
+        sections: [{
+            properties: {},
+            children: [new Paragraph(fullText)]
+        }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.style.display = "inline-block";
+});
+</script>
+</body>
+</html>
