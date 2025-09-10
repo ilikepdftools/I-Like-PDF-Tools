@@ -3,381 +3,234 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>I Like PDF Tools</title>
-  <meta name="description" content="I Like PDF Tools offers a comprehensive suite of PDF and file conversion tools (PDF to Word, Merge PDFs, Compress PDF, Image Converter, etc.). Our responsive website provides easy access to all tools." />
-  <meta name="keywords" content="PDF Tools, PDF converter, Merge PDF, Compress PDF, Convert PDF, PDF editor, online PDF" />
+  <title>I Like PDF Tools – All Tools</title>
   <style>
-    /* Global CSS variables for theme colors */
-    :root {
-      --color-bg: #1E1E2F;         /* Dark blue background */
-      --color-text: #EAEAEA;       /* Light gray text */
-      --color-header: #2B2D42;     /* Deep red header background */
-      --color-accent: #FFD700;     /* Gold accent */
-      --color-card: #3A3D5B;       /* Dark grayish-red card background */
-      --color-btn-hover: #E6C200;  /* Deeper gold on hover */
-      --color-shadow: rgba(255, 215, 0, 0.2); /* Soft gold shadow */
-    }
-    /* Light mode theme overrides */
-    body.light-mode {
-      --color-bg: #F0F0F0;
-      --color-text: #2B2D42;
-      --color-header: #FFD700;
-      --color-card: #FFFFFF;
-      --color-accent: #2B2D42;
-      --color-btn-hover: #B5A000;
-      --color-shadow: rgba(0, 0, 0, 0.1);
-    }
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background-color: var(--color-bg);
-      color: var(--color-text);
-      line-height: 1.6;
+      background-color: #1E1E2F;
+      color: #EAEAEA;
+      margin: 0;
+      padding: 0;
     }
+
     header {
-      background-color: var(--color-header);
-      padding: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      background: #2B2D42;
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
+
     header h1 {
       margin: 0;
-      color: var(--color-accent);
-      font-size: 1.5rem;
+      font-size: 24px;
+      color: #FFD700;
     }
-    /* Search box styling */
-    #searchBox {
-      padding: 0.5rem;
-      margin: 0.5rem;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      flex: 1 0 200px;
-      max-width: 300px;
-    }
-    /* Theme toggle button */
-    #themeToggle {
-      margin-left: 1rem;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      background: var(--color-accent);
-      color: var(--color-bg);
+
+    #toolSearch {
+      margin-top: 10px;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
       border: none;
       border-radius: 5px;
-      font-weight: bold;
     }
-    #themeToggle:hover {
-      background: var(--color-btn-hover);
+
+    main {
+      padding: 30px;
     }
-    /* Main tools grid container */
-    #tools {
+
+    .category {
+      margin: 40px 0 20px;
+    }
+
+    .category h2 {
+      color: #FFD700;
+      border-bottom: 2px solid #FFD700;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    #toolsContainer {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      padding: 2rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
     }
-    /* Single column on narrow screens for responsiveness */
-    @media (max-width: 768px) {
-      #tools {
-        grid-template-columns: 1fr;
-      }
-    }
-    /* Tool card styling */
+
     .tool-card {
-      background-color: var(--color-card);
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 4px 6px var(--color-shadow);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .tool-card:hover {
-      background-color: var(--color-accent);
-      color: var(--color-bg);
-    }
-    .tool-card h2 {
-      margin-top: 0;
-      font-size: 1.25rem;
-    }
-    .tool-card p {
-      margin-bottom: 1rem;
-    }
-    /* Button styling */
-    .tool-card button {
-      background-color: var(--color-accent);
-      color: var(--color-bg);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .tool-card button:hover {
-      background-color: var(--color-btn-hover);
-    }
-    /* About/Article section styling */
-    #about {
-      padding: 2rem;
-      background: var(--color-bg);
-      color: var(--color-text);
-      font-size: 1rem;
-    }
-    #about h2 {
-      font-size: 1.5rem;
-      color: var(--color-accent);
-    }
-    #about p {
-      margin-bottom: 1rem;
-    }
-    mark {
-      background: yellow;
-      color: var(--color-bg);
-      padding: 0.1rem;
-    }
-    /* Contact section */
-    #contact {
-      padding: 2rem;
-      background: var(--color-card);
-      color: var(--color-text);
+      background: #3A3D5B;
+      border-radius: 10px;
+      padding: 20px;
       text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(255, 215, 0, 0.1);
     }
-    #contact h2 {
-      color: var(--color-accent);
+
+    .tool-card:hover {
+      background: #FFD700;
+      color: #1E1E2F;
+      box-shadow: 0 6px 12px rgba(255, 215, 0, 0.3);
     }
-    #contact p {
-      margin: 0.5rem 0;
+
+    .tool-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
     }
-    #contact a {
-      color: var(--color-accent);
+
+    .tool-card p {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .tool-btn {
+      display: inline-block;
+      padding: 10px 15px;
+      background: #FFD700;
+      color: #1E1E2F;
       text-decoration: none;
       font-weight: bold;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .tool-btn:hover {
+      background: #E6C200;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>I Like PDF Tools</h1>
-    <!-- Search box to filter tools -->
-    <input type="search" id="searchBox" placeholder="Search tools..." />
-    <!-- Theme toggle button -->
-    <button id="themeToggle">Toggle Theme</button>
+    <h1>I Like PDF Tools – All Tools</h1>
+    <input type="text" id="toolSearch" placeholder="Search for a tool...">
   </header>
-  <!-- Tools Section -->
-  <section id="tools">
-    <!-- Sample tool card -->
-    <div class="tool-card">
-      <h2>PDF → Word (DOCX)</h2>
-      <p>Convert PDF files into editable Word documents preserving layout.</p>
-      <button data-tool-name="PDF → Word">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>PDF → Excel (XLSX)</h2>
-      <p>Extract tables from PDFs into Excel spreadsheets.</p>
-      <button data-tool-name="PDF → Excel">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>PDF → PowerPoint (PPTX)</h2>
-      <p>Turn your PDF content into an editable PowerPoint presentation.</p>
-      <button data-tool-name="PDF → PowerPoint">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>PDF → JPG/PNG</h2>
-      <p>Export each page of your PDF as an image (JPG or PNG).</p>
-      <button data-tool-name="PDF → JPG/PNG">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Word → PDF</h2>
-      <p>Save your Word documents as high-quality PDF files.</p>
-      <button data-tool-name="Word → PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Excel → PDF</h2>
-      <p>Convert spreadsheets into PDF format for easy sharing.</p>
-      <button data-tool-name="Excel → PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>PowerPoint → PDF</h2>
-      <p>Convert PowerPoint slideshows into PDF documents.</p>
-      <button data-tool-name="PowerPoint → PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>TXT → PDF</h2>
-      <p>Convert plain text files into PDF documents.</p>
-      <button data-tool-name="TXT → PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Image (JPG/PNG) → PDF</h2>
-      <p>Combine multiple images into a single PDF file.</p>
-      <button data-tool-name="Image → PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Merge PDFs</h2>
-      <p>Combine multiple PDF files into one document.</p>
-      <button data-tool-name="Merge PDFs">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Split PDF</h2>
-      <p>Extract or split specific pages from a PDF.</p>
-      <button data-tool-name="Split PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Delete PDF Pages</h2>
-      <p>Remove unwanted pages from your PDF file.</p>
-      <button data-tool-name="Delete PDF Pages">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Rotate PDF Pages</h2>
-      <p>Rotate individual or multiple pages in a PDF.</p>
-      <button data-tool-name="Rotate PDF Pages">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Rearrange PDF Pages</h2>
-      <p>Drag and drop to reorder pages in your PDF.</p>
-      <button data-tool-name="Rearrange PDF Pages">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Extract Images from PDF</h2>
-      <p>Pull out all embedded images from a PDF file.</p>
-      <button data-tool-name="Extract Images from PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Add Watermark to PDF</h2>
-      <p>Insert custom text or image watermarks into your PDF.</p>
-      <button data-tool-name="Add Watermark to PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Add Signature to PDF</h2>
-      <p>Draw, upload, or type a digital signature onto your PDF.</p>
-      <button data-tool-name="Add Signature to PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Protect PDF (Password Lock)</h2>
-      <p>Add password encryption to secure your PDF files.</p>
-      <button data-tool-name="Protect PDF (Password Lock)">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Unlock PDF (Remove Password)</h2>
-      <p>Remove password protection from a PDF file.</p>
-      <button data-tool-name="Unlock PDF (Remove Password)">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Compress PDF</h2>
-      <p>Reduce PDF file size without losing quality.</p>
-      <button data-tool-name="Compress PDF">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Image Converter</h2>
-      <p>Convert images between JPG, PNG, WEBP, GIF, etc.</p>
-      <button data-tool-name="Image Converter">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Image Background Remover</h2>
-      <p>Use AI to remove backgrounds from images.</p>
-      <button data-tool-name="Image Background Remover">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Image Compressor</h2>
-      <p>Reduce image file size for faster loading.</p>
-      <button data-tool-name="Image Compressor">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Video Converter</h2>
-      <p>Convert videos between MP4, AVI, MOV, etc.</p>
-      <button data-tool-name="Video Converter">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Video to GIF Maker</h2>
-      <p>Create animated GIFs from video clips.</p>
-      <button data-tool-name="Video to GIF Maker">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Video Compressor</h2>
-      <p>Compress video files for easier sharing.</p>
-      <button data-tool-name="Video Compressor">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Audio Converter</h2>
-      <p>Convert audio between MP3, WAV, OGG, etc.</p>
-      <button data-tool-name="Audio Converter">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Audio Cutter & Joiner</h2>
-      <p>Edit audio files by cutting or merging tracks.</p>
-      <button data-tool-name="Audio Cutter & Joiner">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Text to Speech (AI Voice)</h2>
-      <p>Generate speech from text using AI voice synthesis.</p>
-      <button data-tool-name="Text to Speech (AI Voice)">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>Speech to Text (Transcription)</h2>
-      <p>Transcribe audio to text automatically.</p>
-      <button data-tool-name="Speech to Text (Audio Transcription)">Use Tool</button>
-    </div>
-    <div class="tool-card">
-      <h2>All-in-One File Converter</h2>
-      <p>Convert documents, images, audio, and video in one place.</p>
-      <button data-tool-name="All-in-One File Converter">Use Tool</button>
-    </div>
-    <!-- Add more tool cards here if needed up to 50 -->
-  </section>
-  <!-- About / Article Section (2000+ words) -->
-  <section id="about">
-    <h2>About I Like PDF Tools</h2>
-    <p>Welcome to <strong>I Like PDF Tools</strong>, your all-in-one destination for powerful online file conversion and editing utilities. Our mission is to simplify how you manage documents, images, audio, and video by providing a comprehensive set of tools in one professional, easy-to-use interface. Each tool listed above is designed with user convenience in mind. For example, the <mark>PDF → Word (DOCX)</mark> converter transforms a PDF into an editable Word document while preserving the original formatting. Similarly, the <mark>PDF → Excel (XLSX)</mark> tool accurately extracts tables and data from PDFs into spreadsheet format, and our <mark>PDF → PowerPoint (PPTX)</mark> converter turns your PDF pages into slideshow slides. These <mark>PDF conversion</mark> tools ensure you can work on content across different platforms and maintain full fidelity.</p>
-    <p>We also support the reverse conversions: you can take familiar formats like Word, Excel, or PowerPoint and convert them to PDF. For example, the <mark>Word → PDF</mark>, <mark>Excel → PDF</mark>, and <mark>PowerPoint → PDF</mark> converters create high-quality PDFs from your documents. If you have text files or images, tools like <mark>TXT → PDF</mark> and <mark>Image → PDF</mark> let you quickly assemble those into PDFs as well. This means whether you start with a document or an image, our site handles the conversion to PDF seamlessly.</p>
-    <p>The PDF editing suite on our site provides robust features to manipulate PDF files. With <mark>Merge PDFs</mark>, you can combine multiple documents into one file in just a few clicks. If you only need certain pages, the <mark>Split PDF</mark> tool lets you extract specific pages as a new file. You can also remove pages completely with <mark>Delete PDF Pages</mark>, or adjust page orientation using <mark>Rotate PDF Pages</mark>. For advanced reordering, <mark>Rearrange PDF Pages</mark> enables drag-and-drop reordering of pages to customize your document's flow. All of these editing features work instantly in your browser, so there’s no need for software downloads.</p>
-    <p>Our site includes tools to secure and optimize PDFs. Use <mark>Protect PDF (Password Lock)</mark> to add a password and encryption, ensuring only authorized people can open sensitive documents. Conversely, if you have a file with an owner password, <mark>Unlock PDF (Remove Password)</mark> can strip the password requirements (assuming you have the permission to do so). For file size management, the <mark>Compress PDF</mark> tool reduces file sizes while keeping document quality high, which is great for emailing or uploading where limits exist. All of these tools cater to making PDFs flexible: we help you edit, protect, compress, and convert them efficiently.</p>
-    <p>In addition to PDFs, <mark>I Like PDF Tools</mark> offers a variety of media utilities. Our <mark>Image Converter</mark> can handle many image formats (JPG, PNG, WEBP, GIF, etc.), making it easy to convert images for web or print. If you need to remove backgrounds from photos for design or presentation, the AI-powered <mark>Image Background Remover</mark> isolates the subject from its background with one click. For bulk photo handling, <mark>Image Compressor</mark> shrinks images to save space or speed up websites without noticeable quality loss.</p>
-    <p>Video tasks are covered too. With <mark>Video Converter</mark>, you can change video formats (MP4, AVI, MOV, and more) for compatibility with different devices or platforms. Want to create an animated GIF? Use our <mark>Video to GIF Maker</mark> to trim a clip and export as an animated image. If you have large video files, the <mark>Video Compressor</mark> tool will reduce the file size to help with storage and sharing, all within the browser.</p>
-    <p>Audio conversion is also available. Convert files between audio formats with our <mark>Audio Converter</mark>, whether you need MP3 for music players or WAV for high-quality sound. The <mark>Audio Cutter & Joiner</mark> allows you to trim songs or podcasts and merge audio tracks together, which is handy for editing without installing special software.</p>
-    <p>We even provide AI-powered utilities. Our <mark>Text to Speech (AI Voice Generator)</mark> tool generates natural-sounding speech from written text. It supports multiple languages and voice options, so you can produce spoken audio or narrations instantly. Conversely, the <mark>Speech to Text (Audio Transcription)</mark> tool transcribes spoken audio into text, leveraging AI to recognize speech patterns. This is useful for converting lectures, interviews, or voice notes into editable text documents quickly.</p>
-    <p>For situations where you have mixed file types or you’re not sure which tool to use, the <mark>All-in-One File Converter</mark> brings everything together. It can convert documents, images, audio, and video all from one interface. Simply upload your file, and our smart tool will detect the file type and show relevant conversion options. It’s a universal solution when you need multiple conversion paths without navigating away.</p>
-    <p>Overall, <strong>I Like PDF Tools</strong> offers a comprehensive online toolkit for individuals and businesses alike. Whether you need to manage PDF workflows, edit documents, or handle multimedia files, our tools are ready to assist. Because the website is fully responsive:contentReference[oaicite:11]{index=11}, you can use it on any device: desktop, tablet, or mobile. The modern, professional color scheme (dark blues and red with gold accents) provides a premium feel. All functionalities are implemented with clean, semantic HTML and CSS, which not only ensures good accessibility but also helps search engines crawl the content effectively:contentReference[oaicite:12]{index=12}. The content above is deliberately rich in relevant terms (e.g. *PDF converter*, *merge PDF*, *compress PDF*, *video converter*, *text to speech*) to match users’ search queries, aligning with SEO best practices:contentReference[oaicite:13]{index=13}:contentReference[oaicite:14]{index=14}.</p>
-    <p>Enjoy the convenience of our online tools: no installations or accounts required. Simply choose a tool, upload your file, and perform the task you need. Each tool is explained clearly with instructions, and we ensure fast, secure processing. If you ever need assistance, feel free to contact us. Thank you for choosing I Like PDF Tools as your go-to online utility suite!</p>
-  </section>
-  <!-- Contact Section -->
-  <section id="contact">
-    <h2>Contact Us</h2>
-    <p>Have questions or need support? Reach out to our team:</p>
-    <p>Email: <a href="mailto:helpilikepdftools@gmail.com">helpilikepdftools@gmail.com</a></p>
-    <p style="font-size:0.9rem;">&copy; 2025 I Like PDF Tools. All rights reserved.</p>
-  </section>
+
+  <main id="mainContent"></main>
+
   <script>
-    // JavaScript for theme toggle and search filtering
+    const categories = [
+      {
+        title: "🔄 PDF Conversion",
+        tools: [
+          { name: "PDF → Word (DOCX)", description: "Convert PDFs into editable Word documents", link: "pdf-to-word.html" },
+          { name: "PDF → Excel (XLSX)", description: "Convert tables to spreadsheets", link: "pdf-to-excel.html" },
+          { name: "PDF → PowerPoint (PPTX)", description: "Turn PDFs into presentations", link: "pdf-to-ppt.html" },
+          { name: "PDF → JPG/PNG", description: "Export each page as an image", link: "pdf-to-image.html" },
+          { name: "Word → PDF", description: "Preserve formatting while saving Word docs as PDF", link: "word-to-pdf.html" },
+          { name: "Excel → PDF", description: "Save spreadsheets as PDFs", link: "excel-to-pdf.html" },
+          { name: "PowerPoint → PDF", description: "Convert slides to PDF", link: "ppt-to-pdf.html" },
+          { name: "TXT → PDF", description: "Convert plain text files into PDF", link: "txt-to-pdf.html" },
+          { name: "Image (JPG/PNG) → PDF", description: "Convert images into a single PDF", link: "image-to-pdf.html" }
+        ]
+      },
+      {
+        title: "✂️ PDF Editing",
+        tools: [
+          { name: "Merge PDFs", description: "Combine multiple PDFs into one", link: "merge-pdf.html" },
+          { name: "Split PDF", description: "Extract or split specific pages from a PDF", link: "split-pdf.html" },
+          { name: "Delete PDF Pages", description: "Remove unwanted pages from a file", link: "delete-pages.html" },
+          { name: "Rotate PDF Pages", description: "Rotate single or multiple pages", link: "rotate-pdf.html" },
+          { name: "Rearrange PDF Pages", description: "Drag & drop to reorder pages", link: "rearrange-pdf.html" },
+          { name: "Extract Images from PDF", description: "Pull out all embedded images", link: "extract-images.html" },
+          { name: "Add Watermark to PDF", description: "Insert custom text or image watermarks", link: "add-watermark.html" },
+          { name: "Add Signature to PDF", description: "Draw, upload, or type digital signatures", link: "add-signature.html" }
+        ]
+      },
+      {
+        title: "🔐 PDF Security",
+        tools: [
+          { name: "Protect PDF (Password Lock)", description: "Add password encryption", link: "protect-pdf.html" },
+          { name: "Unlock PDF (Remove Password)", description: "Remove password restrictions", link: "unlock-pdf.html" }
+        ]
+      },
+      {
+        title: "📉 PDF Compression",
+        tools: [
+          { name: "Compress PDF", description: "Reduce file size without losing quality", link: "compress-pdf.html" }
+        ]
+      },
+      {
+        title: "🖼️ Image Tools",
+        tools: [
+          { name: "Image Converter", description: "JPG ↔ PNG ↔ WEBP ↔ GIF, etc.", link: "image-converter.html" },
+          { name: "Image Background Remover", description: "AI-based background removal", link: "background-remover.html" },
+          { name: "Image Compressor", description: "Reduce image size", link: "image-compressor.html" }
+        ]
+      },
+      {
+        title: "🎥 Video Tools",
+        tools: [
+          { name: "Video Converter", description: "MP4 ↔ AVI ↔ MOV, etc.", link: "video-converter.html" },
+          { name: "Video to GIF Maker", description: "Create GIFs from videos", link: "video-to-gif.html" },
+          { name: "Video Compressor", description: "Reduce video file size", link: "video-compressor.html" }
+        ]
+      },
+      {
+        title: "🎵 Audio Tools",
+        tools: [
+          { name: "Audio Converter", description: "MP3 ↔ WAV ↔ OGG, etc.", link: "audio-converter.html" },
+          { name: "Audio Cutter & Joiner", description: "Cut and merge audio files", link: "audio-cutter.html" }
+        ]
+      },
+      {
+        title: "🗣️ AI Tools",
+        tools: [
+          { name: "Text to Speech", description: "AI Voice Generator", link: "text-to-speech.html" },
+          { name: "Speech to Text", description: "Audio Transcription", link: "speech-to-text.html" }
+        ]
+      },
+      {
+        title: "🔄 Universal Converter",
+        tools: [
+          { name: "All-in-One File Converter", description: "Docs / Images / Audio / Video", link: "universal-converter.html" }
+        ]
+      }
+    ];
+
+    // Render categories + tools
+    function renderCategories(filteredCategories = categories) {
+      const mainContent = document.getElementById('mainContent');
+      mainContent.innerHTML = '';
+
+      filteredCategories.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category';
+
+        let toolsHTML = '<div id="toolsContainer">';
+        category.tools.forEach(tool => {
+          toolsHTML += `
+            <div class="tool-card">
+              <h3>${tool.name}</h3>
+              <p>${tool.description}</p>
+              <a href="${tool.link}" class="tool-btn">Use Tool</a>
+            </div>
+          `;
+        });
+        toolsHTML += '</div>';
+
+        categoryDiv.innerHTML = `
+          <h2>${category.title}</h2>
+          ${toolsHTML}
+        `;
+        mainContent.appendChild(categoryDiv);
+      });
+    }
+
+    // Search function
     document.addEventListener('DOMContentLoaded', () => {
-      const toggleBtn = document.getElementById('themeToggle');
-      const searchBox = document.getElementById('searchBox');
-      const cards = document.querySelectorAll('.tool-card');
+      renderCategories();
 
-      // Theme toggle: adds/removes 'light-mode' class
-      toggleBtn.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-      });
+      document.getElementById('toolSearch').addEventListener('input', e => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = categories.map(cat => ({
+          ...cat,
+          tools: cat.tools.filter(
+            tool => tool.name.toLowerCase().includes(searchTerm) ||
+                    tool.description.toLowerCase().includes(searchTerm)
+          )
+        })).filter(cat => cat.tools.length > 0);
 
-      // Search filter function
-      searchBox.addEventListener('input', () => {
-        const query = searchBox.value.toLowerCase();
-        cards.forEach(card => {
-          const text = card.textContent.toLowerCase();
-          if (text.includes(query)) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-
-      // Tool button click alerts (placeholder for actual navigation)
-      const buttons = document.querySelectorAll('.tool-card button');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const toolName = btn.getAttribute('data-tool-name');
-          alert('Redirecting to ' + toolName + ' tool.');
-        });
+        renderCategories(filtered);
       });
     });
   </script>
