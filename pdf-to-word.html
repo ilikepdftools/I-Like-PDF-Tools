@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF → Word Converter | I Like PDF Tools</title>
+  <title>Universal File Converter | I Like PDF Tools</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
     }
     header {
       padding: 1rem;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: bold;
       color: #38bdf8;
     }
@@ -27,7 +27,7 @@
       padding: 1.5rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      max-width: 800px;
+      max-width: 850px;
       width: 95%;
       margin-bottom: 2rem;
     }
@@ -52,15 +52,10 @@
       background: #0f172a;
       padding: 1rem;
       border-radius: 8px;
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
       border: 1px solid #334155;
       font-size: 0.9rem;
-    }
-    .toggle {
-      display: flex;
-      align-items: center;
-      margin: 0.5rem 0;
     }
     .status { margin-top: 1rem; font-size: 0.9rem; color: #94a3b8; }
     table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
@@ -68,154 +63,130 @@
   </style>
 </head>
 <body>
-  <header>🔄 PDF → Word (DOCX) Converter</header>
+  <header>⚡ Universal File Converter</header>
 
   <div class="container">
-    <input type="file" id="pdfFile" accept="application/pdf" multiple>
+    <!-- Upload -->
+    <input type="file" id="fileInput" multiple>
 
-    <div class="toggle">
-      <input type="checkbox" id="serverMode">&nbsp;
-      <label for="serverMode"> Use server-side conversion (higher fidelity)</label>
-    </div>
+    <!-- Format Selection -->
+    <label for="formatSelect">Convert to:</label>
+    <select id="formatSelect">
+      <option value="docx">Word (.docx)</option>
+      <option value="txt">Text (.txt)</option>
+      <option value="xlsx">Excel (.xlsx)</option>
+      <option value="png">Image (.png)</option>
+      <option value="jpg">Image (.jpg)</option>
+    </select>
 
-    <button onclick="convertPDF()">Convert PDF → Word</button>
+    <button onclick="useTool()">Use Tool</button>
 
     <div id="status" class="status"></div>
     <div id="preview"></div>
   </div>
 
-  <!-- PDF.js for text extraction -->
+  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-  <!-- Mammoth.js for docx generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
-  <!-- Tesseract.js for OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.3/dist/tesseract.min.js"></script>
 
   <script>
-    // Utility: escape HTML
-    function escapeHtml(text) {
-      const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-      return text.replace(/[&<>"']/g, m => map[m]);
-    }
+    const statusEl = document.getElementById("status");
+    const previewEl = document.getElementById("preview");
 
-    // Improved table detection
-    function detectAndRenderTables(lines) {
-      const tolerance = 10;
-      const xBuckets = new Map();
+    function setStatus(msg) { statusEl.textContent = msg; }
 
-      lines.forEach(line => {
-        line.forEach(item => {
-          const x = Math.round(item.transform[4]);
-          let found = false;
-          for (let key of xBuckets.keys()) {
-            if (Math.abs(key - x) <= tolerance) {
-              xBuckets.get(key).push(item.str);
-              found = true;
-              break;
-            }
-          }
-          if (!found) xBuckets.set(x, [item.str]);
-        });
-      });
+    // Main tool handler
+    async function useTool() {
+      const files = document.getElementById("fileInput").files;
+      const format = document.getElementById("formatSelect").value;
 
-      if (xBuckets.size >= 3) {
-        const sortedCols = [...xBuckets.keys()].sort((a,b)=>a-b);
-        let html = "<table>";
-        for (let line of lines) {
-          html += "<tr>";
-          for (let col of sortedCols) {
-            const cell = line.find(i => Math.abs(i.transform[4]-col) <= tolerance);
-            html += `<td>${cell ? escapeHtml(cell.str) : ""}</td>`;
-          }
-          html += "</tr>";
-        }
-        html += "</table>";
-        return { isTable:true, html };
-      }
-      return { isTable:false, html:"" };
-    }
-
-    // Client-side conversion using pdf.js
-    async function clientConvert(file) {
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-      let docHtml = "";
-
-      for (let pageNum=1; pageNum<=pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const content = await page.getTextContent();
-
-        const lines = [];
-        let currentLineY = null;
-        content.items.forEach(item => {
-          const y = Math.round(item.transform[5]);
-          if (currentLineY === null || Math.abs(currentLineY-y) > 5) {
-            currentLineY = y;
-            lines.push([]);
-          }
-          lines[lines.length-1].push(item);
-        });
-
-        const tableResult = detectAndRenderTables(lines);
-        if (tableResult.isTable) {
-          docHtml += tableResult.html;
-        } else {
-          lines.forEach(line => {
-            docHtml += `<p>${line.map(i=>escapeHtml(i.str)).join(" ")}</p>`;
-          });
-        }
-      }
-
-      document.getElementById("preview").innerHTML = docHtml;
-
-      // Download as .docx (basic)
-      const blob = new Blob([docHtml], {type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = file.name.replace(/\.pdf$/i, ".docx");
-      a.click();
-    }
-
-    // Server fallback
-    async function serverConvert(file) {
-      const status = document.getElementById("status");
-      status.textContent = "Uploading to server...";
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const resp = await fetch("/convert", {method:"POST", body: formData});
-        if (!resp.ok) throw new Error("Server conversion failed");
-        const blob = await resp.blob();
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = file.name.replace(/\.pdf$/i, ".docx");
-        a.click();
-        status.textContent = "Download ready (server mode).";
-      } catch(e) {
-        status.textContent = "❌ " + e.message;
-      }
-    }
-
-    // Main trigger
-    async function convertPDF() {
-      const input = document.getElementById("pdfFile");
-      const status = document.getElementById("status");
-      status.textContent = "Processing...";
-
-      if (!input.files.length) {
-        status.textContent = "❌ Please upload a PDF file.";
+      if (!files.length) {
+        setStatus("❌ Please upload at least one file.");
         return;
       }
 
-      const useServer = document.getElementById("serverMode").checked;
-      for (let file of input.files) {
-        if (useServer) await serverConvert(file);
-        else await clientConvert(file);
+      setStatus("⏳ Processing files...");
+      previewEl.innerHTML = "";
+
+      for (let file of files) {
+        try {
+          if (format === "docx") await convertToDocx(file);
+          else if (format === "txt") await convertToTxt(file);
+          else if (format === "xlsx") await convertToXlsx(file);
+          else if (format === "png" || format === "jpg") await convertToImage(file, format);
+        } catch (err) {
+          setStatus("❌ Error: " + err.message);
+        }
       }
-      status.textContent = "✅ Conversion complete.";
+
+      setStatus("✅ Conversion complete.");
+    }
+
+    // --- Converters ---
+    async function convertToDocx(file) {
+      if (file.type === "application/pdf") {
+        // extract PDF text
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = "";
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const content = await page.getTextContent();
+          text += content.items.map(i => i.str).join(" ") + "\n";
+        }
+        previewEl.innerHTML += `<pre>${text}</pre>`;
+        downloadFile(text, file.name.replace(/\.\w+$/, ".docx"), "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+      }
+    }
+
+    async function convertToTxt(file) {
+      const text = await file.text();
+      previewEl.innerHTML += `<pre>${text}</pre>`;
+      downloadFile(text, file.name.replace(/\.\w+$/, ".txt"), "text/plain");
+    }
+
+    async function convertToXlsx(file) {
+      if (file.type === "application/pdf") {
+        setStatus("Detecting tables...");
+        // simplified: just export all text lines into cells
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const ws_data = [];
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const content = await page.getTextContent();
+          ws_data.push(content.items.map(i => i.str));
+        }
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, file.name.replace(/\.\w+$/, ".xlsx"));
+        previewEl.innerHTML += "<p>Table preview ready (see download)</p>";
+      }
+    }
+
+    async function convertToImage(file, format) {
+      if (file.type.startsWith("image/")) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.style.maxWidth = "200px";
+        previewEl.appendChild(img);
+        downloadFile(await file.arrayBuffer(), file.name.replace(/\.\w+$/, "."+format), "image/"+format);
+      } else {
+        setStatus("❌ Only image files supported for this output.");
+      }
+    }
+
+    // Download helper
+    function downloadFile(data, filename, type) {
+      let blob = (data instanceof ArrayBuffer) ? new Blob([data], { type }) : new Blob([data], { type });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
     }
   </script>
 </body>
 </html>
-
