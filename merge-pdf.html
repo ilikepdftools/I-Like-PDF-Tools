@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge PDFs | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input[type=file],button{padding:8px;margin:6px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;max-height:200px;overflow-x:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start}
+.preview-item{position:relative;width:80px;height:100px;border:1px solid #334155;border-radius:8px;overflow:hidden;cursor:move;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:2px;font-size:0.75rem;text-align:center}
+.merged-preview{margin-top:8px;display:flex;gap:6px;overflow-x:auto;padding:6px;background:#1e293b;border-radius:8px;flex-wrap:wrap;max-height:220px}
+.merged-preview canvas{border:1px solid #334155;border-radius:4px}
+.dragging{opacity:0.5;border:2px dashed var(--accent)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+</style>
+</head>
+<body>
+
+<header>🔗 Merge PDFs Online</header>
+
+<div class="card">
+  <div class="controls">
+    <input type="file" id="fileInput" accept="application/pdf" multiple>
+    <button id="mergeBtn">Merge PDFs</button>
+  </div>
+
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div id="preview"></div>
+  <div class="merged-preview" id="mergedPreview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const mergedPreview = document.getElementById('mergedPreview');
+const mergeBtn = document.getElementById('mergeBtn');
+const statusEl = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+
+let pdfFiles = [];
+
+// Display uploaded PDFs with draggable previews
+fileInput.addEventListener('change', e => {
+  pdfFiles = [];
+  preview.innerHTML = '';
+  const files = Array.from(e.target.files);
+  files.forEach((file,i)=>{
+    if(file.type!=="application/pdf") return;
+    const div = document.createElement('div');
+    div.className='preview-item';
+    div.draggable=true;
+    div.dataset.index=i;
+    div.textContent=file.name;
+    preview.appendChild(div);
+    pdfFiles.push(file);
+  });
+});
+
+// Drag-and-drop reorder
+let dragSrcEl = null;
+preview.addEventListener('dragstart', e=>{
+  dragSrcEl = e.target;
+  e.target.classList.add('dragging');
+});
+preview.addEventListener('dragend', e=>{
+  e.target.classList.remove('dragging');
+});
+preview.addEventListener('dragover', e=>{
+  e.preventDefault();
+  const target = e.target.closest('.preview-item');
+  if(target && target!==dragSrcEl){
+    const rect = target.getBoundingClientRect();
+    const next = (e.clientY - rect.top)/(rect.bottom - rect.top) >0.5;
+    preview.insertBefore(dragSrcEl,next?target.nextSibling:target);
+  }
+});
+
+// Merge PDFs and show merged page thumbnails
+mergeBtn.addEventListener('click', async ()=>{
+  if(!pdfFiles.length){alert('No PDF files selected'); return;}
+  statusEl.textContent='Merging PDFs...';
+  progressBar.style.width='0%';
+  mergedPreview.innerHTML='';
+
+  try {
+    const mergedPdf = await PDFLib.PDFDocument.create();
+    const items = Array.from(preview.children);
+    for(let i=0;i<items.length;i++){
+      const idx = items[i].dataset.index;
+      const file = pdfFiles[idx];
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+      const copiedPages = await mergedPdf.copyPages(pdf,pdf.getPageIndices());
+      copiedPages.forEach(page=>mergedPdf.addPage(page));
+      progressBar.style.width=Math.round(((i+1)/items.length)*100)+'%';
+    }
+
+    // Save merged PDF as Blob for download & preview
+    const mergedBytes = await mergedPdf.save();
+    const blob = new Blob([mergedBytes],{type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+
+    // Show page thumbnails using PDF.js
+    const pdfDoc = await pdfjsLib.getDocument({data:mergedBytes}).promise;
+    const numPages = pdfDoc.numPages;
+    for(let i=1;i<=numPages;i++){
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({scale:0.2});
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      await page.render({canvasContext:ctx, viewport}).promise;
+      mergedPreview.appendChild(canvas);
+    }
+
+    // Trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download='merged.pdf';
+    a.click();
+    statusEl.textContent=`✅ Merge complete (${numPages} pages)`;
+  } catch(err){
+    console.error(err);
+    statusEl.textContent='❌ Error during merge: '+err.message;
+  }
+});
+</script>
+
+</body>
+</html>
