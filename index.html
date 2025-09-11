@@ -108,6 +108,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -148,7 +150,7 @@
         }
 
         .search-container {
-            flex: 1;
+            flex: 1 1 360px;
             max-width: 500px;
             margin: 0 20px;
             position: relative;
@@ -161,7 +163,7 @@
 
         .search-input {
             width: 100%;
-            padding: 14px 50px 14px 20px;
+            padding: 12px 45px 12px 18px;
             border: none;
             border-radius: 30px;
             background: rgba(255, 255, 255, 0.1);
@@ -526,7 +528,7 @@
             text-align: justify;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .article-content {
                 column-count: 1;
             }
@@ -798,8 +800,9 @@
             
             .search-container {
                 order: 3;
+                flex: 1 1 100%;
                 max-width: 100%;
-                margin: 15px 0 0;
+                margin-top: 10px;
             }
             
             .nav-toggle {
