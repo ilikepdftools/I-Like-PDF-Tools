@@ -67,7 +67,7 @@
         }
 
         .section {
-            padding: 60px 0;
+            padding: 40px 0;
         }
 
         .text-center {
@@ -127,7 +127,7 @@
         }
 
         .logo h1 {
-            font-size: 24px;
+            font-size: 20px;
             margin: 0;
             background: linear-gradient(45deg, var(--gold), var(--dark-gold));
             -webkit-background-clip: text;
@@ -279,12 +279,13 @@
 
         .sidebar-menu li {
             margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
+            padding: 15px;
             color: var(--light-gray);
             border-radius: 5px;
             transition: var(--transition);
@@ -299,6 +300,7 @@
             margin-right: 10px;
             width: 20px;
             text-align: center;
+            font-size: 18px;
         }
 
         .sidebar-overlay {
@@ -322,7 +324,7 @@
         /* Hero Section */
         .hero {
             background: linear-gradient(135deg, var(--deep-red) 0%, var(--dark-blue) 100%);
-            padding: 100px 0;
+            padding: 80px 0;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -340,17 +342,18 @@
         }
 
         .hero h2 {
-            font-size: 3rem;
+            font-size: 2.2rem;
             margin-bottom: 20px;
             color: var(--white);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1rem;
             max-width: 800px;
             margin: 0 auto 30px;
             color: var(--light-gray);
+            padding: 0 15px;
         }
 
         .hero-buttons {
@@ -367,7 +370,7 @@
 
         .section-title {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
         }
 
@@ -386,11 +389,11 @@
             justify-content: center;
             flex-wrap: wrap;
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .filter-btn {
-            padding: 10px 24px;
+            padding: 10px 20px;
             background: var(--dark-grayish-red);
             color: var(--light-gray);
             border: none;
@@ -398,6 +401,7 @@
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
+            font-size: 14px;
         }
 
         .filter-btn.active, .filter-btn:hover {
@@ -407,14 +411,14 @@
 
         .tools-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .tool-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
             transition: var(--transition);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -442,7 +446,7 @@
         }
 
         .tool-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             box-shadow: 0 12px 25px var(--shadow);
             background: var(--card-hover-bg);
             color: var(--card-hover-text);
@@ -454,21 +458,21 @@
         }
 
         .tool-card i {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 15px;
             color: var(--gold);
         }
 
         .tool-card h3 {
-            font-size: 20px;
-            margin-bottom: 12px;
+            font-size: 18px;
+            margin-bottom: 10px;
             color: var(--light-gray);
         }
 
         .tool-card p {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--light-gray);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             flex-grow: 1;
         }
 
@@ -477,317 +481,11 @@
             background: var(--gold);
             color: var(--dark-blue);
             font-weight: 500;
+            padding: 10px;
         }
 
         .tool-card .btn:hover {
             background: var(--dark-gold);
-        }
-
-        /* About Section */
-        .about-section {
-            background: var(--dark-blue);
-        }
-
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 40px;
-        }
-
-        .about-text h2 {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-        }
-
-        .feature-list {
-            margin-top: 20px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .feature-item i {
-            color: var(--gold);
-            margin-right: 12px;
-            font-size: 20px;
-        }
-
-        /* Article Section */
-        .article-section {
-            background: var(--section-bg);
-        }
-
-        .article-content {
-            column-count: 2;
-            column-gap: 40px;
-            text-align: justify;
-        }
-
-        @media (max-width: 768px) {
-            .article-content {
-                column-count: 1;
-            }
-        }
-
-        .article-content p {
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
-
-        .highlight {
-            background: rgba(255, 215, 0, 0.1);
-            color: var(--gold);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        /* FAQ Section */
-        .faq-section {
-            background: var(--dark-blue);
-        }
-
-        .faq-container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .faq-item {
-            background: var(--card-bg);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .faq-question {
-            padding: 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 500;
-        }
-
-        .faq-answer {
-            padding: 0 20px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .faq-answer.active {
-            padding: 0 20px 20px;
-            max-height: 500px;
-        }
-
-        /* Contact Section */
-        .contact-section {
-            background: var(--section-bg);
-        }
-
-        .contact-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        @media (max-width: 992px) {
-            .contact-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .contact-item i {
-            width: 45px;
-            height: 45px;
-            background: var(--gold);
-            color: var(--dark-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .contact-form {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light-gray);
-            transition: var(--transition);
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 0 2px var(--gold);
-        }
-
-        .form-group textarea {
-            min-height: 140px;
-            resize: vertical;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--deep-red);
-            padding: 50px 0 20px;
-        }
-
-        .footer-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-        }
-
-        @media (max-width: 992px) {
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 576px) {
-            .footer-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .footer-col h4 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: var(--gold);
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-col h4::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 30px;
-            height: 3px;
-            background: var(--gold);
-            border-radius: 2px;
-        }
-
-        .footer-col ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-col ul li a {
-            color: var(--light-gray);
-            transition: var(--transition);
-        }
-
-        .footer-col ul li a:hover {
-            color: var(--gold);
-            padding-left: 5px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        .social-links a:hover {
-            background: var(--gold);
-            color: var(--dark-blue);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            padding: 15px 0;
-            background: rgba(255, 255, 255, 0.03);
-            margin-bottom: 30px;
-        }
-
-        .breadcrumb-container {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .breadcrumb-item {
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-        }
-
-        .breadcrumb-item:not(:last-child)::after {
-            content: '/';
-            margin: 0 10px;
-            color: var(--gold);
-        }
-
-        .breadcrumb-item a {
-            color: var(--light-gray);
-        }
-
-        .breadcrumb-item a:hover {
-            color: var(--gold);
         }
 
         /* Mobile Navigation Enhancements */
@@ -816,6 +514,7 @@
             color: var(--light-gray);
             font-size: 12px;
             padding: 5px 10px;
+            transition: var(--transition);
         }
 
         .mobile-nav-item i {
@@ -823,7 +522,7 @@
             margin-bottom: 4px;
         }
 
-        .mobile-nav-item.active {
+        .mobile-nav-item.active, .mobile-nav-item:hover {
             color: var(--gold);
         }
 
@@ -860,7 +559,7 @@
 
         .mobile-tool-card {
             flex: 0 0 auto;
-            width: 280px;
+            width: 250px;
             background: var(--card-bg);
             border-radius: 12px;
             padding: 20px;
@@ -870,13 +569,13 @@
         }
 
         .mobile-tool-card i {
-            font-size: 36px;
+            font-size: 32px;
             color: var(--gold);
             margin-bottom: 15px;
         }
 
         .mobile-tool-card h3 {
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 10px;
             color: var(--light-gray);
         }
@@ -897,6 +596,10 @@
         @media (max-width: 768px) {
             .header-container {
                 flex-wrap: wrap;
+            }
+            
+            .logo h1 {
+                font-size: 18px;
             }
             
             .search-container {
@@ -932,16 +635,15 @@
             }
             
             .hero {
-                padding: 80px 0;
+                padding: 60px 0;
             }
             
             .hero h2 {
-                font-size: 2.2rem;
+                font-size: 1.8rem;
             }
             
             .hero p {
-                font-size: 1rem;
-                padding: 0 15px;
+                font-size: 0.9rem;
             }
             
             .hero-buttons {
@@ -968,11 +670,11 @@
             }
             
             .section {
-                padding: 40px 0;
+                padding: 30px 0;
             }
             
             .section-title h2 {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
             }
             
             .mobile-nav-bottom {
@@ -981,20 +683,6 @@
             
             .mobile-top-tools {
                 display: block;
-            }
-            
-            .contact-item {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .contact-item i {
-                margin-bottom: 10px;
-            }
-            
-            .form-group input, 
-            .form-group textarea {
-                padding: 16px; /* Larger touch targets */
             }
             
             .sidebar {
@@ -1006,15 +694,27 @@
                 overflow-x: auto;
                 white-space: nowrap;
             }
+            
+            /* Improve mobile forms */
+            .form-group input, 
+            .form-group textarea {
+                padding: 16px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            /* Adjust section spacing for mobile */
+            .about-content, .contact-container, .footer-container {
+                gap: 25px;
+            }
         }
 
         @media (max-width: 480px) {
             .logo h1 {
-                font-size: 20px;
+                font-size: 16px;
             }
             
             .hero h2 {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
             }
             
             .footer-container {
@@ -1034,13 +734,23 @@
             }
             
             .mobile-tool-card {
-                width: 250px;
+                width: 220px;
+                padding: 15px;
+            }
+            
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+            
+            .hero-buttons .btn {
+                font-size: 14px;
+                padding: 12px;
             }
         }
 
         /* SEO Improvements */
         .seo-text {
-            margin: 30px 0;
+            margin: 25px 0;
             padding: 20px;
             background: var(--card-bg);
             border-radius: 8px;
@@ -1049,21 +759,22 @@
         .seo-text h3 {
             color: var(--gold);
             margin-bottom: 15px;
+            font-size: 1.4rem;
         }
         
         .seo-keywords {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 8px;
+            margin: 15px 0;
         }
         
         .seo-keyword {
             background: rgba(255, 215, 0, 0.1);
             color: var(--gold);
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -1144,21 +855,6 @@
                 <i class="fas fa-bars"></i>
                 <span>Menu</span>
             </a>
-        </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <div class="container breadcrumb-container">
-            <div class="breadcrumb-item">
-                <a href="#">Home</a>
-            </div>
-            <div class="breadcrumb-item">
-                <a href="#all-tools">Tools</a>
-            </div>
-            <div class="breadcrumb-item">
-                <span>All PDF Tools</span>
-            </div>
         </div>
     </div>
 
@@ -1326,187 +1022,6 @@
                     <p>Whether you're a student, professional, or occasional user, our tools are designed to make your document workflow seamless and efficient. From simple conversions to advanced editing features, we've got you covered.</p>
                     
                     <a href="#contact" class="btn">Get In Touch</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Article Section -->
-    <section class="section article-section" id="article">
-        <div class="container">
-            <div class="section-title">
-                <h2>The Complete Guide to PDF Tools and Conversions</h2>
-                <p>Everything you need to know about PDF tools and file conversions</p>
-            </div>
-            
-            <div class="article-content">
-                <p>In today's digital world, <span class="highlight">PDF tools</span> have become essential for professionals, students, and everyday computer users. The Portable Document Format (PDF) remains the standard for sharing documents while preserving their formatting across different devices and platforms. However, working with PDFs often requires specialized tools for editing, conversion, and manipulation.</p>
-                
-                <p>Our comprehensive suite of <span class="highlight">PDF conversion tools</span> allows you to transform your documents between various formats. With <span class="highlight">PDF to Word conversion</span>, you can easily extract text from PDF files and make edits in Microsoft Word. This is particularly useful for contracts, reports, and other documents that need occasional updates. Similarly, our <span class="highlight">PDF to Excel tool</span> helps you extract tables from PDFs and convert them into editable spreadsheets, saving you from the tedious task of manual data entry.</p>
-                
-                <p>For presentations and visual content, <span class="highlight">PDF to PowerPoint conversion</span> enables you to transform your PDF slides into editable presentation files. This is invaluable when you need to update or repurpose existing presentation materials. Additionally, our <span class="highlight">PDF to JPG/PNG tool</span> lets you export each page of your PDF as a high-quality image, perfect for sharing specific pages on social media or embedding in websites.</p>
-                
-                <p>Creating PDFs from other formats is just as important. Our <span class="highlight">Word to PDF conversion</span> tool preserves your document formatting while converting it to the universal PDF format. The <span class="highlight">Excel to PDF</span> and <span class="highlight">PowerPoint to PDF</span> converters ensure your spreadsheets and presentations look exactly as intended when shared with others. For simpler text documents, the <span class="highlight">TXT to PDF tool</span> creates properly formatted PDFs from plain text files.</p>
-                
-                <p>Beyond conversion, our <span class="highlight">PDF editing tools</span> provide comprehensive functionality for manipulating PDF documents. The <span class="highlight">Merge PDFs tool</span> allows you to combine multiple documents into a single file, perfect for compiling reports or combining chapters of a book. Conversely, the <span class="highlight">Split PDF tool</span> lets you extract specific pages or separate a large document into smaller files.</p>
-                
-                <p>Sometimes you need to remove unnecessary content from your documents, and that's where our <span class="highlight">Delete PDF Pages tool</span> comes in handy. For documents that were scanned incorrectly or need reorientation, the <span class="highlight">Rotate PDF Pages tool</span> allows you to correct page orientations in just a few clicks. When you need to reorganize your document, the <span class="highlight">Rearrange PDF Pages tool</span> provides an intuitive drag-and-drop interface for changing page order.</p>
-                
-                <p>PDFs often contain valuable images that you might want to use elsewhere. Our <span class="highlight">Extract Images from PDF tool</span> identifies and extracts all embedded images in high quality. To add professional touches to your documents, the <span class="highlight">Add Watermark to PDF tool</span> lets you insert text or image watermarks, while the <span class="highlight">Add Signature to PDF tool</span> provides multiple options for signing documents digitally.</p>
-                
-                <p>Document security is crucial in the digital age. Our <span class="highlight">Protect PDF tool</span> allows you to add password encryption and permissions to sensitive documents, preventing unauthorized access. If you've received a protected document that you need to edit, the <span class="highlight">Unlock PDF tool</span> can remove password restrictions (when you have the proper authorization).</p>
-                
-                <p>Large PDF files can be difficult to share via email or messaging apps. Our <span class="highlight">Compress PDF tool</span> reduces file size without significant quality loss, making sharing easier and faster. The compression algorithm smartly balances file size and quality based on your needs.</p>
-                
-                <p>Beyond PDF tools, we offer a comprehensive set of media conversion tools. Our <span class="highlight">Image Converter</span> supports all major formats including JPG, PNG, WEBP, and GIF. The <span class="highlight">Image Background Remover</span> uses advanced AI technology to isolate subjects from their backgrounds, creating professional-looking transparent images. For optimizing web content, the <span class="highlight">Image Compressor</span> reduces file sizes while maintaining visual quality.</p>
-                
-                <p>Video content continues to grow in importance, and our video tools help you work with various formats. The <span class="highlight">Video Converter</span> transforms files between MP4, AVI, MOV, and other popular formats. For creating engaging social media content, the <span class="highlight">Video to GIF Maker</span> converts video clips into animated GIFs. When file size is a concern, the <span class="highlight">Video Compressor</span> reduces video sizes without significant quality loss.</p>
-                
-                <p>Audio tools round out our media conversion offerings. The <span class="highlight">Audio Converter</span> supports MP3, WAV, OGG, and other common audio formats. For editing audio files, the <span class="highlight">Audio Cutter & Joiner</span> lets you trim audio clips or combine multiple files into one. These tools are perfect for podcasters, musicians, and audio enthusiasts.</p>
-                
-                <p>Our AI-powered tools represent the cutting edge of digital technology. The <span class="highlight">Text to Speech tool</span> converts written text into natural-sounding audio using advanced AI voices, perfect for creating audio content or assisting those with reading difficulties. The <span class="highlight">Speech to Text tool</span> does the reverse, transcribing spoken audio into written text with impressive accuracy.</p>
-                
-                <p>For ultimate convenience, our <span class="highlight">All-in-One Converter</span> provides a unified interface for converting between various document, image, audio, and video formats. This versatile tool eliminates the need to switch between different converters for different file types.</p>
-                
-                <p>All our tools are designed with user experience in mind. They feature intuitive interfaces, fast processing speeds, and reliable results. We prioritize your privacy and security by processing files entirely in your browser when possible, or on secure servers that automatically delete your files after processing.</p>
-                
-                <p>Whether you're a student preparing assignments, a professional handling business documents, or someone who occasionally needs to work with digital files, I Like PDF Tools provides everything you need in one convenient location. Our platform is constantly evolving with new tools and improvements based on user feedback and technological advancements.</p>
-                
-                <p>Best of all, every tool on our platform is completely free to use, with no hidden fees, watermarks, or limitations. We believe that powerful digital tools should be accessible to everyone, regardless of budget or technical expertise. Try our tools today and experience the convenience of comprehensive file conversion and editing capabilities right in your web browser.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="section faq-section" id="faq">
-        <div class="container">
-            <div class="section-title">
-                <h2>Frequently Asked Questions</h2>
-                <p>Find answers to common questions about our PDF tools</p>
-            </div>
-            
-            <div class="faq-container">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Are these PDF tools really free to use?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, all our PDF tools are completely free to use. We don't charge any fees, and there are no hidden costs. You can use our tools as much as you want without any limitations.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Is my data secure when using your tools?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Absolutely. We take security seriously. All file processing happens on secure servers, and we automatically delete your files after processing. We don't store or access your files for any other purpose.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Do I need to create an account to use the tools?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>No, you don't need to create an account or register to use our tools. They are available for immediate use without any sign-up process.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What file formats do you support?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We support a wide range of file formats including PDF, DOCX, XLSX, PPTX, JPG, PNG, GIF, WEBP, MP4, AVI, MOV, MP3, WAV, and many more. Our all-in-one converter handles most common file types.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Is there a file size limit for uploads?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We don't impose strict file size limits for most tools. However, very large files may take longer to process. For optimal performance, we recommend files under 100MB for most tools.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="section contact-section" id="contact">
-        <div class="container">
-            <div class="section-title">
-                <h2>Get In Touch</h2>
-                <p>Have questions or need support? Reach out to our team</p>
-            </div>
-            
-            <div class="contact-container">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h4>Email Us</h4>
-                            <p>helpilikepdftools@gmail.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <h4>Response Time</h4>
-                            <p>We typically respond within 24 hours</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-info-circle"></i>
-                        <div>
-                            <h4>Support</h4>
-                            <p>Our support team is here to help you with any issues</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-lightbulb"></i>
-                        <div>
-                            <h4>Suggestions</h4>
-                            <p>We welcome feedback and tool suggestions</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="contact-form">
-                    <h3>Send us a Message</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Your Message</label>
-                            <textarea id="message" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn">Send Message</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -1887,54 +1402,6 @@
                 sidebarOverlay.classList.remove('active');
             });
             
-            // Setup FAQ toggle
-            const faqQuestions = document.querySelectorAll('.faq-question');
-            faqQuestions.forEach(question => {
-                question.addEventListener('click', function() {
-                    const answer = this.nextElementSibling;
-                    answer.classList.toggle('active');
-                    
-                    const icon = this.querySelector('i');
-                    if (answer.classList.contains('active')) {
-                        icon.className = 'fas fa-chevron-up';
-                    } else {
-                        icon.className = 'fas fa-chevron-down';
-                    }
-                });
-            });
-            
-            // Setup contact form
-            const contactForm = document.getElementById('contactForm');
-            if (contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    alert('Thank you for your message! We will get back to you soon.');
-                    contactForm.reset();
-                });
-            }
-            
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-                    
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 100,
-                            behavior: 'smooth'
-                        });
-                        
-                        // Close sidebar if open
-                        sidebar.classList.remove('active');
-                        sidebarOverlay.classList.remove('active');
-                    }
-                });
-            });
-            
             // Add touch events for mobile
             if ('ontouchstart' in window) {
                 // Make tool cards more touch-friendly
@@ -2002,14 +1469,6 @@
                 `;
                 container.appendChild(card);
             });
-        }
-
-        // Toggle sidebar function
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
         }
     </script>
 </body>
