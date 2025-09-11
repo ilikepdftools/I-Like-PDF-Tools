@@ -378,66 +378,6 @@
             background: var(--dark-gold);
         }
 
-        /* Category Sections */
-        .category-section {
-            margin-bottom: 40px;
-        }
-
-        .category-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--gold);
-        }
-
-        .category-header i {
-            font-size: 30px;
-            color: var(--gold);
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .tool-item {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: var(--transition);
-        }
-
-        .tool-item:hover {
-            background: var(--gold);
-            color: var(--dark-blue);
-            transform: translateX(5px);
-        }
-
-        .tool-item:hover h4 {
-            color: var(--dark-blue);
-        }
-
-        .tool-item i {
-            font-size: 24px;
-            color: var(--gold);
-        }
-
-        .tool-item:hover i {
-            color: var(--dark-blue);
-        }
-
-        .tool-item h4 {
-            font-size: 16px;
-            margin: 0;
-            color: var(--light-gray);
-        }
-
         /* About Section */
         .about-section {
             background: var(--dark-blue);
@@ -445,21 +385,8 @@
 
         .about-content {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 40px;
-            align-items: center;
-        }
-
-        .about-image {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .about-image img {
-            width: 100%;
-            height: auto;
-            display: block;
         }
 
         .about-text h2 {
@@ -483,9 +410,32 @@
             font-size: 18px;
         }
 
+        /* Article Section */
+        .article-section {
+            background: var(--section-bg);
+        }
+
+        .article-content {
+            column-count: 2;
+            column-gap: 40px;
+            text-align: justify;
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
         /* Contact Section */
         .contact-section {
-            background: var(--section-bg);
+            background: var(--dark-blue);
         }
 
         .contact-container {
@@ -627,8 +577,8 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .tools-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            .article-content {
+                column-count: 1;
             }
         }
 
@@ -669,10 +619,6 @@
                 grid-template-columns: 1fr;
             }
             
-            .tools-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .hero-buttons {
                 flex-direction: column;
             }
@@ -690,6 +636,7 @@
             <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
             <li><a href="#all-tools"><i class="fas fa-tools"></i> All Tools</a></li>
             <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="#article"><i class="fas fa-newspaper"></i> Article</a></li>
             <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
             <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
             <hr>
@@ -731,6 +678,7 @@
             <a href="#home" class="nav-item">Home</a>
             <a href="#all-tools" class="nav-item active">All Tools</a>
             <a href="#about" class="nav-item">About</a>
+            <a href="#article" class="nav-item">Article</a>
             <a href="#contact" class="nav-item">Contact</a>
             <a href="#pdf-conversion" class="nav-item">PDF Conversion</a>
             <a href="#pdf-editing" class="nav-item">PDF Editing</a>
@@ -776,260 +724,19 @@
         </div>
     </section>
 
-    <!-- PDF Conversion Tools -->
-    <section class="section category-section" id="pdf-conversion" style="background: var(--dark-blue);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-exchange-alt"></i>
-                <h2>PDF Conversion Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="pdf-to-word.html" class="tool-item">
-                    <i class="fas fa-file-word"></i>
-                    <h4>PDF to Word (DOCX)</h4>
-                </a>
-                <a href="pdf-to-excel.html" class="tool-item">
-                    <i class="fas fa-file-excel"></i>
-                    <h4>PDF to Excel (XLSX)</h4>
-                </a>
-                <a href="pdf-to-powerpoint.html" class="tool-item">
-                    <i class="fas fa-file-powerpoint"></i>
-                    <h4>PDF to PowerPoint (PPTX)</h4>
-                </a>
-                <a href="pdf-to-jpg.html" class="tool-item">
-                    <i class="fas fa-file-image"></i>
-                    <h4>PDF to JPG/PNG</h4>
-                </a>
-                <a href="word-to-pdf.html" class="tool-item">
-                    <i class="fas fa-file-pdf"></i>
-                    <h4>Word to PDF</h4>
-                </a>
-                <a href="excel-to-pdf.html" class="tool-item">
-                    <i class="fas fa-file-excel"></i>
-                    <h4>Excel to PDF</h4>
-                </a>
-                <a href="powerpoint-to-pdf.html" class="tool-item">
-                    <i class="fas fa-file-powerpoint"></i>
-                    <h4>PowerPoint to PDF</h4>
-                </a>
-                <a href="txt-to-pdf.html" class="tool-item">
-                    <i class="fas fa-file-alt"></i>
-                    <h4>TXT to PDF</h4>
-                </a>
-                <a href="image-to-pdf.html" class="tool-item">
-                    <i class="fas fa-image"></i>
-                    <h4>Image to PDF</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- PDF Editing Tools -->
-    <section class="section category-section" id="pdf-editing" style="background: var(--section-bg);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-edit"></i>
-                <h2>PDF Editing Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="merge-pdf.html" class="tool-item">
-                    <i class="fas fa-object-group"></i>
-                    <h4>Merge PDFs</h4>
-                </a>
-                <a href="split-pdf.html" class="tool-item">
-                    <i class="fas fa-scissors"></i>
-                    <h4>Split PDF</h4>
-                </a>
-                <a href="delete-pdf-pages.html" class="tool-item">
-                    <i class="fas fa-trash"></i>
-                    <h4>Delete PDF Pages</h4>
-                </a>
-                <a href="rotate-pdf-pages.html" class="tool-item">
-                    <i class="fas fa-sync-alt"></i>
-                    <h4>Rotate PDF Pages</h4>
-                </a>
-                <a href="rearrange-pdf-pages.html" class="tool-item">
-                    <i class="fas fa-arrows-alt"></i>
-                    <h4>Rearrange PDF Pages</h4>
-                </a>
-                <a href="extract-images-from-pdf.html" class="tool-item">
-                    <i class="fas fa-image"></i>
-                    <h4>Extract Images from PDF</h4>
-                </a>
-                <a href="add-watermark-to-pdf.html" class="tool-item">
-                    <i class="fas fa-tint"></i>
-                    <h4>Add Watermark to PDF</h4>
-                </a>
-                <a href="add-signature-to-pdf.html" class="tool-item">
-                    <i class="fas fa-signature"></i>
-                    <h4>Add Signature to PDF</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- PDF Security Tools -->
-    <section class="section category-section" id="pdf-security" style="background: var(--dark-blue);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-lock"></i>
-                <h2>PDF Security Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="protect-pdf.html" class="tool-item">
-                    <i class="fas fa-lock"></i>
-                    <h4>Protect PDF (Password Lock)</h4>
-                </a>
-                <a href="unlock-pdf.html" class="tool-item">
-                    <i class="fas fa-unlock"></i>
-                    <h4>Unlock PDF (Remove Password)</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- PDF Compression Tools -->
-    <section class="section category-section" id="pdf-compression" style="background: var(--section-bg);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-compress"></i>
-                <h2>PDF Compression Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="compress-pdf.html" class="tool-item">
-                    <i class="fas fa-compress"></i>
-                    <h4>Compress PDF</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Image Tools -->
-    <section class="section category-section" id="image-tools" style="background: var(--dark-blue);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-image"></i>
-                <h2>Image Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="image-converter.html" class="tool-item">
-                    <i class="fas fa-images"></i>
-                    <h4>Image Converter</h4>
-                </a>
-                <a href="background-remover.html" class="tool-item">
-                    <i class="fas fa-wand-magic-sparkles"></i>
-                    <h4>Background Remover (AI-based)</h4>
-                </a>
-                <a href="image-compressor.html" class="tool-item">
-                    <i class="fas fa-compress-arrows-alt"></i>
-                    <h4>Image Compressor</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Video Tools -->
-    <section class="section category-section" id="video-tools" style="background: var(--section-bg);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-video"></i>
-                <h2>Video Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="video-converter.html" class="tool-item">
-                    <i class="fas fa-video"></i>
-                    <h4>Video Converter</h4>
-                </a>
-                <a href="video-to-gif.html" class="tool-item">
-                    <i class="fas fa-film"></i>
-                    <h4>Video to GIF Maker</h4>
-                </a>
-                <a href="video-compressor.html" class="tool-item">
-                    <i class="fas fa-compress"></i>
-                    <h4>Video Compressor</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Audio Tools -->
-    <section class="section category-section" id="audio-tools" style="background: var(--dark-blue);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-music"></i>
-                <h2>Audio Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="audio-converter.html" class="tool-item">
-                    <i class="fas fa-music"></i>
-                    <h4>Audio Converter</h4>
-                </a>
-                <a href="audio-cutter-joiner.html" class="tool-item">
-                    <i class="fas fa-cut"></i>
-                    <h4>Audio Cutter & Joiner</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- AI Tools -->
-    <section class="section category-section" id="ai-tools" style="background: var(--section-bg);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-robot"></i>
-                <h2>AI Tools</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="text-to-speech.html" class="tool-item">
-                    <i class="fas fa-microphone"></i>
-                    <h4>Text to Speech (AI Voice Generator)</h4>
-                </a>
-                <a href="speech-to-text.html" class="tool-item">
-                    <i class="fas fa-keyboard"></i>
-                    <h4>Speech to Text (Audio Transcription)</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Universal Converter -->
-    <section class="section category-section" id="universal-converter" style="background: var(--dark-blue);">
-        <div class="container">
-            <div class="category-header">
-                <i class="fas fa-sync-alt"></i>
-                <h2>Universal Converter</h2>
-            </div>
-            
-            <div class="tools-grid">
-                <a href="all-in-one-converter.html" class="tool-item">
-                    <i class="fas fa-sync-alt"></i>
-                    <h4>All-in-One Converter (Docs/Images/Audio/Video)</h4>
-                </a>
-            </div>
-        </div>
-    </section>
-
     <!-- About Section -->
     <section class="section about-section" id="about">
         <div class="container">
             <h2 class="text-center">About I Like PDF Tools</h2>
             
             <div class="about-content">
-                <div class="about-image">
-                    <img src="https://placehold.co/600x400/3A3D5B/EAEAEA?text=PDF+Tools+Interface" alt="PDF Tools Interface">
-                </div>
-                
                 <div class="about-text">
                     <h3>Your Complete PDF Solution Platform</h3>
                     <p>I Like PDF Tools is a comprehensive online platform offering a wide range of file conversion and manipulation tools. Our mission is to provide users with reliable, fast, and completely free tools to handle their document needs without requiring expensive software or technical expertise.</p>
+                    
+                    <p>Founded in 2020, our platform has helped millions of users worldwide convert, edit, and manage their documents efficiently. We believe that everyone should have access to powerful PDF tools without the burden of subscriptions or complicated software installations.</p>
+                    
+                    <p>Our team of developers is constantly working to improve existing tools and add new features based on user feedback. We prioritize security and privacy, ensuring that all file processing happens securely and that files are deleted from our servers after processing.</p>
                     
                     <div class="feature-list">
                         <div class="feature-item">
@@ -1052,10 +759,63 @@
                             <i class="fas fa-check-circle"></i>
                             <span>Regular updates with new tools and features</span>
                         </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>No watermarks on processed files</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Fast processing with no file size limits</span>
+                        </div>
                     </div>
+                    
+                    <p>Whether you're a student, professional, or occasional user, our tools are designed to make your document workflow seamless and efficient. From simple conversions to advanced editing features, we've got you covered.</p>
                     
                     <a href="#contact" class="btn">Get In Touch</a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Article Section -->
+    <section class="section article-section" id="article">
+        <div class="container">
+            <h2 class="text-center">The Complete Guide to PDF Tools and Conversions</h2>
+            
+            <div class="article-content">
+                <p>In today's digital world, <span class="highlight">PDF tools</span> have become essential for professionals, students, and everyday computer users. The Portable Document Format (PDF) remains the standard for sharing documents while preserving their formatting across different devices and platforms. However, working with PDFs often requires specialized tools for editing, conversion, and manipulation.</p>
+                
+                <p>Our comprehensive suite of <span class="highlight">PDF conversion tools</span> allows you to transform your documents between various formats. With <span class="highlight">PDF to Word conversion</span>, you can easily extract text from PDF files and make edits in Microsoft Word. This is particularly useful for contracts, reports, and other documents that need occasional updates. Similarly, our <span class="highlight">PDF to Excel tool</span> helps you extract tables from PDFs and convert them into editable spreadsheets, saving you from the tedious task of manual data entry.</p>
+                
+                <p>For presentations and visual content, <span class="highlight">PDF to PowerPoint conversion</span> enables you to transform your PDF slides into editable presentation files. This is invaluable when you need to update or repurpose existing presentation materials. Additionally, our <span class="highlight">PDF to JPG/PNG tool</span> lets you export each page of your PDF as a high-quality image, perfect for sharing specific pages on social media or embedding in websites.</p>
+                
+                <p>Creating PDFs from other formats is just as important. Our <span class="highlight">Word to PDF conversion</span> tool preserves your document formatting while converting it to the universal PDF format. The <span class="highlight">Excel to PDF</span> and <span class="highlight">PowerPoint to PDF</span> converters ensure your spreadsheets and presentations look exactly as intended when shared with others. For simpler text documents, the <span class="highlight">TXT to PDF tool</span> creates properly formatted PDFs from plain text files.</p>
+                
+                <p>Beyond conversion, our <span class="highlight">PDF editing tools</span> provide comprehensive functionality for manipulating PDF documents. The <span class="highlight">Merge PDFs tool</span> allows you to combine multiple documents into a single file, perfect for compiling reports or combining chapters of a book. Conversely, the <span class="highlight">Split PDF tool</span> lets you extract specific pages or separate a large document into smaller files.</p>
+                
+                <p>Sometimes you need to remove unnecessary content from your documents, and that's where our <span class="highlight">Delete PDF Pages tool</span> comes in handy. For documents that were scanned incorrectly or need reorientation, the <span class="highlight">Rotate PDF Pages tool</span> allows you to correct page orientations in just a few clicks. When you need to reorganize your document, the <span class="highlight">Rearrange PDF Pages tool</span> provides an intuitive drag-and-drop interface for changing page order.</p>
+                
+                <p>PDFs often contain valuable images that you might want to use elsewhere. Our <span class="highlight">Extract Images from PDF tool</span> identifies and extracts all embedded images in high quality. To add professional touches to your documents, the <span class="highlight">Add Watermark to PDF tool</span> lets you insert text or image watermarks, while the <span class="highlight">Add Signature to PDF tool</span> provides multiple options for signing documents digitally.</p>
+                
+                <p>Document security is crucial in the digital age. Our <span class="highlight">Protect PDF tool</span> allows you to add password encryption and permissions to sensitive documents, preventing unauthorized access. If you've received a protected document that you need to edit, the <span class="highlight">Unlock PDF tool</span> can remove password restrictions (when you have the proper authorization).</p>
+                
+                <p>Large PDF files can be difficult to share via email or messaging apps. Our <span class="highlight">Compress PDF tool</span> reduces file size without significant quality loss, making sharing easier and faster. The compression algorithm smartly balances file size and quality based on your needs.</p>
+                
+                <p>Beyond PDF tools, we offer a comprehensive set of media conversion tools. Our <span class="highlight">Image Converter</span> supports all major formats including JPG, PNG, WEBP, and GIF. The <span class="highlight">Image Background Remover</span> uses advanced AI technology to isolate subjects from their backgrounds, creating professional-looking transparent images. For optimizing web content, the <span class="highlight">Image Compressor</span> reduces file sizes while maintaining visual quality.</p>
+                
+                <p>Video content continues to grow in importance, and our video tools help you work with various formats. The <span class="highlight">Video Converter</span> transforms files between MP4, AVI, MOV, and other popular formats. For creating engaging social media content, the <span class="highlight">Video to GIF Maker</span> converts video clips into animated GIFs. When file size is a concern, the <span class="highlight">Video Compressor</span> reduces video sizes without significant quality loss.</p>
+                
+                <p>Audio tools round out our media conversion offerings. The <span class="highlight">Audio Converter</span> supports MP3, WAV, OGG, and other common audio formats. For editing audio files, the <span class="highlight">Audio Cutter & Joiner</span> lets you trim audio clips or combine multiple files into one. These tools are perfect for podcasters, musicians, and audio enthusiasts.</p>
+                
+                <p>Our AI-powered tools represent the cutting edge of digital technology. The <span class="highlight">Text to Speech tool</span> converts written text into natural-sounding audio using advanced AI voices, perfect for creating audio content or assisting those with reading difficulties. The <span class="highlight">Speech to Text tool</span> does the reverse, transcribing spoken audio into written text with impressive accuracy.</p>
+                
+                <p>For ultimate convenience, our <span class="highlight">All-in-One Converter</span> provides a unified interface for converting between various document, image, audio, and video formats. This versatile tool eliminates the need to switch between different converters for different file types.</p>
+                
+                <p>All our tools are designed with user experience in mind. They feature intuitive interfaces, fast processing speeds, and reliable results. We prioritize your privacy and security by processing files entirely in your browser when possible, or on secure servers that automatically delete your files after processing.</p>
+                
+                <p>Whether you're a student preparing assignments, a professional handling business documents, or someone who occasionally needs to work with digital files, I Like PDF Tools provides everything you need in one convenient location. Our platform is constantly evolving with new tools and improvements based on user feedback and technological advancements.</p>
+                
+                <p>Best of all, every tool on our platform is completely free to use, with no hidden fees, watermarks, or limitations. We believe that powerful digital tools should be accessible to everyone, regardless of budget or technical expertise. Try our tools today and experience the convenience of comprehensive file conversion and editing capabilities right in your web browser.</p>
             </div>
         </div>
     </section>
@@ -1170,10 +930,10 @@
                     <h4>Company</h4>
                     <ul>
                         <li><a href="#about">About Us</a></li>
+                        <li><a href="#article">Article</a></li>
                         <li><a href="#contact">Contact</a></li>
                         <li><a href="#">Privacy Policy</a></li>
                         <li><a href="#">Terms of Service</a></li>
-                        <li><a href="#">Blog</a></li>
                     </ul>
                 </div>
             </div>
@@ -1540,6 +1300,14 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // Toggle sidebar function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
     </script>
 </body>
