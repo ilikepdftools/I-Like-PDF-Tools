@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>I Like PDF Tools — PPTX → PDF</title>
+<style>
+  :root{
+    --bg:#071022; --panel:#0d1b2a; --muted:#9fb0c8; --accent:#06b6d4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#02101a);color:#e6eef6;padding:18px}
+  .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:16px}
+  @media(max-width:980px){.wrap{grid-template-columns:1fr}}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{font-size:18px;margin:0}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .card{background:linear-gradient(180deg,var(--panel),#071426);padding:14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  label.btn{background:var(--accent);color:#022;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  select,input,button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  button.primary{background:var(--accent);color:#012226;border:none;font-weight:700}
+  .meta{color:var(--muted);font-size:13px}
+  .thumbs{display:flex;flex-direction:column;gap:10px;max-height:640px;overflow:auto;padding-right:6px}
+  .thumb{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01)}
+  .thumb img{width:120px;height:auto;border-radius:6px;border:1px solid rgba(255,255,255,0.03)}
+  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+  .note{font-size:12px;color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .preview{border-radius:8px;padding:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);min-height:240px;display:flex;align-items:center;justify-content:center}
+  footer.small{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+  .small{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
+  input[type=file]{display:none}
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>📄 PPTX → PDF Converter</h1>
+      <p class="lead">Convert PowerPoint (.pptx) slides into a printable PDF. Preserves images and extracts text. Client-side where possible.</p>
+    </div>
+    <div class="meta">slides to pdf • pptx to pdf converter</div>
+  </header>
+
+  <div class="wrap">
+    <!-- left -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="controls">
+          <label class="btn" for="fileInput">Upload PPTX</label>
+          <input id="fileInput" type="file" accept=".pptx" />
+          <select id="outputFormat" title="Output">
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end">
+          <div class="note">Include notes as pages?</div>
+          <label style="display:flex;align-items:center;gap:8px">
+            <input id="includeNotes" type="checkbox" /> <span class="note">Yes</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:12px">
+        <label for="rangeFrom">Slide from</label>
+        <input id="rangeFrom" type="number" min="1" style="width:80px" />
+        <label for="rangeTo">to</label>
+        <input id="rangeTo" type="number" min="1" style="width:80px" />
+        <label for="orientation">Orientation</label>
+        <select id="orientation">
+          <option value="landscape">Landscape</option>
+          <option value="portrait">Portrait</option>
+        </select>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="btnRender" class="primary">Process PPTX</button>
+        <button id="btnExport" class="small">Export PDF</button>
+        <button id="btnZip" class="small">Download ZIP (images)</button>
+        <div style="margin-left:auto" class="note" id="status">Idle</div>
+      </div>
+
+      <div class="progress"><i id="progressBar" style="width:0%"></i></div>
+
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div><strong>Slides</strong></div>
+      <div id="thumbs" class="thumbs"><div class="note">No file loaded. Upload a .pptx to extract slides.</div></div>
+    </div>
+
+    <!-- right -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Preview</strong>
+        <div class="note">Click a thumbnail to preview slide</div>
+      </div>
+
+      <div id="preview" class="preview"><div class="note">No preview</div></div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="downloadPdf" class="primary" style="display:none">Download PDF</button>
+        <div style="margin-left:auto" class="note" id="log">Logs</div>
+      </div>
+    </div>
+  </div>
+
+<footer class="small">Client-side conversion — for perfect fidelity use a server-side PowerPoint converter.</footer>
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<script>
+/*
+  PPTX -> PDF (client-side best-effort)
+  - Unzip PPTX with JSZip
+  - Parse slide XML and slide relationships to find embedded images and notes
+  - Render each slide by composing background + images + simple text blocks onto a canvas
+  - Use pdf-lib to assemble PDF pages from canvas images
+  - Provide thumbnails, preview, slide-range, include-notes, orientation, and ZIP download
+  - Limitations: complex layouts, exact text placement, animations, charts, and vector shapes may not be perfectly reproduced.
+*/
+
+/* DOM */
+const fileInput = document.getElementById('fileInput');
+const btnRender = document.getElementById('btnRender');
+const btnExport = document.getElementById('btnExport');
+const btnZip = document.getElementById('btnZip');
+const thumbsEl = document.getElementById('thumbs');
+const previewEl = document.getElementById('preview');
+const progressBar = document.getElementById('progressBar');
+const statusEl = document.getElementById('status');
+const downloadPdfBtn = document.getElementById('downloadPdf');
+const rangeFromEl = document.getElementById('rangeFrom');
+const rangeToEl = document.getElementById('rangeTo');
+const includeNotesChk = document.getElementById('includeNotes');
+const orientationSel = document.getElementById('orientation');
+const logEl = document.getElementById('log');
+
+let zip = null;
+let pptxZip = null;
+let slides = []; // {index, xml, rels, shapes[], images: {id:dataUrl}, notesHtml}
+let maxPages = 0;
+
+function setStatus(text, pct=0){
+  statusEl.textContent = text;
+  progressBar.style.width = pct + '%';
+  logEl.textContent = `${new Date().toLocaleTimeString()} — ${text}\n` + logEl.textContent;
+}
+
+/* Utility: parse XML string to DOM */
+function parseXml(str){
+  return (new DOMParser()).parseFromString(str, 'application/xml');
+}
+
+/* Utility: convert binary data to dataURL */
+function blobToDataUrl(blob, type){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/* Read PPTX file */
+fileInput.addEventListener('change', async (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  if(!f.name.toLowerCase().endsWith('.pptx')){ alert('Please upload a .pptx file'); return; }
+  setStatus('Loading PPTX...', 5);
+  try{
+    const arrayBuffer = await f.arrayBuffer();
+    pptxZip = await JSZip.loadAsync(arrayBuffer);
+    setStatus('PPTX loaded', 10);
+    await extractSlides();
+  }catch(err){
+    console.error(err);
+    alert('Error reading PPTX: ' + err.message);
+    setStatus('Error loading file', 0);
+  }
+});
+
+/* Extract slides and assets */
+async function extractSlides(){
+  slides = [];
+  thumbsEl.innerHTML = '<div class="note">Extracting slides...</div>';
+  // find slide files: ppt/slides/slideN.xml
+  const slideFiles = Object.keys(pptxZip.files).filter(p => /^ppt\/slides\/slide\d+\.xml$/.test(p)).sort((a,b)=>{
+    const na = Number(a.match(/slide(\d+)\.xml$/)[1]);
+    const nb = Number(b.match(/slide(\d+)\.xml$/)[1]);
+    return na - nb;
+  });
+  maxPages = slideFiles.length;
+  rangeFromEl.value = 1;
+  rangeToEl.value = maxPages;
+  setStatus(`Found ${slideFiles.length} slides`, 15);
+
+  for(let i=0;i<slideFiles.length;i++){
+    const path = slideFiles[i];
+    const index = i+1;
+    setStatus(`Parsing slide ${index}/${slideFiles.length}`, Math.round(15 + (i/slides.length || 0)*30));
+    try{
+      const xmlStr = await pptxZip.file(path).async('text');
+      const xml = parseXml(xmlStr);
+      // try to load relationships for this slide (ppt/slides/_rels/slideN.xml.rels)
+      const relsPath = path.replace('slides/slide','slides/_rels/slide') + '.rels';
+      let rels = null;
+      if(pptxZip.file(relsPath)) {
+        const relsStr = await pptxZip.file(relsPath).async('text');
+        rels = parseXml(relsStr);
+      }
+      // find notes for this slide: ppt/notesSlides/notesSlideN.xml
+      const notesPath = `ppt/notesSlides/notesSlide${index}.xml`;
+      let notesHtml = '';
+      if(pptxZip.file(notesPath)){
+        try{
+          const notesStr = await pptxZip.file(notesPath).async('text');
+          const notesXml = parseXml(notesStr);
+          // simple extraction: gather all text nodes <a:t>
+          const textNodes = notesXml.getElementsByTagName('a:t');
+          const texts = [];
+          for(const tn of textNodes){ texts.push(tn.textContent); }
+          notesHtml = texts.join('\n');
+        }catch(e){ notesHtml=''; }
+      }
+      // Collect images referenced by slide (via rels)
+      const images = {}; // relId -> dataUrl
+      if(rels){
+        const relElems = rels.getElementsByTagName('Relationship');
+        for(const r of relElems){
+          const type = r.getAttribute('Type') || '';
+          const rid = r.getAttribute('Id');
+          const target = r.getAttribute('Target') || '';
+          // image relationships under .. /media/*
+          if(type.includes('/image')){
+            // handle relative paths: slide rel target like "../media/image1.png"
+            // resolve to ppt/<...> path
+            let resolved = target.replace(/^\.\.\//, 'ppt/');
+            // normalize (if starts with /)
+            const dataFile = pptxZip.file(resolved) || pptxZip.file('ppt/'+resolved);
+            if(dataFile){
+              try{
+                const blob = await dataFile.async('blob');
+                const dataUrl = await blobToDataUrl(blob, 'image/*');
+                images[rid] = dataUrl;
+              }catch(e){ console.warn('img read err', e); }
+            } else {
+              // try direct under ppt/media
+              const mediaPath = 'ppt/media/' + target.split('/').pop();
+              if(pptxZip.file(mediaPath)){
+                const blob = await pptxZip.file(mediaPath).async('blob');
+                images[rid] = await blobToDataUrl(blob, 'image/*');
+              }
+            }
+          }
+        }
+      }
+      // store slide
+      slides.push({ index, path, xmlStr, xml, rels, images, notesHtml, thumbnail:null });
+    }catch(err){
+      console.error('slide parse error', err);
+    }
+  }
+
+  // Now render thumbnails for quick preview (very basic)
+  thumbsEl.innerHTML = '';
+  for(let i=0;i<slides.length;i++){
+    const s = slides[i];
+    const thumb = await renderSlideToCanvas(s, {thumb:true});
+    s.thumbnail = thumb.toDataURL('image/png');
+    const div = document.createElement('div');
+    div.className = 'thumb';
+    div.innerHTML = `<img src="${s.thumbnail}" alt="Slide ${s.index}" /><div style="flex:1"><div style="font-weight:700">Slide ${s.index}</div><div class="meta">${(s.notesHtml? 'notes':'no notes')}</div></div>`;
+    div.addEventListener('click', ()=> previewSlide(s.index));
+    thumbsEl.appendChild(div);
+  }
+
+  setStatus('Slides extracted', 70);
+  downloadPdfBtn.style.display='none';
+}
+
+/* Render slide 'best-effort' onto a canvas and return canvas element
+   Options: {thumb:Boolean} -> produce small thumbnail.
+   Approach:
+   - Create canvas sized by either slide default (use 1024x768 for landscape by default)
+   - Draw slide background if any (look for <p:spTree>/<p:bg>... but we will check for background images via rels)
+   - Draw pics (<p:pic>) by locating r:embed relationship id and mapping to images[rid]
+   - Extract textual runs (<a:t>) and group into blocks by their parent <a:p> and attempt to place them sequentially; precise coordinates unavailable in simple parsing, so place as stacked text blocks.
+*/
+async function renderSlideToCanvas(slideObj, opts={thumb:false}){
+  // canvas size
+  const W = opts.thumb ? 560 : 1400;
+  const H = opts.thumb ? 315 : 900;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  // fill background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,W,H);
+
+  try{
+    // parse slide xml
+    const xml = slideObj.xml;
+    // 1) draw background image if any: look for <p:bg> -> blipFill -> a:blip r:embed
+    const bgBlips = xml.getElementsByTagName('p:bg');
+    if(bgBlips && bgBlips.length){
+      for(const bg of bgBlips){
+        const blips = bg.getElementsByTagName('a:blip');
+        for(const bl of blips){
+          const rid = bl.getAttribute('r:embed');
+          if(rid && slideObj.images && slideObj.images[rid]){
+            const img = new Image();
+            img.src = slideObj.images[rid];
+            await new Promise((res,rej)=>{
+              img.onload = ()=>{ ctx.drawImage(img,0,0,W,H); res(); };
+              img.onerror = ()=>{ res(); };
+            });
+          }
+        }
+      }
+    }
+
+    // 2) draw pictures: find <p:pic> elements and for each find r:embed inside a:blip
+    const pics = xml.getElementsByTagName('p:pic');
+    // We attempt to get transform coordinates inside <a:xfrm> with 'off' and 'ext' children for positioning
+    const picItems = [];
+    for(const pic of pics){
+      const blip = pic.getElementsByTagName('a:blip')[0];
+      let rid = blip ? blip.getAttribute('r:embed') : null;
+      // find transform
+      let x=0,y=0,w=0,h=0;
+      const xfrm = pic.getElementsByTagName('a:xfrm')[0] || pic.getElementsByTagName('p:off')[0];
+      const off = pic.getElementsByTagName('a:off')[0] || pic.getElementsByTagName('p:off')[0];
+      const ext = pic.getElementsByTagName('a:ext')[0] || pic.getElementsByTagName('p:ext')[0];
+      if(off){
+        x = parseInt(off.getAttribute('x') || off.getAttribute('cx') || 0);
+        y = parseInt(off.getAttribute('y') || off.getAttribute('cy') || 0);
+      }
+      if(ext){
+        w = parseInt(ext.getAttribute('cx') || ext.getAttribute('dx') || 0);
+        h = parseInt(ext.getAttribute('cy') || ext.getAttribute('dy') || 0);
+      }
+      picItems.push({rid, x, y, w, h});
+    }
+    // draw pics
+    for(const pItem of picItems){
+      if(!pItem.rid) continue;
+      const dataUrl = slideObj.images[pItem.rid];
+      if(!dataUrl) continue;
+      try{
+        const img = new Image();
+        img.src = dataUrl;
+        await new Promise((res)=>{ img.onload = res; img.onerror = res; });
+        // scale coordinates roughly since PPTX coordinates use EMU units; we don't have slide size info easily -> proportionally place items
+        // We'll place items relative: compute bounding box if ext available; otherwise center
+        const dw = pItem.w ? Math.max(20, Math.round(pItem.w / 10000 * W)) : Math.round(W*0.5);
+        const dh = pItem.h ? Math.max(20, Math.round(pItem.h / 10000 * H)) : Math.round(H*0.3);
+        const dx = pItem.x ? Math.min(W-10, Math.round(pItem.x / 10000 * W)) : Math.round((W - dw)/2);
+        const dy = pItem.y ? Math.min(H-10, Math.round(pItem.y / 10000 * H)) : Math.round((H - dh)/2);
+        ctx.drawImage(img, dx, dy, dw, dh);
+      }catch(e){
+        console.warn('draw pic err', e);
+      }
+    }
+
+    // 3) extract text content: gather <a:t> nodes grouped by their ancestor <p:sp> or <p:txBody>
+    // We'll approximate layout by stacking text blocks with margin
+    const textRuns = [];
+    const spElements = xml.getElementsByTagName('p:sp'); // shapes which often contain text
+    for(const sp of spElements){
+      const paras = sp.getElementsByTagName('a:p');
+      let blockText = [];
+      for(const p of paras){
+        const tNodes = p.getElementsByTagName('a:t');
+        for(const t of tNodes) blockText.push(t.textContent);
+      }
+      if(blockText.length) textRuns.push(blockText.join(' '));
+    }
+    // also search for <p:txBody> directly
+    const txBodies = xml.getElementsByTagName('p:txBody');
+    for(const tb of txBodies){
+      const paras = tb.getElementsByTagName('a:p');
+      for(const p of paras){
+        const tNodes = p.getElementsByTagName('a:t');
+        let line = [];
+        for(const t of tNodes) line.push(t.textContent);
+        if(line.length) textRuns.push(line.join(' '));
+      }
+    }
+
+    // draw text runs as stacked text, respecting some basic font size heuristics
+    ctx.fillStyle = '#000';
+    ctx.textBaseline = 'top';
+    let cursorY = 20;
+    const leftX = 24;
+    for(const tr of textRuns){
+      // limit to avoid huge overlays
+      const text = String(tr).trim().slice(0, 1000);
+      if(!text) continue;
+      ctx.font = '18px sans-serif';
+      // wrap long lines
+      const maxW = W - leftX - 24;
+      const words = text.split(/\s+/);
+      let line = '';
+      for(const w of words){
+        const test = line ? line + ' ' + w : w;
+        const measure = ctx.measureText(test);
+        if(measure.width > maxW){
+          ctx.fillText(line, leftX, cursorY);
+          cursorY += 22;
+          line = w;
+        } else {
+          line = test;
+        }
+      }
+      if(line) { ctx.fillText(line, leftX, cursorY); cursorY += 22; }
+      cursorY += 6;
+      if(cursorY > H - 60) break;
+    }
+
+    return canvas;
+  }catch(err){
+    console.error('renderSlide err', err);
+    return canvas;
+  }
+}
+
+/* Preview slide by index */
+function previewSlide(index){
+  const s = slides.find(s=>s.index === index);
+  if(!s) return;
+  // render thumbnail if exists
+  if(s.thumbnail){
+    previewEl.innerHTML = `<img src="${s.thumbnail}" style="max-width:100%"/>`;
+  } else {
+    previewEl.innerHTML = '<div class="note">Rendering preview...</div>';
+    renderSlideToCanvas(s, {thumb:true}).then(canvas=>{
+      s.thumbnail = canvas.toDataURL('image/png');
+      previewEl.innerHTML = `<img src="${s.thumbnail}" style="max-width:100%"/>`;
+    });
+  }
+}
+
+/* Process extracted slides and prepare for export (render full-size canvases) */
+async function processSlidesForExport(){
+  if(!slides.length){ alert('No slides. Upload a PPTX first.'); return; }
+  const from = Math.max(1, parseInt(rangeFromEl.value || 1));
+  const to = Math.min(slides.length, parseInt(rangeToEl.value || slides.length));
+  setStatus(`Rendering slides ${from}-${to}...`, 20);
+  const canvases = [];
+  for(let i=from;i<=to;i++){
+    const s = slides[i-1];
+    setStatus(`Rendering slide ${i}...`, Math.round(20 + ((i-from)/(to-from+1))*60));
+    const canvas = await renderSlideToCanvas(s, {thumb:false});
+    canvases.push({index:i, canvas, notes: s.notesHtml});
+    await new Promise(r=>setTimeout(r,50));
+  }
+  setStatus('Slides rendered to canvases', 85);
+  return canvases;
+}
+
+/* Export to PDF using pdf-lib */
+btnExport.addEventListener('click', async ()=>{
+  try{
+    if(!pptxZip){ alert('Upload a PPTX first'); return; }
+    downloadPdfBtn.style.display='none';
+    const from = Math.max(1, parseInt(rangeFromEl.value || 1));
+    const to = Math.min(slides.length, parseInt(rangeToEl.value || slides.length));
+    const addNotes = includeNotesChk.checked;
+    const canvases = await processSlidesForExport();
+    setStatus('Composing PDF...', 88);
+
+    const { PDFDocument } = PDFLib;
+    const pdfDoc = await PDFDocument.create();
+    for(let i=0;i<canvases.length;i++){
+      const c = canvases[i].canvas;
+      // convert canvas to PNG bytes
+      const dataUrl = c.toDataURL('image/png');
+      const pngBytes = await (await fetch(dataUrl)).arrayBuffer();
+      const img = await pdfDoc.embedPng(pngBytes);
+      // page orientation: match canvas aspect ratio -> use image size in points
+      const page = pdfDoc.addPage([c.width, c.height]);
+      page.drawImage(img, { x:0, y:0, width:c.width, height: c.height });
+      // optionally add notes as an extra page after each slide
+      if(addNotes && canvases[i].notes && canvases[i].notes.trim()){
+        const notesPage = pdfDoc.addPage([c.width, c.height]);
+        const fontSize = 12;
+        notesPage.drawText(canvases[i].notes, { x: 24, y: c.height - 60, size: fontSize, color: PDFLib.rgb(0,0,0) }); // top-left (not ideal for long notes)
+      }
+      setStatus(`Adding slide ${canvases[i].index} to PDF...`, Math.round(88 + ((i+1)/canvases.length)*10));
+      await new Promise(r=>setTimeout(r,20));
+    }
+    const pdfBytes = await pdfDoc.save();
+    // create blob and download
+    const blob = new Blob([pdfBytes], {type:'application/pdf'});
+    saveAs(blob, 'converted-slides.pdf');
+    downloadPdfBtn.style.display='inline-block';
+    setStatus('PDF ready — downloaded', 100);
+  }catch(err){
+    console.error(err);
+    alert('Export failed: ' + (err && err.message ? err.message : err));
+    setStatus('Export error', 0);
+  }
+});
+
+/* ZIP download of slide images */
+btnZip.addEventListener('click', async ()=>{
+  if(!slides.length){ alert('No slides loaded'); return; }
+  setStatus('Rendering slide images...', 20);
+  const JSZipLib = JSZip;
+  const outZip = new JSZipLib();
+  for(let i=0;i<slides.length;i++){
+    const s = slides[i];
+    setStatus(`Rendering slide ${s.index}/${slides.length}...`, Math.round(20 + (i/slides.length)*60));
+    const canvas = await renderSlideToCanvas(s, {thumb:false});
+    const dataUrl = canvas.toDataURL('image/png');
+    const blob = await (await fetch(dataUrl)).blob();
+    outZip.file(`slide-${s.index}.png`, blob);
+  }
+  setStatus('Generating ZIP...', 85);
+  const zipBlob = await outZip.generateAsync({type:'blob'}, (meta)=> {
+    progressBar.style.width = Math.round(meta.percent) + '%';
+  });
+  saveAs(zipBlob, 'slides-images.zip');
+  setStatus('ZIP downloaded', 100);
+});
+
+/* Show basic guidance */
+setStatus('Idle — upload a PPTX to begin', 0);
+</script>
+</body>
+</html>
