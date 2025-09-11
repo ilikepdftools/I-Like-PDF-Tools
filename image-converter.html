@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Converter | I Like PDF Tools</title>
+<style>
+  body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 1rem;
+    color: #38bdf8;
+  }
+  .container {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-width: 700px;
+    width: 95%;
+    margin-bottom: 2rem;
+  }
+  input, select, button {
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  button {
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { background: #0ea5e9; }
+  #preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  #preview img {
+    max-width: 100px;
+    border-radius: 6px;
+    border: 1px solid #94a3b8;
+  }
+  .status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+</style>
+</head>
+<body>
+
+<header>🖼️ Image Converter Tool</header>
+
+<div class="container">
+  <input type="file" id="imageFiles" accept="image/*" multiple>
+  
+  <select id="outputFormat">
+    <option value="jpeg">JPG</option>
+    <option value="png">PNG</option>
+    <option value="webp" selected>WEBP</option>
+  </select>
+  
+  <input type="range" id="quality" min="0" max="1" step="0.05" value="0.8">
+  <label for="quality">Quality: <span id="qualityValue">0.8</span></label>
+  
+  <button onclick="convertImages()">Convert Images</button>
+  
+  <div class="status" id="status">Upload images to begin conversion.</div>
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.11.0/jszip.min.js"></script>
+
+<script>
+const qualitySlider = document.getElementById('quality');
+const qualityValue = document.getElementById('qualityValue');
+qualitySlider.addEventListener('input', () => {
+  qualityValue.textContent = qualitySlider.value;
+});
+
+async function convertImages() {
+  const files = document.getElementById('imageFiles').files;
+  const format = document.getElementById('outputFormat').value;
+  const quality = parseFloat(document.getElementById('quality').value);
+  const status = document.getElementById('status');
+  const preview = document.getElementById('preview');
+  
+  if (!files.length) {
+    status.textContent = "❌ Please select image files.";
+    return;
+  }
+  
+  preview.innerHTML = '';
+  status.textContent = "Processing images...";
+  
+  const zip = new JSZip();
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    await new Promise(res => img.onload = res);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    
+    let blob;
+    if (format === 'png') {
+      blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+    } else if (format === 'jpeg') {
+      blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', quality));
+    } else if (format === 'webp') {
+      blob = await new Promise(res => canvas.toBlob(res, 'image/webp', quality));
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const previewImg = document.createElement('img');
+      previewImg.src = reader.result;
+      preview.appendChild(previewImg);
+    };
+    reader.readAsDataURL(blob);
+
+    zip.file(file.name.replace(/\.[^/.]+$/, "") + '.' + format, blob);
+  }
+  
+  status.textContent = "Preparing download...";
+  
+  zip.generateAsync({ type: "blob" }).then((content) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(content);
+    a.download = "converted_images.zip";
+    a.click();
+    status.textContent = `✅ Conversion complete! Download started.`;
+  });
+}
+</script>
+
+</body>
+</html>
