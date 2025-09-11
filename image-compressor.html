@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Compressor</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+  .container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+  input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+  button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+  button:hover { background:#0ea5e9; }
+  #preview { display:flex; flex-wrap:wrap; margin-top:1rem; gap:1rem; justify-content:center; }
+  .img-box { display:flex; flex-direction:column; align-items:center; border:1px solid #94a3b8; border-radius:6px; padding:0.5rem; background:#1e293b; }
+  .img-box img { max-width:150px; border-radius:4px; margin-bottom:0.5rem; }
+  .status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+</style>
+</head>
+<body>
+
+<header>🖼️ Image Compressor</header>
+
+<div class="container">
+  <input type="file" id="imageInput" accept="image/*" multiple>
+  
+  <label for="quality">Compression Quality (0.1 - 1.0):</label>
+  <input type="number" id="quality" value="0.8" step="0.1" min="0.1" max="1">
+  
+  <label for="format">Output Format:</label>
+  <select id="format">
+    <option value="image/jpeg">JPEG</option>
+    <option value="image/png">PNG</option>
+    <option value="image/webp">WEBP</option>
+  </select>
+  
+  <button onclick="compressImages()">Compress Images</button>
+  
+  <div class="status" id="status">Select images to start.</div>
+  <div id="preview"></div>
+  <button id="downloadZip" style="display:none;" onclick="downloadZip()">Download ZIP</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+  let compressedFiles = [];
+
+  async function compressImages() {
+    const input = document.getElementById('imageInput');
+    const quality = parseFloat(document.getElementById('quality').value);
+    const format = document.getElementById('format').value;
+    const preview = document.getElementById('preview');
+    const status = document.getElementById('status');
+    const downloadBtn = document.getElementById('downloadZip');
+
+    if (!input.files.length) { status.textContent = "❌ Please select images."; return; }
+
+    preview.innerHTML = '';
+    compressedFiles = [];
+    downloadBtn.style.display = 'none';
+    status.textContent = "Processing images... ⏳";
+
+    for (let file of input.files) {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise(resolve => img.onload = resolve);
+
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const blob = await new Promise(res => canvas.toBlob(res, format, quality));
+
+      compressedFiles.push({ blob, name: file.name.replace(/\.[^/.]+$/, "") + getExtension(format) });
+
+      // Show preview
+      const url = URL.createObjectURL(blob);
+      const div = document.createElement('div');
+      div.className = 'img-box';
+      div.innerHTML = `<img src="${url}"><div>${(file.size/1024).toFixed(1)}KB → ${(blob.size/1024).toFixed(1)}KB</div>`;
+      preview.appendChild(div);
+    }
+
+    status.textContent = `✅ Compression complete for ${compressedFiles.length} images.`;
+    downloadBtn.style.display = 'block';
+  }
+
+  function getExtension(format) {
+    switch(format){
+      case 'image/jpeg': return '.jpg';
+      case 'image/png': return '.png';
+      case 'image/webp': return '.webp';
+      default: return '';
+    }
+  }
+
+  function downloadZip() {
+    if (!compressedFiles.length) return;
+    const zip = new JSZip();
+    compressedFiles.forEach(f => zip.file(f.name, f.blob));
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(content);
+      a.download = 'compressed_images.zip';
+      a.click();
+    });
+  }
+</script>
+
+</body>
+</html>
