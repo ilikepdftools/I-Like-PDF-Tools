@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>I Like PDF Tools - Free Online PDF Converter & Editor</title>
-    <meta name="description" content="Free online PDF tools to convert, edit, compress, and transform your PDFs. All-in-one file converter with image, video, and audio tools.">
-    <meta name="keywords" content="PDF to Word, PDF converter, Merge PDF, Compress PDF, Unlock PDF, Protect PDF, Image converter, Video converter, Audio converter, Free online tools">
+    <meta name="description" content="Free online PDF tools to convert, edit, compress, and transform your PDFs. All-in-one file converter with image, video, and audio tools. 100% free, no registration needed.">
+    <meta name="keywords" content="PDF to Word, PDF converter, Merge PDF, Compress PDF, Unlock PDF, Protect PDF, Image converter, Video converter, Audio converter, Free online tools, PDF editor, PDF tools online, convert PDF to Word, compress PDF online, edit PDF online">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
@@ -63,11 +63,11 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 15px;
+            padding: 0 20px;
         }
 
         .section {
-            padding: 40px 0;
+            padding: 60px 0;
         }
 
         .text-center {
@@ -76,16 +76,15 @@
 
         .btn {
             display: inline-block;
-            padding: 14px 28px;
+            padding: 12px 24px;
             background: var(--gold);
             color: var(--dark-blue);
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
         }
 
         .btn:hover {
@@ -94,11 +93,11 @@
             box-shadow: 0 6px 12px var(--shadow);
         }
 
-        /* Header - Mobile First */
+        /* Header */
         header {
             background: var(--deep-red);
             color: var(--light-gray);
-            padding: 12px 0;
+            padding: 15px 0;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -115,17 +114,20 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 1001;
         }
 
         .logo i {
-            font-size: 24px;
+            font-size: 28px;
             color: var(--gold);
             transition: var(--transition);
         }
 
+        .logo:hover i {
+            transform: rotate(10deg);
+        }
+
         .logo h1 {
-            font-size: 18px;
+            font-size: 24px;
             margin: 0;
             background: linear-gradient(45deg, var(--gold), var(--dark-gold));
             -webkit-background-clip: text;
@@ -137,9 +139,8 @@
             font-size: 24px;
             cursor: pointer;
             color: var(--gold);
+            display: none;
             transition: var(--transition);
-            z-index: 1001;
-            padding: 5px;
         }
 
         .nav-toggle:hover {
@@ -147,65 +148,110 @@
         }
 
         .search-container {
-            display: none; /* Hidden by default on mobile */
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            position: relative;
         }
 
-        /* Mobile Bottom Navigation */
-        .mobile-bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--deep-red);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 5px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 999;
+        .search-input-container {
+            position: relative;
+            width: 100%;
         }
 
-        .mobile-nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 10px;
+        .search-input {
+            width: 100%;
+            padding: 14px 50px 14px 20px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light-gray);
+            font-size: 16px;
             transition: var(--transition);
         }
 
-        .mobile-nav-item.active {
-            background: rgba(255, 215, 0, 0.15);
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px var(--gold);
         }
 
-        .mobile-nav-item i {
-            font-size: 20px;
-            margin-bottom: 4px;
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--light-gray);
+            cursor: pointer;
         }
 
-        .mobile-nav-item span {
-            font-size: 12px;
-            color: var(--light-gray);
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
         }
 
-        .mobile-nav-item.active i,
-        .mobile-nav-item.active span {
+        .search-result-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-result-item:hover {
+            background: var(--gold);
+            color: var(--dark-blue);
+        }
+
+        .search-result-item:hover h4 {
+            color: var(--dark-blue);
+        }
+
+        .search-result-item i {
             color: var(--gold);
+            font-size: 18px;
         }
 
-        /* Sidebar - Mobile Optimized */
+        .search-result-item:hover i {
+            color: var(--dark-blue);
+        }
+
+        .search-result-item h4 {
+            font-size: 14px;
+            margin: 0;
+            color: var(--light-gray);
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: var(--light-gray);
+        }
+
+        /* Sidebar */
         .sidebar {
             position: fixed;
             top: 0;
-            left: -100%;
-            width: 100%;
+            left: -300px;
+            width: 300px;
             height: 100%;
             background: var(--deep-red);
             color: var(--light-gray);
             transition: var(--transition);
-            padding: 70px 20px 20px;
+            padding-top: 70px;
             overflow-y: auto;
-            z-index: 998;
+            z-index: 999;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar.active {
@@ -220,7 +266,6 @@
             cursor: pointer;
             color: var(--gold);
             transition: var(--transition);
-            z-index: 1001;
         }
 
         .sidebar-close:hover {
@@ -229,7 +274,7 @@
 
         .sidebar-menu {
             list-style: none;
-            padding: 0;
+            padding: 0 20px;
         }
 
         .sidebar-menu li {
@@ -239,9 +284,9 @@
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 12px 15px;
             color: var(--light-gray);
-            border-radius: 8px;
+            border-radius: 5px;
             transition: var(--transition);
         }
 
@@ -251,10 +296,9 @@
         }
 
         .sidebar-menu i {
-            margin-right: 15px;
+            margin-right: 10px;
             width: 20px;
             text-align: center;
-            font-size: 20px;
         }
 
         .sidebar-overlay {
@@ -264,7 +308,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 997;
+            z-index: 998;
             opacity: 0;
             visibility: hidden;
             transition: var(--transition);
@@ -275,10 +319,10 @@
             visibility: visible;
         }
 
-        /* Hero Section - Mobile Optimized */
+        /* Hero Section */
         .hero {
             background: linear-gradient(135deg, var(--deep-red) 0%, var(--dark-blue) 100%);
-            padding: 60px 0 80px;
+            padding: 100px 0;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -296,78 +340,64 @@
         }
 
         .hero h2 {
-            font-size: 2rem;
-            margin-bottom: 15px;
+            font-size: 3rem;
+            margin-bottom: 20px;
             color: var(--white);
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero p {
-            font-size: 1rem;
-            margin: 0 auto 25px;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
             color: var(--light-gray);
-            max-width: 90%;
         }
 
         .hero-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .hero-buttons .btn {
-            width: 100%;
-            max-width: 250px;
-        }
-
-        /* Tools Section - Mobile Dashboard */
+        /* Tools Section */
         .tools-section {
             background: var(--section-bg);
-            padding-bottom: 80px; /* Extra padding for mobile nav */
         }
 
         .section-title {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             position: relative;
         }
 
         .section-title::after {
             content: '';
             display: block;
-            width: 50px;
+            width: 60px;
             height: 4px;
             background: var(--gold);
-            margin: 12px auto 0;
+            margin: 15px auto 0;
             border-radius: 2px;
         }
 
         .tools-filter {
             display: flex;
-            overflow-x: auto;
-            gap: 8px;
-            margin-bottom: 25px;
-            padding: 5px 0 15px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .tools-filter::-webkit-scrollbar {
-            display: none;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
         }
 
         .filter-btn {
-            padding: 10px 18px;
+            padding: 10px 24px;
             background: var(--dark-grayish-red);
             color: var(--light-gray);
             border: none;
-            border-radius: 20px;
+            border-radius: 30px;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
-            white-space: nowrap;
-            flex-shrink: 0;
         }
 
         .filter-btn.active, .filter-btn:hover {
@@ -377,17 +407,17 @@
 
         .tools-container {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
         }
 
         .tool-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
             transition: var(--transition);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -412,8 +442,8 @@
         }
 
         .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px var(--shadow);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px var(--shadow);
             background: var(--card-hover-bg);
             color: var(--card-hover-text);
         }
@@ -424,21 +454,21 @@
         }
 
         .tool-card i {
-            font-size: 40px;
-            margin-bottom: 15px;
+            font-size: 48px;
+            margin-bottom: 20px;
             color: var(--gold);
         }
 
         .tool-card h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
+            font-size: 20px;
+            margin-bottom: 12px;
             color: var(--light-gray);
         }
 
         .tool-card p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--light-gray);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             flex-grow: 1;
         }
 
@@ -447,92 +477,10 @@
             background: var(--gold);
             color: var(--dark-blue);
             font-weight: 500;
-            padding: 12px;
         }
 
         .tool-card .btn:hover {
             background: var(--dark-gold);
-        }
-
-        /* Mobile Search Overlay */
-        .search-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--deep-red);
-            z-index: 1002;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .search-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .search-header {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: var(--deep-red);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .search-back {
-            font-size: 24px;
-            color: var(--gold);
-            margin-right: 15px;
-            cursor: pointer;
-        }
-
-        .mobile-search-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light-gray);
-            font-size: 16px;
-        }
-
-        .mobile-search-results {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .mobile-search-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            background: var(--card-bg);
-            transition: var(--transition);
-        }
-
-        .mobile-search-item:active {
-            background: var(--gold);
-        }
-
-        .mobile-search-item:active h4 {
-            color: var(--dark-blue);
-        }
-
-        .mobile-search-item i {
-            font-size: 24px;
-            color: var(--gold);
-            margin-right: 15px;
-        }
-
-        .mobile-search-item h4 {
-            font-size: 16px;
-            color: var(--light-gray);
         }
 
         /* About Section */
@@ -543,12 +491,12 @@
         .about-content {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 30px;
+            gap: 40px;
         }
 
         .about-text h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
         }
 
         .feature-list {
@@ -564,56 +512,186 @@
         .feature-item i {
             color: var(--gold);
             margin-right: 12px;
-            font-size: 18px;
+            font-size: 20px;
         }
 
-        /* Mobile Tabs Navigation */
-        .mobile-tabs {
-            display: flex;
-            overflow-x: auto;
-            background: var(--deep-red);
-            padding: 10px 15px;
-            gap: 5px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
+        /* Article Section */
+        .article-section {
+            background: var(--section-bg);
         }
 
-        .mobile-tabs::-webkit-scrollbar {
-            display: none;
+        .article-content {
+            column-count: 2;
+            column-gap: 40px;
+            text-align: justify;
         }
 
-        .mobile-tab {
-            padding: 10px 20px;
-            background: var(--dark-grayish-red);
-            color: var(--light-gray);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: var(--transition);
+        @media (max-width: 768px) {
+            .article-content {
+                column-count: 1;
+            }
+        }
+
+        .article-content p {
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 500;
-            white-space: nowrap;
-            flex-shrink: 0;
         }
 
-        .mobile-tab.active {
+        /* FAQ Section */
+        .faq-section {
+            background: var(--dark-blue);
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-answer.active {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: var(--section-bg);
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-item i {
+            width: 45px;
+            height: 45px;
             background: var(--gold);
             color: var(--dark-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .contact-form {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px var(--gold);
+        }
+
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
         }
 
         /* Footer */
         footer {
             background: var(--deep-red);
-            padding: 40px 0 70px; /* Extra padding for mobile nav */
+            padding: 50px 0 20px;
         }
 
         .footer-container {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         .footer-col h4 {
             font-size: 18px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             color: var(--gold);
             position: relative;
             padding-bottom: 10px;
@@ -651,8 +729,8 @@
 
         .social-links {
             display: flex;
-            gap: 12px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .social-links a {
@@ -674,123 +752,117 @@
 
         .copyright {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 50px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Responsive Design for Tablets and Desktops */
-        @media (min-width: 768px) {
-            .container {
-                padding: 0 20px;
-            }
-            
-            .logo h1 {
-                font-size: 22px;
-            }
-            
-            .nav-toggle {
-                display: none;
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .breadcrumb-item:not(:last-child)::after {
+            content: '/';
+            margin: 0 10px;
+            color: var(--gold);
+        }
+
+        .breadcrumb-item a {
+            color: var(--light-gray);
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--gold);
+        }
+
+        /* Mobile Navigation Enhancements */
+        .mobile-nav-bottom {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--deep-red);
+            padding: 10px 0;
+            z-index: 990;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-nav-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: var(--light-gray);
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
+        .mobile-nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--gold);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap;
             }
             
             .search-container {
+                order: 3;
+                max-width: 100%;
+                margin: 15px 0 0;
+                width: 100%;
+            }
+            
+            .nav-toggle {
                 display: block;
-                flex: 1;
-                max-width: 400px;
-                margin: 0 20px;
-                position: relative;
             }
             
-            .search-input-container {
-                position: relative;
-                width: 100%;
+            .tools-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
-            .search-input {
-                width: 100%;
-                padding: 12px 45px 12px 15px;
-                border: none;
-                border-radius: 30px;
-                background: rgba(255, 255, 255, 0.1);
-                color: var(--light-gray);
-                font-size: 16px;
-                transition: var(--transition);
+            .tool-card {
+                padding: 20px 15px;
             }
             
-            .search-input:focus {
-                outline: none;
-                background: rgba(255, 255, 255, 0.15);
-                box-shadow: 0 0 0 2px var(--gold);
+            .tool-card i {
+                font-size: 36px;
             }
             
-            .search-icon {
-                position: absolute;
-                right: 15px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--light-gray);
-                cursor: pointer;
-            }
-            
-            .search-results {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--card-bg);
-                border-radius: 0 0 10px 10px;
-                max-height: 300px;
-                overflow-y: auto;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                z-index: 1000;
-                display: none;
-            }
-            
-            .search-result-item {
-                padding: 12px 15px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                transition: var(--transition);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            
-            .search-result-item:hover {
-                background: var(--gold);
-                color: var(--dark-blue);
-            }
-            
-            .search-result-item:hover h4 {
-                color: var(--dark-blue);
-            }
-            
-            .search-result-item i {
-                color: var(--gold);
+            .tool-card h3 {
                 font-size: 18px;
             }
             
-            .search-result-item:hover i {
-                color: var(--dark-blue);
-            }
-            
-            .search-result-item h4 {
+            .tool-card p {
                 font-size: 14px;
-                margin: 0;
-                color: var(--light-gray);
-            }
-            
-            .no-results {
-                padding: 15px;
-                text-align: center;
-                color: var(--light-gray);
-            }
-            
-            .mobile-bottom-nav {
-                display: none;
-            }
-            
-            .mobile-tabs {
-                display: none;
             }
             
             .hero {
@@ -798,43 +870,126 @@
             }
             
             .hero h2 {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
             
             .hero p {
-                font-size: 1.2rem;
+                font-size: 1rem;
+                padding: 0 15px;
             }
             
             .hero-buttons {
-                flex-direction: row;
-                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+                padding: 0 20px;
             }
             
             .hero-buttons .btn {
-                width: auto;
+                width: 100%;
+                margin-bottom: 10px;
             }
             
-            .tools-container {
-                grid-template-columns: repeat(2, 1fr);
+            .tools-filter {
+                overflow-x: auto;
+                padding-bottom: 10px;
+                justify-content: flex-start;
             }
             
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+                white-space: nowrap;
+            }
+            
+            .section {
+                padding: 40px 0;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .mobile-nav-bottom {
+                display: block;
+            }
+            
+            .contact-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .contact-item i {
+                margin-bottom: 10px;
+            }
+            
+            .form-group input, 
+            .form-group textarea {
+                padding: 16px; /* Larger touch targets */
+            }
+            
+            .sidebar {
+                width: 85%;
+                left: -85%;
+            }
+            
+            .breadcrumb-container {
+                overflow-x: auto;
+                white-space: nowrap;
             }
         }
 
-        @media (min-width: 992px) {
-            .tools-container {
-                grid-template-columns: repeat(3, 1fr);
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 20px;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
             }
             
             .footer-container {
-                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
             }
             
-            .about-content {
-                grid-template-columns: 1fr 1fr;
+            .footer-col {
+                margin-bottom: 20px;
             }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .contact-form {
+                padding: 20px 15px;
+            }
+        }
+
+        /* SEO Improvements */
+        .seo-text {
+            margin: 30px 0;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+        }
+        
+        .seo-text h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .seo-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .seo-keyword {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -868,19 +1023,6 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Search Overlay for Mobile -->
-    <div class="search-overlay" id="searchOverlay">
-        <div class="search-header">
-            <div class="search-back" id="searchBack">
-                <i class="fas fa-arrow-left"></i>
-            </div>
-            <input type="text" class="mobile-search-input" id="mobileSearchInput" placeholder="Search for tools...">
-        </div>
-        <div class="mobile-search-results" id="mobileSearchResults">
-            <!-- Search results will be inserted here -->
-        </div>
-    </div>
-
     <!-- Header -->
     <header>
         <div class="container header-container">
@@ -905,14 +1047,45 @@
         </div>
     </header>
 
-    <!-- Mobile Tabs Navigation -->
-    <div class="mobile-tabs">
-        <div class="mobile-tab active" data-filter="all">All</div>
-        <div class="mobile-tab" data-filter="pdf">PDF</div>
-        <div class="mobile-tab" data-filter="image">Image</div>
-        <div class="mobile-tab" data-filter="video">Video</div>
-        <div class="mobile-tab" data-filter="audio">Audio</div>
-        <div class="mobile-tab" data-filter="ai">AI Tools</div>
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav-bottom">
+        <div class="mobile-nav-container">
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#all-tools" class="mobile-nav-item">
+                <i class="fas fa-tools"></i>
+                <span>Tools</span>
+            </a>
+            <a href="#search" class="mobile-nav-item" id="mobileSearchBtn">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </a>
+            <a href="#contact" class="mobile-nav-item">
+                <i class="fas fa-envelope"></i>
+                <span>Contact</span>
+            </a>
+            <a href="javascript:void(0)" class="mobile-nav-item" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+                <span>Menu</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container breadcrumb-container">
+            <div class="breadcrumb-item">
+                <a href="#">Home</a>
+            </div>
+            <div class="breadcrumb-item">
+                <a href="#all-tools">Tools</a>
+            </div>
+            <div class="breadcrumb-item">
+                <span>All PDF Tools</span>
+            </div>
+        </div>
     </div>
 
     <!-- Hero Section -->
@@ -923,6 +1096,30 @@
             <div class="hero-buttons">
                 <a href="#all-tools" class="btn">Explore Tools</a>
                 <a href="#contact" class="btn">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEO Keywords Section -->
+    <section class="section">
+        <div class="container">
+            <div class="seo-text">
+                <h3>Top PDF Tools for All Your Document Needs</h3>
+                <p>I Like PDF Tools offers the most comprehensive collection of free online PDF utilities. Convert PDF to Word, Excel, PowerPoint, JPG, and more with our easy-to-use tools. Edit, merge, split, compress, and secure your PDF files without installing any software.</p>
+                
+                <div class="seo-keywords">
+                    <span class="seo-keyword">PDF to Word Converter</span>
+                    <span class="seo-keyword">Merge PDF Files</span>
+                    <span class="seo-keyword">Compress PDF Online</span>
+                    <span class="seo-keyword">Edit PDF Free</span>
+                    <span class="seo-keyword">PDF to JPG Converter</span>
+                    <span class="seo-keyword">Unlock PDF Password</span>
+                    <span class="seo-keyword">Protect PDF with Password</span>
+                    <span class="seo-keyword">Split PDF Pages</span>
+                    <span class="seo-keyword">PDF Converter Online</span>
+                </div>
+                
+                <p>Our platform is optimized for mobile devices, allowing you to convert and edit files on the go. All processing happens securely in the cloud, and we automatically delete your files after processing to ensure your privacy.</p>
             </div>
         </div>
     </section>
@@ -950,25 +1147,296 @@
         </div>
     </section>
 
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <div class="mobile-nav-item active" id="navHome">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
+    <!-- About Section -->
+    <section class="section about-section" id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>About I Like PDF Tools</h2>
+                <p>Your complete PDF solution platform</p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <h3>Your Complete PDF Solution Platform</h3>
+                    <p>I Like PDF Tools is a comprehensive online platform offering a wide range of file conversion and manipulation tools. Our mission is to provide users with reliable, fast, and completely free tools to handle their document needs without requiring expensive software or technical expertise.</p>
+                    
+                    <p>Founded in 2020, our platform has helped millions of users worldwide convert, edit, and manage their documents efficiently. We believe that everyone should have access to powerful PDF tools without the burden of subscriptions or complicated software installations.</p>
+                    
+                    <p>Our team of developers is constantly working to improve existing tools and add new features based on user feedback. We prioritize security and privacy, ensuring that all file processing happens securely and that files are deleted from our servers after processing.</p>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>100% free online tools with no registration required</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Secure processing - files are deleted after conversion</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Works on all devices - desktop, tablet, and mobile</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>High-quality conversions with accurate formatting</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Regular updates with new tools and features</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>No watermarks on processed files</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Fast processing with no file size limits</span>
+                        </div>
+                    </div>
+                    
+                    <p>Whether you're a student, professional, or occasional user, our tools are designed to make your document workflow seamless and efficient. From simple conversions to advanced editing features, we've got you covered.</p>
+                    
+                    <a href="#contact" class="btn">Get In Touch</a>
+                </div>
+            </div>
         </div>
-        <div class="mobile-nav-item" id="navTools">
-            <i class="fas fa-tools"></i>
-            <span>Tools</span>
+    </section>
+
+    <!-- Article Section -->
+    <section class="section article-section" id="article">
+        <div class="container">
+            <div class="section-title">
+                <h2>The Complete Guide to PDF Tools and Conversions</h2>
+                <p>Everything you need to know about PDF tools and file conversions</p>
+            </div>
+            
+            <div class="article-content">
+                <p>In today's digital world, <span class="highlight">PDF tools</span> have become essential for professionals, students, and everyday computer users. The Portable Document Format (PDF) remains the standard for sharing documents while preserving their formatting across different devices and platforms. However, working with PDFs often requires specialized tools for editing, conversion, and manipulation.</p>
+                
+                <p>Our comprehensive suite of <span class="highlight">PDF conversion tools</span> allows you to transform your documents between various formats. With <span class="highlight">PDF to Word conversion</span>, you can easily extract text from PDF files and make edits in Microsoft Word. This is particularly useful for contracts, reports, and other documents that need occasional updates. Similarly, our <span class="highlight">PDF to Excel tool</span> helps you extract tables from PDFs and convert them into editable spreadsheets, saving you from the tedious task of manual data entry.</p>
+                
+                <p>For presentations and visual content, <span class="highlight">PDF to PowerPoint conversion</span> enables you to transform your PDF slides into editable presentation files. This is invaluable when you need to update or repurpose existing presentation materials. Additionally, our <span class="highlight">PDF to JPG/PNG tool</span> lets you export each page of your PDF as a high-quality image, perfect for sharing specific pages on social media or embedding in websites.</p>
+                
+                <p>Creating PDFs from other formats is just as important. Our <span class="highlight">Word to PDF conversion</span> tool preserves your document formatting while converting it to the universal PDF format. The <span class="highlight">Excel to PDF</span> and <span class="highlight">PowerPoint to PDF</span> converters ensure your spreadsheets and presentations look exactly as intended when shared with others. For simpler text documents, the <span class="highlight">TXT to PDF tool</span> creates properly formatted PDFs from plain text files.</p>
+                
+                <p>Beyond conversion, our <span class="highlight">PDF editing tools</span> provide comprehensive functionality for manipulating PDF documents. The <span class="highlight">Merge PDFs tool</span> allows you to combine multiple documents into a single file, perfect for compiling reports or combining chapters of a book. Conversely, the <span class="highlight">Split PDF tool</span> lets you extract specific pages or separate a large document into smaller files.</p>
+                
+                <p>Sometimes you need to remove unnecessary content from your documents, and that's where our <span class="highlight">Delete PDF Pages tool</span> comes in handy. For documents that were scanned incorrectly or need reorientation, the <span class="highlight">Rotate PDF Pages tool</span> allows you to correct page orientations in just a few clicks. When you need to reorganize your document, the <span class="highlight">Rearrange PDF Pages tool</span> provides an intuitive drag-and-drop interface for changing page order.</p>
+                
+                <p>PDFs often contain valuable images that you might want to use elsewhere. Our <span class="highlight">Extract Images from PDF tool</span> identifies and extracts all embedded images in high quality. To add professional touches to your documents, the <span class="highlight">Add Watermark to PDF tool</span> lets you insert text or image watermarks, while the <span class="highlight">Add Signature to PDF tool</span> provides multiple options for signing documents digitally.</p>
+                
+                <p>Document security is crucial in the digital age. Our <span class="highlight">Protect PDF tool</span> allows you to add password encryption and permissions to sensitive documents, preventing unauthorized access. If you've received a protected document that you need to edit, the <span class="highlight">Unlock PDF tool</span> can remove password restrictions (when you have the proper authorization).</p>
+                
+                <p>Large PDF files can be difficult to share via email or messaging apps. Our <span class="highlight">Compress PDF tool</span> reduces file size without significant quality loss, making sharing easier and faster. The compression algorithm smartly balances file size and quality based on your needs.</p>
+                
+                <p>Beyond PDF tools, we offer a comprehensive set of media conversion tools. Our <span class="highlight">Image Converter</span> supports all major formats including JPG, PNG, WEBP, and GIF. The <span class="highlight">Image Background Remover</span> uses advanced AI technology to isolate subjects from their backgrounds, creating professional-looking transparent images. For optimizing web content, the <span class="highlight">Image Compressor</span> reduces file sizes while maintaining visual quality.</p>
+                
+                <p>Video content continues to grow in importance, and our video tools help you work with various formats. The <span class="highlight">Video Converter</span> transforms files between MP4, AVI, MOV, and other popular formats. For creating engaging social media content, the <span class="highlight">Video to GIF Maker</span> converts video clips into animated GIFs. When file size is a concern, the <span class="highlight">Video Compressor</span> reduces video sizes without significant quality loss.</p>
+                
+                <p>Audio tools round out our media conversion offerings. The <span class="highlight">Audio Converter</span> supports MP3, WAV, OGG, and other common audio formats. For editing audio files, the <span class="highlight">Audio Cutter & Joiner</span> lets you trim audio clips or combine multiple files into one. These tools are perfect for podcasters, musicians, and audio enthusiasts.</p>
+                
+                <p>Our AI-powered tools represent the cutting edge of digital technology. The <span class="highlight">Text to Speech tool</span> converts written text into natural-sounding audio using advanced AI voices, perfect for creating audio content or assisting those with reading difficulties. The <span class="highlight">Speech to Text tool</span> does the reverse, transcribing spoken audio into written text with impressive accuracy.</p>
+                
+                <p>For ultimate convenience, our <span class="highlight">All-in-One Converter</span> provides a unified interface for converting between various document, image, audio, and video formats. This versatile tool eliminates the need to switch between different converters for different file types.</p>
+                
+                <p>All our tools are designed with user experience in mind. They feature intuitive interfaces, fast processing speeds, and reliable results. We prioritize your privacy and security by processing files entirely in your browser when possible, or on secure servers that automatically delete your files after processing.</p>
+                
+                <p>Whether you're a student preparing assignments, a professional handling business documents, or someone who occasionally needs to work with digital files, I Like PDF Tools provides everything you need in one convenient location. Our platform is constantly evolving with new tools and improvements based on user feedback and technological advancements.</p>
+                
+                <p>Best of all, every tool on our platform is completely free to use, with no hidden fees, watermarks, or limitations. We believe that powerful digital tools should be accessible to everyone, regardless of budget or technical expertise. Try our tools today and experience the convenience of comprehensive file conversion and editing capabilities right in your web browser.</p>
+            </div>
         </div>
-        <div class="mobile-nav-item" id="navSearch">
-            <i class="fas fa-search"></i>
-            <span>Search</span>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section faq-section" id="faq">
+        <div class="container">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Find answers to common questions about our PDF tools</p>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Are these PDF tools really free to use?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, all our PDF tools are completely free to use. We don't charge any fees, and there are no hidden costs. You can use our tools as much as you want without any limitations.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is my data secure when using your tools?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely. We take security seriously. All file processing happens on secure servers, and we automatically delete your files after processing. We don't store or access your files for any other purpose.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Do I need to create an account to use the tools?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>No, you don't need to create an account or register to use our tools. They are available for immediate use without any sign-up process.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What file formats do you support?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We support a wide range of file formats including PDF, DOCX, XLSX, PPTX, JPG, PNG, GIF, WEBP, MP4, AVI, MOV, MP3, WAV, and many more. Our all-in-one converter handles most common file types.</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Is there a file size limit for uploads?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>We don't impose strict file size limits for most tools. However, very large files may take longer to process. For optimal performance, we recommend files under 100MB for most tools.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mobile-nav-item" id="navMenu">
-            <i class="fas fa-bars"></i>
-            <span>Menu</span>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section contact-section" id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Get In Touch</h2>
+                <p>Have questions or need support? Reach out to our team</p>
+            </div>
+            
+            <div class="contact-container">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4>Email Us</h4>
+                            <p>helpilikepdftools@gmail.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h4>Response Time</h4>
+                            <p>We typically respond within 24 hours</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <h4>Support</h4>
+                            <p>Our support team is here to help you with any issues</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-lightbulb"></i>
+                        <div>
+                            <h4>Suggestions</h4>
+                            <p>We welcome feedback and tool suggestions</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <h3>Send us a Message</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Your Message</label>
+                            <textarea id="message" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn">Send Message</button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h4>I Like PDF Tools</h4>
+                    <p>Your all-in-one solution for PDF and file conversion needs. Free, fast, and reliable tools for everyone.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>PDF Tools</h4>
+                    <ul>
+                        <li><a href="#pdf-conversion">PDF Conversion</a></li>
+                        <li><a href="#pdf-editing">PDF Editing</a></li>
+                        <li><a href="#pdf-security">PDF Security</a></li>
+                        <li><a href="#pdf-compression">PDF Compression</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Other Tools</h4>
+                    <ul>
+                        <li><a href="#image-tools">Image Tools</a></li>
+                        <li><a href="#video-tools">Video Tools</a></li>
+                        <li><a href="#audio-tools">Audio Tools</a></li>
+                        <li><a href="#ai-tools">AI Tools</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#article">Article</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 I Like PDF Tools. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <!-- Script -->
     <script>
@@ -1208,15 +1676,6 @@
                     filterButtons.forEach(btn => btn.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Also update mobile tabs
-                    document.querySelectorAll('.mobile-tab').forEach(tab => {
-                        if (tab.getAttribute('data-filter') === filter) {
-                            tab.classList.add('active');
-                        } else {
-                            tab.classList.remove('active');
-                        }
-                    });
-                    
                     // Filter tools
                     let filteredTools;
                     if (filter === 'all') {
@@ -1231,119 +1690,41 @@
                 });
             });
             
-            // Setup mobile tabs
-            const mobileTabs = document.querySelectorAll('.mobile-tab');
-            mobileTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const filter = this.getAttribute('data-filter');
-                    
-                    // Update active state
-                    mobileTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Also update filter buttons
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        if (btn.getAttribute('data-filter') === filter) {
-                            btn.classList.add('active');
-                        } else {
-                            btn.classList.remove('active');
-                        }
-                    });
-                    
-                    // Filter tools
-                    let filteredTools;
-                    if (filter === 'all') {
-                        filteredTools = tools;
-                    } else {
-                        filteredTools = tools.filter(tool => tool.category === filter);
-                    }
-                    
-                    // Clear and render filtered tools
-                    container.innerHTML = '';
-                    renderTools(filteredTools, container);
-                    
-                    // Scroll to tools section
-                    document.getElementById('all-tools').scrollIntoView({ behavior: 'smooth' });
-                });
-            });
-            
-            // Setup search functionality for desktop
+            // Setup search functionality
             const searchInput = document.getElementById('searchInput');
             const searchResults = document.getElementById('searchResults');
             
-            if (searchInput) {
-                // Fast responsive search with debouncing
-                let searchTimeout;
-                searchInput.addEventListener('input', function() {
-                    clearTimeout(searchTimeout);
-                    const searchTerm = this.value.trim().toLowerCase();
-                    
-                    if (searchTerm.length === 0) {
-                        searchResults.style.display = 'none';
-                        return;
-                    }
-                    
-                    // Show loading state
-                    searchResults.innerHTML = '<div class="no-results">Searching...</div>';
-                    searchResults.style.display = 'block';
-                    
-                    // Debounce the search to improve performance
-                    searchTimeout = setTimeout(() => {
-                        performSearch(searchTerm, searchResults);
-                    }, 100);
-                });
-                
-                // Close search results when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                        searchResults.style.display = 'none';
-                    }
-                });
-                
-                // Keep results open when clicking on them
-                searchResults.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
-            
-            // Setup mobile search
-            const searchOverlay = document.getElementById('searchOverlay');
-            const mobileSearchInput = document.getElementById('mobileSearchInput');
-            const mobileSearchResults = document.getElementById('mobileSearchResults');
-            const searchBack = document.getElementById('searchBack');
-            const navSearch = document.getElementById('navSearch');
-            
-            // Open mobile search
-            navSearch.addEventListener('click', function() {
-                searchOverlay.classList.add('active');
-                setTimeout(() => {
-                    mobileSearchInput.focus();
-                }, 300);
-            });
-            
-            // Close mobile search
-            searchBack.addEventListener('click', function() {
-                searchOverlay.classList.remove('active');
-            });
-            
-            // Mobile search functionality
-            let mobileSearchTimeout;
-            mobileSearchInput.addEventListener('input', function() {
-                clearTimeout(mobileSearchTimeout);
+            // Fast responsive search with debouncing
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
                 const searchTerm = this.value.trim().toLowerCase();
                 
                 if (searchTerm.length === 0) {
-                    mobileSearchResults.innerHTML = '<div class="no-results">Type to search for tools</div>';
+                    searchResults.style.display = 'none';
                     return;
                 }
                 
                 // Show loading state
-                mobileSearchResults.innerHTML = '<div class="no-results">Searching...</div>';
+                searchResults.innerHTML = '<div class="no-results">Searching...</div>';
+                searchResults.style.display = 'block';
                 
                 // Debounce the search to improve performance
-                mobileSearchTimeout = setTimeout(() => {
-                    performMobileSearch(searchTerm, mobileSearchResults);
+                searchTimeout = setTimeout(() => {
+                    performSearch(searchTerm);
                 }, 100);
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+            
+            // Keep results open when clicking on them
+            searchResults.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
             
             // Setup sidebar toggle
@@ -1351,16 +1732,21 @@
             const sidebar = document.getElementById('sidebar');
             const sidebarClose = document.getElementById('sidebarClose');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
-            const navMenu = document.getElementById('navMenu');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
             
             navToggle.addEventListener('click', function() {
                 sidebar.classList.add('active');
                 sidebarOverlay.classList.add('active');
             });
             
-            navMenu.addEventListener('click', function() {
+            mobileMenuBtn.addEventListener('click', function() {
                 sidebar.classList.add('active');
                 sidebarOverlay.classList.add('active');
+            });
+            
+            mobileSearchBtn.addEventListener('click', function() {
+                searchInput.focus();
             });
             
             sidebarClose.addEventListener('click', function() {
@@ -1373,31 +1759,31 @@
                 sidebarOverlay.classList.remove('active');
             });
             
-            // Mobile navigation
-            const navHome = document.getElementById('navHome');
-            const navTools = document.getElementById('navTools');
-            
-            navHome.addEventListener('click', function() {
-                // Update active state
-                document.querySelectorAll('.mobile-nav-item').forEach(item => {
-                    item.classList.remove('active');
+            // Setup FAQ toggle
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    answer.classList.toggle('active');
+                    
+                    const icon = this.querySelector('i');
+                    if (answer.classList.contains('active')) {
+                        icon.className = 'fas fa-chevron-up';
+                    } else {
+                        icon.className = 'fas fa-chevron-down';
+                    }
                 });
-                this.classList.add('active');
-                
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
             
-            navTools.addEventListener('click', function() {
-                // Update active state
-                document.querySelectorAll('.mobile-nav-item').forEach(item => {
-                    item.classList.remove('active');
+            // Setup contact form
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Thank you for your message! We will get back to you soon.');
+                    contactForm.reset();
                 });
-                this.classList.add('active');
-                
-                // Scroll to tools section
-                document.getElementById('all-tools').scrollIntoView({ behavior: 'smooth' });
-            });
+            }
             
             // Smooth scrolling for navigation links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1410,7 +1796,7 @@
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         window.scrollTo({
-                            top: targetElement.offsetTop - 70,
+                            top: targetElement.offsetTop - 100,
                             behavior: 'smooth'
                         });
                         
@@ -1420,10 +1806,27 @@
                     }
                 });
             });
+            
+            // Add touch events for mobile
+            if ('ontouchstart' in window) {
+                // Make tool cards more touch-friendly
+                const toolCards = document.querySelectorAll('.tool-card');
+                toolCards.forEach(card => {
+                    card.addEventListener('touchstart', function() {
+                        this.classList.add('touch-active');
+                    }, {passive: true});
+                    
+                    card.addEventListener('touchend', function() {
+                        this.classList.remove('touch-active');
+                    }, {passive: true});
+                });
+            }
         });
 
         // Function to perform search
-        function performSearch(searchTerm, resultsContainer) {
+        function performSearch(searchTerm) {
+            const searchResults = document.getElementById('searchResults');
+            
             // Filter tools based on search term
             const filteredTools = tools.filter(tool => {
                 return tool.name.toLowerCase().includes(searchTerm) || 
@@ -1433,9 +1836,9 @@
             
             // Display results
             if (filteredTools.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-results">No tools found matching your search</div>';
+                searchResults.innerHTML = '<div class="no-results">No tools found matching your search</div>';
             } else {
-                resultsContainer.innerHTML = '';
+                searchResults.innerHTML = '';
                 filteredTools.forEach(tool => {
                     const resultItem = document.createElement('div');
                     resultItem.className = 'search-result-item';
@@ -1446,40 +1849,11 @@
                     resultItem.addEventListener('click', function() {
                         window.location.href = tool.url;
                     });
-                    resultsContainer.appendChild(resultItem);
+                    searchResults.appendChild(resultItem);
                 });
             }
             
-            resultsContainer.style.display = 'block';
-        }
-
-        // Function to perform mobile search
-        function performMobileSearch(searchTerm, resultsContainer) {
-            // Filter tools based on search term
-            const filteredTools = tools.filter(tool => {
-                return tool.name.toLowerCase().includes(searchTerm) || 
-                       tool.description.toLowerCase().includes(searchTerm) ||
-                       tool.category.toLowerCase().includes(searchTerm);
-            });
-            
-            // Display results
-            if (filteredTools.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-results">No tools found matching your search</div>';
-            } else {
-                resultsContainer.innerHTML = '';
-                filteredTools.forEach(tool => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'mobile-search-item';
-                    resultItem.innerHTML = `
-                        <i class="fas ${tool.icon}"></i>
-                        <h4>${tool.name}</h4>
-                    `;
-                    resultItem.addEventListener('click', function() {
-                        window.location.href = tool.url;
-                    });
-                    resultsContainer.appendChild(resultItem);
-                });
-            }
+            searchResults.style.display = 'block';
         }
 
         // Function to render tools
@@ -1500,6 +1874,14 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // Toggle sidebar function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
     </script>
 </body>
