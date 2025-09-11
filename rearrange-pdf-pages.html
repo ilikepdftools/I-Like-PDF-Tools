@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rearrange PDF Pages | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input[type=file],button{padding:8px;margin:6px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;overflow-x:auto}
+.preview-item{position:relative;width:80px;height:100px;border:1px solid #334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:2px;font-size:0.75rem;text-align:center;cursor:grab}
+.preview-item.dragging{opacity:0.5;border:2px dashed var(--accent)}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header>📄 Rearrange PDF Pages</header>
+
+<div class="card">
+  <div class="controls">
+    <input type="file" id="fileInput" accept="application/pdf">
+    <button id="undoBtn">Undo</button>
+    <button id="downloadBtn">Download PDF</button>
+  </div>
+
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const fileInput=document.getElementById('fileInput');
+const preview=document.getElementById('preview');
+const undoBtn=document.getElementById('undoBtn');
+const downloadBtn=document.getElementById('downloadBtn');
+const statusEl=document.getElementById('status');
+const progressBar=document.getElementById('progressBar');
+
+let pdfBytes=null;
+let pdfDoc=null;
+let originalOrder=[];
+let dragged=null;
+
+// Load PDF
+fileInput.addEventListener('change', async e=>{
+  preview.innerHTML='';
+  pdfBytes=null;
+  pdfDoc=null;
+  originalOrder=[];
+  const file=e.target.files[0];
+  if(!file || file.type!=='application/pdf'){statusEl.textContent='❌ Please upload a PDF'; return;}
+
+  statusEl.textContent='Loading PDF...';
+  const arrayBuffer=await file.arrayBuffer();
+  pdfBytes=arrayBuffer;
+  pdfDoc=await PDFLib.PDFDocument.load(arrayBuffer);
+
+  const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const totalPages=pdf.numPages;
+
+  for(let i=1;i<=totalPages;i++){
+    const page=await pdf.getPage(i);
+    const viewport=page.getViewport({scale:0.2});
+    const canvas=document.createElement('canvas');
+    canvas.width=viewport.width;
+    canvas.height=viewport.height;
+    const ctx=canvas.getContext('2d');
+    await page.render({canvasContext:ctx,viewport}).promise;
+
+    const div=document.createElement('div');
+    div.className='preview-item';
+    div.dataset.page=i-1;
+    div.appendChild(canvas);
+    div.appendChild(document.createTextNode(`Page ${i}`));
+    preview.appendChild(div);
+
+    div.addEventListener('dragstart',e=>{dragged=div; div.classList.add('dragging')});
+    div.addEventListener('dragend',e=>{dragged=null; div.classList.remove('dragging')});
+
+    div.addEventListener('dragover',e=>{e.preventDefault(); const target=div; if(dragged && target!==dragged){
+      const rect=target.getBoundingClientRect();
+      const next=(e.clientX-rect.left)/(rect.right-rect.left)>0.5?target.nextSibling:target;
+      preview.insertBefore(dragged,next);
+    }});
+  }
+
+  originalOrder=[...preview.children];
+  statusEl.textContent=`PDF loaded (${totalPages} pages)`;
+});
+
+// Undo
+undoBtn.addEventListener('click',()=>{
+  preview.innerHTML='';
+  originalOrder.forEach(node=>preview.appendChild(node));
+  statusEl.textContent='Order reset';
+});
+
+// Download PDF
+downloadBtn.addEventListener('click', async ()=>{
+  if(!pdfDoc){alert('No PDF loaded'); return;}
+  statusEl.textContent='Processing PDF...';
+  progressBar.style.width='0%';
+
+  const newPdf = await PDFLib.PDFDocument.create();
+  const srcPages = await newPdf.copyPages(pdfDoc, [...preview.children].map(div=>parseInt(div.dataset.page)));
+
+  srcPages.forEach((p,i)=>newPdf.addPage(p));
+  progressBar.style.width='100%';
+
+  const bytes = await newPdf.save();
+  const blob = new Blob([bytes],{type:'application/pdf'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download='rearranged.pdf';
+  a.click();
+  statusEl.textContent='✅ PDF ready for download';
+});
+</script>
+</body>
+</html>
