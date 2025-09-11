@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speech → Text Transcription Tool</title>
+<style>
+body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+.container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+textarea, select, input, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+button:hover { background:#0ea5e9; }
+.status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+a { display:block; margin-top:1rem; color:#38bdf8; font-weight:bold; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>📝 Speech → Text Transcription</header>
+
+<div class="container">
+  <button id="recordBtn">🎤 Start Recording</button>
+  <button id="stopBtn" disabled>⏹ Stop Recording</button>
+  <div class="status" id="status">Click Start to record your voice.</div>
+
+  <label>Or upload audio file:</label>
+  <input type="file" id="audioUpload" accept="audio/*">
+  <div class="status" id="uploadStatus"></div>
+
+  <label>Transcription:</label>
+  <textarea id="transcript" rows="10" placeholder="Transcribed text will appear here..."></textarea>
+
+  <a id="downloadTxt" style="display:none;">💾 Download TXT</a>
+  <a id="downloadSrt" style="display:none;">💾 Download SRT</a>
+
+  <audio id="audioPreview" controls style="width:100%; margin-top:1rem;"></audio>
+</div>
+
+<script>
+const recordBtn = document.getElementById('recordBtn');
+const stopBtn = document.getElementById('stopBtn');
+const status = document.getElementById('status');
+const transcriptArea = document.getElementById('transcript');
+const downloadTxt = document.getElementById('downloadTxt');
+const downloadSrt = document.getElementById('downloadSrt');
+const audioUpload = document.getElementById('audioUpload');
+const uploadStatus = document.getElementById('uploadStatus');
+const audioPreview = document.getElementById('audioPreview');
+
+let recognition, recording = false;
+let startTime;
+
+// Live Recording with Web Speech API
+if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    status.textContent = '🎙 Recording... Speak now.';
+    startTime = Date.now();
+  };
+
+  recognition.onresult = (event) => {
+    let text = '';
+    for(let i=event.resultIndex; i<event.results.length; i++){
+      text += event.results[i][0].transcript;
+    }
+    transcriptArea.value = text;
+  };
+
+  recognition.onend = () => {
+    status.textContent = '⏹ Recording stopped.';
+    recording = false;
+    stopBtn.disabled = true;
+    recordBtn.disabled = false;
+    generateDownloadLinks();
+  };
+} else {
+  recordBtn.disabled = true;
+  status.textContent = '❌ Web Speech API not supported in this browser.';
+}
+
+recordBtn.onclick = () => {
+  if(recognition) { recognition.start(); recording=true; recordBtn.disabled=true; stopBtn.disabled=false; }
+};
+stopBtn.onclick = () => { if(recognition) recognition.stop(); };
+
+// Upload Audio File
+audioUpload.onchange = async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  uploadStatus.textContent = '⏳ Preparing audio...';
+  const url = URL.createObjectURL(file);
+  audioPreview.src = url;
+  audioPreview.load();
+
+  // Placeholder for sending file to server ASR API
+  uploadStatus.textContent = '⏳ Sending audio to server for transcription...';
+  
+  // Example fetch: Replace URL with your ASR server endpoint
+  /*
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await fetch('https://your-server.com/asr', {method:'POST', body:formData});
+  const result = await response.json();
+  transcriptArea.value = result.text;
+  */
+
+  setTimeout(() => {
+    transcriptArea.value = 'Server ASR placeholder: transcription of uploaded file would appear here.';
+    uploadStatus.textContent = '✅ Transcription complete (demo placeholder).';
+    generateDownloadLinks();
+  }, 2000);
+};
+
+// Generate Download Links (TXT & SRT)
+function generateDownloadLinks() {
+  const text = transcriptArea.value.trim();
+  if(!text) { downloadTxt.style.display='none'; downloadSrt.style.display='none'; return; }
+
+  // TXT
+  const txtBlob = new Blob([text], {type:'text/plain'});
+  downloadTxt.href = URL.createObjectURL(txtBlob);
+  downloadTxt.download = 'transcript.txt';
+  downloadTxt.style.display='block';
+
+  // SRT (simple demo: 1s per line)
+  const lines = text.split(/[\n.?!]+/).filter(l=>l.trim());
+  let srtContent = '';
+  lines.forEach((line, i)=>{
+    const start = new Date(i*1000).toISOString().substr(11,8) + ',000';
+    const end = new Date((i+1)*1000).toISOString().substr(11,8) + ',000';
+    srtContent += `${i+1}\n${start} --> ${end}\n${line.trim()}\n\n`;
+  });
+  const srtBlob = new Blob([srtContent], {type:'text/plain'});
+  downloadSrt.href = URL.createObjectURL(srtBlob);
+  downloadSrt.download = 'transcript.srt';
+  downloadSrt.style.display='block';
+}
+</script>
+</body>
+</html>
