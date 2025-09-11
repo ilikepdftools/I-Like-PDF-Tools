@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>I Like PDF Tools — Hybrid PDF → PPTX (images + text boxes)</title>
+
+<style>
+  :root{
+    --bg:#070b10; --panel:#0f1720; --muted:#9fb0c8; --accent:#06b6d4;
+    --card:#0b1220;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg),#051021);color:#e6eef6;padding:18px}
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:18px}
+  @media(max-width:980px){.container{grid-template-columns:1fr}}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  h1{font-size:18px;margin:0}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--card));padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  label.btn{background:var(--accent);color:#012226;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  select,input[type=file],button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  .thumbs{display:flex;flex-direction:column;gap:10px;max-height:640px;overflow:auto;padding-right:6px}
+  .thumb{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);cursor:grab}
+  .thumb.dragging{opacity:0.5}
+  .thumb img{width:120px;height:auto;border-radius:6px;border:1px solid rgba(255,255,255,0.03)}
+  .meta{color:var(--muted);font-size:13px}
+  .row{display:flex;gap:8px;align-items:center}
+  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+  .options{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .out{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .note{font-size:12px;color:var(--muted)}
+  footer.small{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+  /* Fullscreen modal preview */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:60}
+  .modal .inner{max-width:95%;max-height:95%;background:#071021;padding:10px;border-radius:8px;overflow:auto}
+  .modal img{max-width:100%;height:auto;display:block}
+  .navBtns{display:flex;gap:8px}
+  .small{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px;border-radius:8px;color:var(--muted);cursor:pointer}
+</style>
+
+<!-- pdf.js and pptxgenjs -->
+<script src="https://unpkg.com/pdfjs-dist@3.7.107/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.0/dist/pptxgen.bundle.min.js"></script>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>I Like PDF Tools — Hybrid PDF → PowerPoint</h1>
+      <p class="lead">Adds rasterized page images + positioned text lines as textboxes to PPTX slides (client-side).</p>
+    </div>
+    <div class="note">Privacy-first • Client-side</div>
+  </header>
+
+  <div class="container">
+    <!-- LEFT -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="row">
+          <label class="btn" for="fileInput">Upload PDF</label>
+          <input id="fileInput" type="file" accept=".pdf" style="display:none" />
+          <select id="outputSelect" title="Output format">
+            <option value="pptx">PowerPoint (.pptx)</option>
+          </select>
+        </div>
+        <div class="row">
+          <button id="convertBtn" style="background:var(--accent);color:#012226;padding:8px 12px;border-radius:8px;border:none">Convert</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <div class="note">Slide size:</div>
+        <select id="slideSize">
+          <option value="16:9">16:9 (Widescreen)</option>
+          <option value="4:3">4:3 (Standard)</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:6px;margin-left:8px"><input id="includeNotes" type="checkbox" checked/> <span class="note">Include page text as notes</span></label>
+        <label style="display:flex;align-items:center;gap:6px;margin-left:8px"><input id="addTextBox" type="checkbox"/> <span class="note">Add positioned text lines as textboxes</span></label>
+      </div>
+
+      <div class="progress" aria-hidden="false" style="margin-top:12px"><i id="progressBar" style="width:0%"></i></div>
+      <div class="row" style="justify-content:space-between;margin-top:10px">
+        <div class="meta" id="statusText">No file loaded</div>
+        <div class="meta" id="pageCount"></div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Page Thumbnails (drag to reorder)</strong></div>
+        <div class="note">Reorder pages before export</div>
+      </div>
+
+      <div id="thumbs" class="thumbs" style="margin-top:8px">
+        <div class="note">No PDF loaded. Upload a PDF to generate thumbnails.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Preview & Controls</strong>
+        <div class="note">Preview, full-screen, navigate</div>
+      </div>
+
+      <div id="previewArea" style="margin-top:10px;min-height:240px;border-radius:8px;background:rgba(255,255,255,0.02);padding:8px;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div class="note">No preview</div>
+      </div>
+
+      <div class="out" style="margin-top:12px">
+        <div class="navBtns">
+          <button id="prevBtn" class="small">Prev</button>
+          <button id="nextBtn" class="small">Next</button>
+          <button id="fullBtn" class="small">Fullscreen</button>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button id="downloadBtn" class="btn" style="display:none">Download PPTX</button>
+          <button id="resetBtn" class="small">Reset</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px" id="log" class="note">Idle</div>
+    </div>
+  </div>
+
+  <!-- Modal placeholder -->
+  <div id="modalRoot" style="display:none"></div>
+
+<script>
+/* Hybrid PDF → PPTX tool
+   Features:
+   - Renders PDF pages as images (thumbnails)
+   - Extracts text items and groups into lines
+   - When 'Add textboxes' is enabled, creates positioned textboxes per line in slides
+   - Allows reorder of thumbnails via drag/drop
+   - Next/Prev navigation and fullscreen preview modal
+   - Uses pdf.js and pptxgenjs client-side
+*/
+
+/* pdf.js worker */
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.7.107/build/pdf.worker.min.js';
+
+/* UI elements */
+const fileInput = document.getElementById('fileInput');
+const thumbsEl = document.getElementById('thumbs');
+const previewArea = document.getElementById('previewArea');
+const convertBtn = document.getElementById('convertBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const fullBtn = document.getElementById('fullBtn');
+const statusText = document.getElementById('statusText');
+const pageCountEl = document.getElementById('pageCount');
+const progressBar = document.getElementById('progressBar');
+const slideSizeSel = document.getElementById('slideSize');
+const includeNotesChk = document.getElementById('includeNotes');
+const addTextBoxChk = document.getElementById('addTextBox');
+const logEl = document.getElementById('log');
+const modalRoot = document.getElementById('modalRoot');
+
+let pdfDoc = null;
+let pages = []; // {pageNum, dataUrl, textLines: [{text, x, y, width}], widthPx, heightPx}
+let currentPreviewIndex = 0;
+let draggingEl = null;
+const MAX_FILE_SIZE = 120 * 1024 * 1024; // 120MB
+
+/* File load */
+fileInput.addEventListener('change', async (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  if(!f.name.toLowerCase().endsWith('.pdf')) { alert('Only PDF files allowed here'); return; }
+  if(f.size > MAX_FILE_SIZE){ alert('File too large (max 120MB)'); return; }
+  await loadPdfFile(f);
+});
+
+/* Reset */
+resetBtn.addEventListener('click', ()=>{
+  pdfDoc = null; pages = []; thumbsEl.innerHTML = '<div class="note">No PDF loaded. Upload a PDF to generate thumbnails.</div>'; previewArea.innerHTML = '<div class="note">No preview</div>'; downloadBtn.style.display='none';
+  statusText.textContent = 'Reset'; pageCountEl.textContent=''; progressBar.style.width='0%'; logEl.textContent='Idle'; currentPreviewIndex = 0;
+});
+
+/* Load PDF and extract pages */
+async function loadPdfFile(file){
+  thumbsEl.innerHTML = ''; previewArea.innerHTML = '<div class="note">Rendering thumbnails...</div>'; statusText.textContent='Loading PDF...'; progressBar.style.width='5%'; logEl.textContent='Loading PDF';
+  try{
+    const arrayBuf = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuf });
+    pdfDoc = await loadingTask.promise;
+    const num = pdfDoc.numPages;
+    pageCountEl.textContent = `${num} pages`;
+    pages = [];
+    for(let p=1;p<=num;p++){
+      // render page to canvas
+      const page = await pdfDoc.getPage(p);
+      const scale = 1.4;
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      // extract text content and group into lines
+      let lines = [];
+      try{
+        const textContent = await page.getTextContent();
+        lines = groupTextItemsToLines(textContent.items);
+        // map each line to an object with approximate x,y,w relative to canvas pixels
+        lines = lines.map(arr=>{
+          // compute avg x and y in PDF coords and convert to canvas pixels
+          const xs = arr.map(it=> (it.transform && it.transform[4]) ? it.transform[4] : (it.x||0));
+          const ys = arr.map(it=> (it.transform && it.transform[5]) ? it.transform[5] : (it.y||0));
+          const avgX = xs.reduce((a,b)=>a+b,0)/xs.length;
+          const avgY = ys.reduce((a,b)=>a+b,0)/ys.length;
+          // PDF coordinate system has origin bottom-left; pdf.js text transform values are in PDF coords.
+          // Convert PDF coords -> canvas pixel coords:
+          const px = (avgX / viewport.width) * canvas.width;
+          const py = canvas.height - ((avgY / viewport.height) * canvas.height);
+          const text = arr.map(i=>i.str).join(' ');
+          return { text, x: px, y: py };
+        });
+      }catch(e){
+        lines = [];
+      }
+
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      pages.push({ pageNum:p, dataUrl, textLines:lines, widthPx: canvas.width, heightPx: canvas.height });
+      appendThumbnail(pages[pages.length-1]);
+
+      // small delay for UI
+      await new Promise(r=>setTimeout(r,50));
+      progressBar.style.width = `${Math.round((p / pdfDoc.numPages) * 60)}%`;
+    }
+    statusText.textContent = `Rendered ${pdfDoc.numPages} pages.`;
+    previewPage(0);
+    logEl.textContent = 'Thumbnails ready';
+    progressBar.style.width = `0%`;
+  }catch(err){
+    console.error(err);
+    alert('Error loading PDF: ' + err.message);
+    statusText.textContent = 'Error';
+    logEl.textContent = 'Error: ' + err.message;
+  }
+}
+
+/* group pdf.js text items into lines by Y coordinate */
+function groupTextItemsToLines(items){
+  const tolerance = 4;
+  const buckets = [];
+  for(const it of items){
+    const y = (it.transform && it.transform.length>=6) ? Math.round(it.transform[5]) : Math.round(it.y||0);
+    let found=false;
+    for(const b of buckets){
+      if(Math.abs(b.y - y) <= tolerance){ b.items.push(it); found=true; break; }
+    }
+    if(!found){ buckets.push({ y, items:[it] }); }
+  }
+  // sort top->bottom (pdf coords descending)
+  buckets.sort((a,b)=>b.y - a.y);
+  // sort items left->right by x
+  for(const b of buckets){
+    b.items.sort((p,q)=> {
+      const px = (p.transform && p.transform[4]) ? p.transform[4] : (p.x||0);
+      const qx = (q.transform && q.transform[4]) ? q.transform[4] : (q.x||0);
+      return px - qx;
+    });
+  }
+  // return arrays
+  return buckets.map(b=>b.items);
+}
+
+/* Append thumbnail with drag/drop and preview button */
+function appendThumbnail(obj){
+  if(thumbsEl.querySelector('.note')) thumbsEl.innerHTML = '';
+  const el = document.createElement('div'); el.className='thumb'; el.draggable=true; el.dataset.pagenum = obj.pageNum;
+  el.innerHTML = `<img src="${obj.dataUrl}" alt="Page ${obj.pageNum}"><div style="flex:1"><div style="font-weight:700">Page ${obj.pageNum}</div><div class="meta">${obj.textLines.length? obj.textLines.slice(0,2).map(l=>l.text).join(' • '): '<i>no text</i>'}</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px"><button class="small" onclick="previewPageByNum(${obj.pageNum})">Preview</button><div class="meta">Drag to reorder</div></div>`;
+  // drag events
+  el.addEventListener('dragstart', (e)=>{ draggingEl = el; el.classList.add('dragging'); });
+  el.addEventListener('dragend', ()=>{ if(draggingEl){ draggingEl.classList.remove('dragging'); draggingEl = null; } });
+  el.addEventListener('dragover', (e)=>{ e.preventDefault(); });
+  el.addEventListener('drop', (e)=>{ e.preventDefault(); if(!draggingEl || draggingEl===el) return; thumbsEl.insertBefore(draggingEl, el.nextSibling); reorderPagesFromDOM(); });
+  thumbsEl.appendChild(el);
+}
+
+/* Reorder pages[] based on DOM order */
+function reorderPagesFromDOM(){
+  const nodes = Array.from(thumbsEl.querySelectorAll('.thumb'));
+  const newPages = [];
+  for(const n of nodes){
+    const pnum = Number(n.dataset.pagenum);
+    const found = pages.find(pp=>pp.pageNum===pnum);
+    if(found) newPages.push(found);
+  }
+  pages = newPages;
+  logEl.textContent = 'Order updated';
+}
+
+/* Preview helpers */
+function previewPage(index){
+  if(pages.length===0) return;
+  currentPreviewIndex = Math.max(0, Math.min(index, pages.length-1));
+  const p = pages[currentPreviewIndex];
+  previewArea.innerHTML = '';
+  const img = document.createElement('img'); img.src = p.dataUrl; img.style.maxWidth='100%';
+  previewArea.appendChild(img);
+  const info = document.createElement('div'); info.className='note'; info.style.marginTop='8px'; info.textContent = p.textLines.length? p.textLines.map(l=>l.text).slice(0,6).join(' — ') : 'No selectable text';
+  previewArea.appendChild(info);
+}
+
+function previewPageByNum(pageNum){
+  const idx = pages.findIndex(p=>p.pageNum===pageNum);
+  if(idx>=0) previewPage(idx);
+}
+
+prevBtn.addEventListener('click', ()=> previewPage(currentPreviewIndex-1));
+nextBtn.addEventListener('click', ()=> previewPage(currentPreviewIndex+1));
+
+/* Fullscreen modal */
+fullBtn.addEventListener('click', ()=> {
+  if(pages.length===0) return;
+  const p = pages[currentPreviewIndex];
+  const modal = document.createElement('div'); modal.className='modal';
+  const inner = document.createElement('div'); inner.className='inner';
+  const img = document.createElement('img'); img.src = p.dataUrl;
+  const close = document.createElement('button'); close.textContent='Close'; close.className='small'; close.style.marginTop='8px';
+  close.onclick = ()=> { modal.remove(); modalRoot.style.display='none'; };
+  inner.appendChild(img); inner.appendChild(close); modal.appendChild(inner);
+  modalRoot.style.display='block'; modalRoot.innerHTML=''; modalRoot.appendChild(modal);
+});
+
+/* Convert to PPTX (Hybrid) */
+convertBtn.addEventListener('click', async ()=>{
+  if(!pages.length){ alert('Upload a PDF and generate thumbnails first'); return; }
+  convertBtn.disabled = true; resetBtn.disabled = true;
+  statusText.textContent = 'Generating PPTX...'; logEl.textContent = 'Starting conversion'; progressBar.style.width='3%';
+  try{
+    const pptx = new PptxGenJS();
+    // set layout
+    const size = slideSizeSel.value;
+    if(size === '16:9') { pptx.layout = 'LAYOUT_WIDE'; /* 10 x 5.625 in */ }
+    else { pptx.layout = 'LAYOUT_4x3'; /* 10 x 7.5 in */ }
+
+    // slide dimension helpers (pptxgenjs uses inches by default)
+    const slideDims = (pptx.layout === 'LAYOUT_WIDE') ? { wIn:10, hIn:5.625 } : { wIn:10, hIn:7.5 };
+
+    const total = pages.length;
+    for(let i=0;i<pages.length;i++){
+      const p = pages[i];
+      progressBar.style.width = `${Math.round((i/total)*70)}%`;
+      statusText.textContent = `Processing page ${i+1}/${total}...`;
+      logEl.textContent = `Processing page ${p.pageNum}`;
+
+      const slide = pptx.addSlide();
+
+      // Add page image as background fill (cover)
+      try{
+        slide.addImage({ data: p.dataUrl, x:0, y:0, w:slideDims.wIn, h:slideDims.hIn });
+      }catch(e){
+        console.warn('Image add failed', e);
+      }
+
+      // Include page text as slide notes if requested
+      if(includeNotesChk.checked && p.textLines.length){
+        const combined = p.textLines.map(l=>l.text).join('\n');
+        try{ slide.addNotes(combined); }catch(e){ /* ignore if older API */ }
+      }
+
+      // Add positioned text boxes per line (grouping)
+      if(addTextBoxChk.checked && p.textLines.length){
+        // Map canvas px to inches: x_in = (x_px / widthPx) * slideWidthIn
+        const scaleX = slideDims.wIn / p.widthPx;
+        const scaleY = slideDims.hIn / p.heightPx;
+        for(const ln of p.textLines){
+          // compute approximate textbox position & width
+          const txIn = Math.max(0, (ln.x / p.widthPx) * slideDims.wIn);
+          const tyIn = Math.max(0, (ln.y / p.heightPx) * slideDims.hIn);
+          // choose a width that attempts to stay within bounds
+          const wIn = Math.min(slideDims.wIn - txIn - 0.2, 8);
+          // choose a small font size (map roughly)
+          let fontSize = 10; // default
+          // adjust font size based on text length (crude)
+          if(ln.text.length < 20) fontSize = 14;
+          else if(ln.text.length < 60) fontSize = 12;
+          else fontSize = 10;
+
+          // Add the textbox (transparent background)
+          try{
+            slide.addText(ln.text, {
+              x: txIn, y: tyIn, w: wIn, h: 0.4, fontSize, color:'000000', fill:{ color:'FFFFFF', transparency: 100 }, valign:'top', margin:0.02
+            });
+          }catch(e){
+            // some pptxgenjs versions expect different options; ignore on failure
+          }
+        }
+      }
+
+      await new Promise(r=>setTimeout(r,40)); // yield to UI
+    }
+
+    progressBar.style.width = '90%';
+    statusText.textContent = 'Finalizing download...';
+
+    const fileName = `converted-${Date.now()}.pptx`;
+    await pptx.writeFile({ fileName });
+    downloadBtn.style.display = 'inline-block';
+    statusText.textContent = 'Done — download started';
+    progressBar.style.width = '100%';
+    logEl.textContent = 'Conversion complete';
+  }catch(err){
+    console.error(err);
+    alert('Conversion failed: ' + err.message);
+    statusText.textContent = 'Error during conversion';
+    logEl.textContent = 'Error: ' + err.message;
+  } finally {
+    convertBtn.disabled = false; resetBtn.disabled = false;
+  }
+});
+
+</script>
+</body>
+</html>
