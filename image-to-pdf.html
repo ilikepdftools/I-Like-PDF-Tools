@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image → PDF | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input, select, button, textarea{padding:6px 8px;margin:4px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;max-height:300px;overflow-x:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start}
+.preview-item{position:relative;width:100px;height:100px;border:1px solid #334155;border-radius:8px;overflow:hidden;cursor:move;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.preview-item img{max-width:100%;max-height:70%;display:block}
+.caption-input{width:90%;font-size:0.75rem;margin-top:2px}
+.dragging{opacity:0.5;border:2px dashed var(--accent)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+</style>
+</head>
+<body>
+
+<header>🖼️ Image → PDF Converter</header>
+
+<div class="card">
+  <div class="controls">
+    <input type="file" id="fileInput" accept="image/*" multiple>
+    <select id="pageSize">
+      <option value="a4">A4</option>
+      <option value="letter">Letter</option>
+    </select>
+    <select id="orientation">
+      <option value="portrait">Portrait</option>
+      <option value="landscape">Landscape</option>
+    </select>
+    <button id="convertBtn">Convert to PDF</button>
+  </div>
+  
+  <div id="status" style="margin-top:4px;color:var(--muted)">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const convertBtn = document.getElementById('convertBtn');
+const statusEl = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+const pageSizeEl = document.getElementById('pageSize');
+const orientationEl = document.getElementById('orientation');
+
+let images = [];
+
+fileInput.addEventListener('change', e => {
+  images = [];
+  preview.innerHTML = '';
+  const files = Array.from(e.target.files);
+  files.forEach((file,index)=>{
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const src = ev.target.result;
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      div.draggable = true;
+      div.dataset.index = index;
+
+      const img = document.createElement('img');
+      img.src = src;
+      div.appendChild(img);
+
+      const caption = document.createElement('input');
+      caption.type='text';
+      caption.placeholder='Caption';
+      caption.className='caption-input';
+      div.appendChild(caption);
+
+      preview.appendChild(div);
+      images.push({file, src, caption});
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+// Drag and drop reorder
+let dragSrcEl = null;
+preview.addEventListener('dragstart', e=>{
+  dragSrcEl = e.target;
+  e.target.classList.add('dragging');
+});
+preview.addEventListener('dragend', e=>{
+  e.target.classList.remove('dragging');
+});
+preview.addEventListener('dragover', e=>{
+  e.preventDefault();
+  const target = e.target.closest('.preview-item');
+  if(target && target!==dragSrcEl){
+    const rect = target.getBoundingClientRect();
+    const next = (e.clientY - rect.top)/(rect.bottom - rect.top) >0.5;
+    preview.insertBefore(dragSrcEl,next?target.nextSibling:target);
+  }
+});
+
+convertBtn.addEventListener('click', async ()=>{
+  if(!images.length){alert('No images uploaded'); return;}
+  statusEl.textContent = 'Generating PDF...';
+  progressBar.style.width='0%';
+  const pdf = new jsPDF({format:pageSizeEl.value,orientation:orientationEl.value});
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  const items = Array.from(preview.children);
+  for(let i=0;i<items.length;i++){
+    const img = items[i].querySelector('img');
+    const captionText = items[i].querySelector('input').value;
+    await new Promise(res=>{const tmp=new Image();tmp.src=img.src;tmp.onload=()=>{res(tmp)}});
+
+    const imgProps = pdf.getImageProperties(img.src);
+    let imgWidth=imgProps.width;
+    let imgHeight=imgProps.height;
+    const ratio = Math.min(pageWidth/imgWidth, pageHeight/imgHeight);
+    imgWidth*=ratio;
+    imgHeight*=ratio;
+    const x = (pageWidth-imgWidth)/2;
+    let y = (pageHeight-imgHeight)/2;
+    pdf.addImage(img.src,'JPEG',x,y,imgWidth,imgHeight);
+    if(captionText){
+      pdf.setFontSize(12);
+      pdf.text(captionText,pageWidth/2,pageHeight-10,{align:'center'});
+    }
+    if(i<items.length-1) pdf.addPage();
+    progressBar.style.width = Math.round(((i+1)/items.length)*100)+'%';
+  }
+
+  const blob = pdf.output('blob');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download='images.pdf';
+  a.click();
+  statusEl.textContent = 'PDF ready';
+});
+</script>
+</body>
+</html>
