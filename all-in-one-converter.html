@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All-in-One File Converter</title>
+<style>
+  body { background-color: #121212; color: #e0e0e0; font-family: Arial, sans-serif; margin:0; padding:0; }
+  header { padding: 20px; text-align:center; font-size:2rem; color:#bb86fc; font-weight:bold; }
+  .container { max-width:800px; margin:auto; padding:20px; }
+  .upload-area { border: 2px dashed #6200ea; border-radius:8px; padding:30px; text-align:center; cursor:pointer; margin-bottom:20px; }
+  input[type="file"] { display:none; }
+  select, button { width:100%; padding:10px; margin:10px 0; border-radius:5px; border:none; font-size:1rem; cursor:pointer; }
+  button { background-color:#6200ea; color:white; }
+  button:disabled { background-color:#9e9e9e; cursor:not-allowed; }
+  .progress { margin-top:10px; font-size:0.9rem; color:#03dac5; }
+  .output { margin-top:20px; }
+  a.download-link { display:block; margin:10px 0; color:#bb86fc; text-decoration:none; word-break:break-word; }
+  @media (max-width:600px){ .upload-area{padding:20px;} }
+</style>
+</head>
+<body>
+
+<header>⚡ All-in-One File Converter</header>
+<div class="container">
+
+  <div class="upload-area" id="uploadArea">Click or Drag & Drop Files Here</div>
+  <input type="file" id="fileInput" multiple>
+
+  <select id="conversionSelect">
+    <option value="">Select Conversion</option>
+    <option value="image">Image Convert (JPG/PNG/WebP)</option>
+    <option value="textpdf">Text → PDF</option>
+    <option value="audio">Audio Convert (stub)</option>
+    <option value="video">Video Convert (stub)</option>
+  </select>
+
+  <button id="convertBtn" disabled>Convert</button>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="output" id="output"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput = document.getElementById('fileInput');
+  const convertBtn = document.getElementById('convertBtn');
+  const conversionSelect = document.getElementById('conversionSelect');
+  const progress = document.getElementById('progress');
+  const output = document.getElementById('output');
+
+  let files = [];
+
+  // Drag & Drop
+  uploadArea.addEventListener('click', ()=> fileInput.click());
+  uploadArea.addEventListener('dragover', e => e.preventDefault());
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    files = Array.from(e.dataTransfer.files);
+    showFiles();
+  });
+  fileInput.addEventListener('change', e => {
+    files = Array.from(e.target.files);
+    showFiles();
+  });
+
+  function showFiles() {
+    if(files.length) convertBtn.disabled = false;
+    progress.textContent = `${files.length} file(s) ready`;
+  }
+
+  convertBtn.addEventListener('click', async () => {
+    const conversion = conversionSelect.value;
+    if(!conversion) { alert('Select a conversion type'); return; }
+    output.innerHTML = '';
+    progress.textContent = 'Processing...';
+
+    for(let i=0;i<files.length;i++){
+      const file = files[i];
+      try {
+        if(conversion === 'image'){
+          const result = await convertImage(file);
+          createDownloadLink(result.blob, result.name);
+        } else if(conversion === 'textpdf'){
+          const result = await convertTextToPDF(file);
+          createDownloadLink(result.blob, result.name);
+        } else if(conversion === 'audio' || conversion === 'video'){
+          // Stub: replace with server-side FFmpeg or cloud API
+          const info = document.createElement('div');
+          info.textContent = `Server-side conversion needed for ${file.name}`;
+          output.appendChild(info);
+        }
+        progress.textContent = `Processed ${i+1}/${files.length}`;
+      } catch(err){
+        const errMsg = document.createElement('div');
+        errMsg.textContent = `Error processing ${file.name}: ${err.message}`;
+        output.appendChild(errMsg);
+      }
+    }
+    progress.textContent = 'Conversion complete';
+  });
+
+  function createDownloadLink(blob, name){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.textContent = `Download ${name}`;
+    a.className = 'download-link';
+    output.appendChild(a);
+  }
+
+  // Image conversion using Canvas
+  function convertImage(file){
+    return new Promise((resolve,reject)=>{
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img,0,0);
+          canvas.toBlob(blob=>{
+            const ext = file.name.split('.').pop().toLowerCase() === 'png' ? 'jpg' : 'png';
+            const name = file.name.replace(/\.[^/.]+$/,"")+"."+ext;
+            resolve({blob,name});
+          }, file.name.endsWith('.png') ? 'image/jpeg' : 'image/png');
+        }
+        img.onerror = () => reject(new Error('Invalid image file'));
+        img.src = reader.result;
+      }
+      reader.onerror = () => reject(new Error('File read error'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Text to PDF conversion using jsPDF
+  async function convertTextToPDF(file){
+    const reader = new FileReader();
+    return new Promise((resolve,reject)=>{
+      reader.onload = () => {
+        try{
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          const lines = reader.result.split('\n');
+          let y=10;
+          lines.forEach(line=>{
+            doc.text(line,10,y);
+            y+=10;
+            if(y>280){ doc.addPage(); y=10; }
+          });
+          const blob = doc.output('blob');
+          const name = file.name.replace(/\.[^/.]+$/,"")+".pdf";
+          resolve({blob,name});
+        } catch(e){
+          reject(e);
+        }
+      }
+      reader.onerror = () => reject(new Error('File read error'));
+      reader.readAsText(file);
+    });
+  }
+
+</script>
+
+</body>
+</html>
