@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF → Excel (XLSX) Table Extractor | I Like PDF Tools</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+    .container {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      max-width: 950px;
+      width: 95%;
+      margin-bottom: 2rem;
+    }
+    input[type=file], select, button {
+      margin: 0.5rem 0;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: none;
+      width: 100%;
+      font-size: 1rem;
+    }
+    button {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #0ea5e9; }
+    #preview {
+      margin-top: 1rem;
+      background: #0f172a;
+      padding: 1rem;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #334155;
+      font-size: 0.9rem;
+    }
+    .status { margin-top: 1rem; font-size: 0.9rem; color: #94a3b8; }
+    table { border-collapse: collapse; width: 100%; margin-top: 0.5rem; }
+    td, th { border: 1px solid #475569; padding: 4px; }
+    canvas { border: 1px solid #475569; margin-top: 1rem; max-width: 100%; cursor: crosshair; }
+    #selectionBox {
+      position: absolute;
+      border: 2px dashed #38bdf8;
+      pointer-events: none;
+      display: none;
+    }
+    .canvasWrapper { position: relative; display: inline-block; }
+  </style>
+</head>
+<body>
+  <header>📊 PDF → Excel (XLSX) Table Extractor</header>
+
+  <div class="container">
+    <input type="file" id="fileInput" accept="application/pdf">
+
+    <label for="formatSelect">Convert to:</label>
+    <select id="formatSelect">
+      <option value="xlsx">Excel (.xlsx)</option>
+      <option value="txt">Text (.txt)</option>
+    </select>
+
+    <button onclick="useTool()">Use Tool</button>
+
+    <div id="status" class="status"></div>
+    <div class="canvasWrapper">
+      <canvas id="pdfCanvas"></canvas>
+      <div id="selectionBox"></div>
+    </div>
+    <div id="preview"></div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const previewEl = document.getElementById("preview");
+    const canvas = document.getElementById("pdfCanvas");
+    const ctx = canvas.getContext("2d");
+    const selectionBox = document.getElementById("selectionBox");
+    let pdfDoc, page, pageScale = 1.5;
+    let selection = null;
+
+    function setStatus(msg) { statusEl.textContent = msg; }
+
+    async function useTool() {
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) {
+        setStatus("❌ Please upload a PDF.");
+        return;
+      }
+      setStatus("⏳ Loading PDF...");
+      const arrayBuffer = await file.arrayBuffer();
+      pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      page = await pdfDoc.getPage(1); // first page
+      const viewport = page.getViewport({ scale: pageScale });
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      setStatus("✅ PDF loaded. Drag to select a table region.");
+    }
+
+    // Handle drag selection
+    let isDragging = false, startX, startY;
+    canvas.addEventListener("mousedown", e => {
+      isDragging = true;
+      startX = e.offsetX;
+      startY = e.offsetY;
+      selectionBox.style.left = startX + "px";
+      selectionBox.style.top = startY + "px";
+      selectionBox.style.width = "0px";
+      selectionBox.style.height = "0px";
+      selectionBox.style.display = "block";
+    });
+    canvas.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      const x = Math.min(e.offsetX, startX);
+      const y = Math.min(e.offsetY, startY);
+      const w = Math.abs(e.offsetX - startX);
+      const h = Math.abs(e.offsetY - startY);
+      selectionBox.style.left = x + "px";
+      selectionBox.style.top = y + "px";
+      selectionBox.style.width = w + "px";
+      selectionBox.style.height = h + "px";
+    });
+    canvas.addEventListener("mouseup", e => {
+      isDragging = false;
+      const rect = canvas.getBoundingClientRect();
+      selection = {
+        x: parseInt(selectionBox.style.left),
+        y: parseInt(selectionBox.style.top),
+        w: parseInt(selectionBox.style.width),
+        h: parseInt(selectionBox.style.height)
+      };
+      setStatus("✅ Region selected. Click 'Extract Table'.");
+    });
+
+    // Extract text inside selection
+    async function extractTable() {
+      if (!selection) {
+        setStatus("❌ Please select a region first.");
+        return;
+      }
+      const content = await page.getTextContent();
+      const rows = [];
+      let currentY = null, currentRow = [];
+
+      content.items.forEach(item => {
+        const tx = item.transform[4] * pageScale;
+        const ty = canvas.height - (item.transform[5] * pageScale);
+        if (
+          tx >= selection.x && tx <= selection.x + selection.w &&
+          ty >= selection.y && ty <= selection.y + selection.h
+        ) {
+          const y = Math.round(ty);
+          if (currentY === null || Math.abs(currentY - y) > 5) {
+            if (currentRow.length) rows.push(currentRow);
+            currentRow = [];
+            currentY = y;
+          }
+          currentRow.push(item.str);
+        }
+      });
+      if (currentRow.length) rows.push(currentRow);
+
+      if (!rows.length) {
+        setStatus("❌ No text detected in region.");
+        return;
+      }
+
+      // Preview
+      let html = "<table>";
+      rows.forEach(r => {
+        html += "<tr>" + r.map(c => `<td>${c}</td>`).join("") + "</tr>";
+      });
+      html += "</table>";
+      previewEl.innerHTML = html;
+
+      // Export XLSX
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Extracted");
+      XLSX.writeFile(wb, "extracted_table.xlsx");
+      setStatus("✅ Table extracted and downloaded.");
+    }
+
+    // Add button dynamically
+    const btn = document.createElement("button");
+    btn.textContent = "Extract Table";
+    btn.onclick = extractTable;
+    document.querySelector(".container").appendChild(btn);
+  </script>
+</body>
+</html>
