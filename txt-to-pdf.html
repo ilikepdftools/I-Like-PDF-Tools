@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Like PDF Tools — TXT → PDF (Batch & Google Fonts)</title>
+<style>
+:root{
+  --bg:#071022; --panel:#0d1b2a; --muted:#9fb0c8; --accent:#06b6d4;
+}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:linear-gradient(180deg,var(--bg),#02101a);color:#e6eef6;padding:18px}
+h1{margin:0;font-size:18px}
+.card{background:linear-gradient(180deg,var(--panel),#071426);padding:14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);margin-bottom:16px}
+input, select, button, textarea{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+button.primary{background:var(--accent);border:none;color:#022;font-weight:700;cursor:pointer}
+label.btn{background:var(--accent);color:#022;padding:6px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+textarea{width:100%;height:200px;background:rgba(255,255,255,0.02);color:#e6eef6;resize:vertical}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.preview{border-radius:8px;padding:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);min-height:240px;display:flex;align-items:center;justify-content:center;white-space:pre-wrap;font-family:monospace}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+input[type=file]{display:none}
+footer.small{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📄 TXT → PDF Generator (Batch & Google Fonts)</h1>
+  <p style="color:var(--muted);font-size:13px">Upload multiple TXT files or paste text. Choose Google Fonts dynamically.</p>
+</header>
+
+<div class="card">
+  <div class="controls">
+    <label class="btn" for="fileInput">Upload TXT Files</label>
+    <input type="file" id="fileInput" accept=".txt" multiple/>
+    <select id="googleFontSelect">
+      <option value="">Default</option>
+      <option value="Roboto">Roboto</option>
+      <option value="Lato">Lato</option>
+      <option value="Montserrat">Montserrat</option>
+      <option value="Open+Sans">Open Sans</option>
+      <option value="Poppins">Poppins</option>
+    </select>
+    <input type="number" id="fontSize" placeholder="Font size" value="12" style="width:90px"/>
+    <input type="number" id="margin" placeholder="Margin mm" value="20" style="width:90px"/>
+    <select id="pageSize">
+      <option value="a4">A4</option>
+      <option value="letter">Letter</option>
+    </select>
+  </div>
+
+  <textarea id="textContent" placeholder="Paste your text here or upload files"></textarea>
+
+  <div class="controls" style="margin-top:10px">
+    <input type="text" id="headerText" placeholder="Header text"/>
+    <input type="text" id="footerText" placeholder="Footer text"/>
+  </div>
+
+  <div class="controls" style="margin-top:10px">
+    <button id="btnConvert" class="primary">Generate PDF</button>
+    <div style="margin-left:auto;color:var(--muted)" id="status">Idle</div>
+  </div>
+
+  <div class="progress"><i id="progressBar"></i></div>
+
+  <div style="margin-top:12px">
+    <strong>Preview</strong>
+    <div id="preview" class="preview">No preview</div>
+  </div>
+</div>
+
+<footer class="small">Client-side batch conversion — privacy-friendly, responsive, Google Fonts support</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const { jsPDF } = window.jspdf;
+const fileInput = document.getElementById('fileInput');
+const textContent = document.getElementById('textContent');
+const fontSizeEl = document.getElementById('fontSize');
+const marginEl = document.getElementById('margin');
+const pageSizeEl = document.getElementById('pageSize');
+const headerTextEl = document.getElementById('headerText');
+const footerTextEl = document.getElementById('footerText');
+const previewEl = document.getElementById('preview');
+const btnConvert = document.getElementById('btnConvert');
+const statusEl = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+const googleFontSelect = document.getElementById('googleFontSelect');
+
+let uploadedTexts = [];
+
+fileInput.addEventListener('change', async e=>{
+  uploadedTexts = [];
+  const files = e.target.files;
+  if(!files.length) return;
+  statusEl.textContent = `Reading ${files.length} file(s)...`;
+  for(let f of files){
+    if(!f.name.endsWith('.txt')) continue;
+    const text = await f.text();
+    uploadedTexts.push({name:f.name,text});
+  }
+  textContent.value = uploadedTexts.map(t=>t.text).join('\n\n---\n\n');
+  previewEl.textContent = textContent.value.slice(0,1000)+'...';
+  statusEl.textContent = `${uploadedTexts.length} file(s) loaded`;
+});
+
+btnConvert.addEventListener('click', async ()=>{
+  let textBlocks = textContent.value.trim();
+  if(!textBlocks){ alert('No text to convert'); return; }
+  statusEl.textContent = 'Generating PDF...';
+  progressBar.style.width = '10%';
+
+  const fontSize = parseInt(fontSizeEl.value)||12;
+  const margin = parseInt(marginEl.value)||20;
+  const pageSize = pageSizeEl.value;
+  const header = headerTextEl.value;
+  const footer = footerTextEl.value;
+  const googleFont = googleFontSelect.value;
+
+  // Load Google Font dynamically
+  if(googleFont){
+    const linkId = 'googleFontLink';
+    let link = document.getElementById(linkId);
+    if(link) link.remove();
+    link = document.createElement('link');
+    link.id = linkId;
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${googleFont}&display=swap`;
+    document.head.appendChild(link);
+  }
+
+  const pdf = new jsPDF({ unit:'mm', format: pageSize });
+  pdf.setFont(googleFont?googleFont.replace('+',' '):'helvetica');
+  pdf.setFontSize(fontSize);
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const lineHeight = fontSize * 1.2;
+  let y = margin;
+
+  const lines = textBlocks.split(/\r?\n/);
+  for(let i=0;i<lines.length;i++){
+    if(y + lineHeight > pageHeight - margin){
+      pdf.addPage();
+      y = margin;
+    }
+    if(header){
+      pdf.setFontSize(fontSize-2);
+      pdf.text(header, pageWidth/2, margin/2, {align:'center'});
+      pdf.setFontSize(fontSize);
+    }
+    pdf.text(lines[i], margin, y);
+    if(footer){
+      pdf.setFontSize(fontSize-2);
+      pdf.text(footer, pageWidth/2, pageHeight-margin/4, {align:'center'});
+      pdf.setFontSize(fontSize);
+    }
+    y += lineHeight;
+    progressBar.style.width = Math.round(10 + (i/lines.length)*80) + '%';
+  }
+
+  const blob = pdf.output('blob');
+  const url = URL.createObjectURL(blob);
+  previewEl.innerHTML = `<iframe src="${url}" width="100%" height="300px"></iframe>`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'converted.pdf';
+  a.click();
+  statusEl.textContent = 'PDF ready';
+  progressBar.style.width = '100%';
+});
+</script>
+
+</body>
+</html>
