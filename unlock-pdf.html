@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlock PDF | I Like PDF Tools</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #38bdf8;
+  }
+  .container {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-width: 600px;
+    width: 95%;
+    margin-bottom: 2rem;
+  }
+  input, button {
+    margin: 0.5rem 0;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-size: 1rem;
+  }
+  button {
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { background: #0ea5e9; }
+  .status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+  .warning {
+    font-size: 0.85rem;
+    color: #f87171;
+    margin-bottom: 0.5rem;
+  }
+</style>
+</head>
+<body>
+
+<header>🔓 Unlock PDF Tool</header>
+
+<div class="container">
+  <div class="warning">
+    ⚠️ Only unlock PDFs you own or have permission to modify. Unauthorized removal of passwords may be illegal.
+  </div>
+  <input type="file" id="pdfFile" accept="application/pdf">
+  <input type="password" id="pdfPassword" placeholder="Enter PDF password">
+  <button onclick="unlockPDF()">Unlock PDF</button>
+  <div id="status" class="status">Select a PDF and enter the password.</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.18.1/pdf-lib.min.js"></script>
+
+<script>
+async function unlockPDF() {
+  const fileInput = document.getElementById('pdfFile');
+  const password = document.getElementById('pdfPassword').value;
+  const status = document.getElementById('status');
+
+  if (!fileInput.files.length) {
+    status.textContent = "❌ Please upload a PDF file.";
+    return;
+  }
+  if (!password) {
+    status.textContent = "❌ Please enter the PDF password.";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  status.textContent = "Processing...";
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    let pdfDoc;
+
+    try {
+      // Attempt client-side decryption
+      pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer, { password });
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = file.name.replace(/\.pdf$/i, "_unlocked.pdf");
+      a.click();
+      status.textContent = "✅ PDF unlocked successfully!";
+    } catch (e) {
+      // If client-side cannot unlock
+      status.innerHTML = "⚠️ Client-side unlock failed. You may need server-side decryption.<br>" +
+                         "Ensure you have permission and try our server-side unlock tool.";
+      console.error(e);
+    }
+
+  } catch (err) {
+    status.textContent = "❌ Error reading PDF: " + err.message;
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
