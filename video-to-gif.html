@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video to GIF Converter</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+  header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+  .container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+  input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+  button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+  button:hover { background:#0ea5e9; }
+  img { max-width:100%; margin-top:1rem; border-radius:8px; }
+  .status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+</style>
+</head>
+<body>
+
+<header>🎞️ Video → GIF Converter</header>
+
+<div class="container">
+  <input type="file" id="videoInput" accept="video/*">
+
+  <label for="startTime">Start Time (seconds):</label>
+  <input type="number" id="startTime" value="0" min="0">
+
+  <label for="duration">Duration (seconds):</label>
+  <input type="number" id="duration" value="5" min="1">
+
+  <label for="frameRate">Frame Rate (fps):</label>
+  <input type="number" id="frameRate" value="10" min="1">
+
+  <label for="resolution">Resolution (width px, height auto):</label>
+  <select id="resolution">
+    <option value="original">Original</option>
+    <option value="480">480</option>
+    <option value="720">720</option>
+    <option value="1080">1080</option>
+  </select>
+
+  <button onclick="convertToGif()">Convert to GIF</button>
+
+  <div class="status" id="status">Select a video to start.</div>
+  <img id="preview" style="display:none;">
+  <a id="downloadLink" style="display:none;" download>Download GIF</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.1/dist/ffmpeg.min.js"></script>
+<script>
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  const ffmpeg = createFFmpeg({ log:true });
+
+  async function convertToGif() {
+    const inputFile = document.getElementById('videoInput').files[0];
+    const startTime = document.getElementById('startTime').value || 0;
+    const duration = document.getElementById('duration').value || 5;
+    const fps = document.getElementById('frameRate').value || 10;
+    const res = document.getElementById('resolution').value;
+    const status = document.getElementById('status');
+    const preview = document.getElementById('preview');
+    const downloadLink = document.getElementById('downloadLink');
+
+    if(!inputFile){ status.textContent = "❌ Please select a video."; return; }
+
+    status.textContent = "⏳ Loading FFmpeg core...";
+    if(!ffmpeg.isLoaded()) await ffmpeg.load();
+
+    status.textContent = "📥 Reading video...";
+    ffmpeg.FS('writeFile', inputFile.name, await fetchFile(inputFile));
+
+    let scaleArg = '';
+    if(res !== 'original') scaleArg = `scale=${res}:-1`;
+
+    status.textContent = "⚙️ Converting to GIF... This may take some time.";
+
+    try {
+      await ffmpeg.run(
+        '-ss', `${startTime}`,
+        '-t', `${duration}`,
+        '-i', inputFile.name,
+        ...(scaleArg ? ['-vf', `${scaleArg},fps=${fps}`] : [`-vf`, `fps=${fps}`]),
+        'output.gif'
+      );
+
+      const data = ffmpeg.FS('readFile', 'output.gif');
+      const url = URL.createObjectURL(new Blob([data.buffer], { type: 'image/gif' }));
+
+      preview.src = url;
+      preview.style.display = 'block';
+      downloadLink.href = url;
+      downloadLink.download = 'converted.gif';
+      downloadLink.style.display = 'inline-block';
+      downloadLink.textContent = '💾 Download GIF';
+
+      status.textContent = "✅ Conversion complete!";
+    } catch(err) {
+      console.error(err);
+      status.textContent = "❌ Conversion failed. For large videos, consider server-side processing.";
+    }
+  }
+</script>
+
+</body>
+</html>
