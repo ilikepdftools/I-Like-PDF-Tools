@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>I Like PDF Tools — Excel → PDF</title>
+
+<!-- Styles: dark theme, responsive -->
+<style>
+  :root{
+    --bg:#081025; --panel:#0e1722; --muted:#95a7bf; --accent:#06b6d4;
+    --card:#0b1320;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#021028);color:#e8f1fb;padding:18px}
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:16px}
+  @media(max-width:980px){.container{grid-template-columns:1fr}}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{font-size:18px;margin:0}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .card{background:linear-gradient(180deg,var(--panel),var(--card));padding:14px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  label.btn{background:var(--accent);color:#012226;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  input[type=file], select, input, button, textarea {padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  button.primary{background:var(--accent);color:#012226;border:none;font-weight:700}
+  .meta{color:var(--muted);font-size:13px}
+  .sheetList{margin-top:12px;display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto;padding-right:6px}
+  .sheetItem{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)}
+  .progress{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:10px}
+  .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+  .previewWrap{margin-top:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.02);padding:8px;min-height:300px;overflow:auto}
+  table.previewTable{border-collapse:collapse;width:100%}
+  table.previewTable td, table.previewTable th{border:1px solid rgba(255,255,255,0.04);padding:6px;font-size:12px;color:#eaf3ff}
+  .note{font-size:12px;color:var(--muted)}
+  .small{padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
+  footer.small{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+  input[type=number]{width:90px}
+</style>
+
+</head>
+<body>
+  <header>
+    <div>
+      <h1>I Like PDF Tools — Excel → PDF</h1>
+      <p class="lead">Convert XLSX to printable PDF. Select sheets, set page size/orientation, preserve merged cells and column widths (best-effort).</p>
+    </div>
+    <div class="meta">excel to pdf online • xlsx to pdf converter</div>
+  </header>
+
+  <div class="container">
+    <!-- LEFT: main -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <label class="btn" for="fileInput">Upload XLSX</label>
+          <input id="fileInput" type="file" accept=".xlsx,.xls" style="display:none" />
+        </div>
+        <div class="meta" id="fileMeta">No file</div>
+      </div>
+
+      <div class="controls">
+        <label for="pageSize">Page size</label>
+        <select id="pageSize">
+          <option value="a4">A4</option>
+          <option value="letter">Letter</option>
+        </select>
+
+        <label for="orientation">Orientation</label>
+        <select id="orientation">
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+
+        <button id="btnRender" class="primary">Render Sheets</button>
+      </div>
+
+      <div class="progress"><i id="progBar"></i></div>
+      <div id="status" class="note" style="margin-top:8px">Idle</div>
+
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0"/>
+
+      <div>
+        <strong>Sheets</strong>
+        <div class="sheetList" id="sheetList">
+          <div class="note">No workbook loaded.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: preview & export -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Preview & Export</strong>
+        <div class="note">Select sheets and click Export to PDF</div>
+      </div>
+
+      <div style="margin-top:10px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <label class="note">Print range (optional)</label>
+          <input id="printFrom" type="number" min="1" placeholder="from row" />
+          <input id="printTo" type="number" min="1" placeholder="to row" />
+          <button id="applyRange" class="small">Apply</button>
+        </div>
+      </div>
+
+      <div id="previewWrap" class="previewWrap">
+        <div class="note">No preview. Select a sheet in the list to preview it here.</div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <button id="btnExportPdf" class="primary">Export to PDF</button>
+        <button id="btnDownload" class="small" style="display:none">Download PDF</button>
+        <div style="margin-left:auto" class="note" id="log">Idle</div>
+      </div>
+      <footer class="small">Tip: For best results, keep fonts standard or include them in source environment. Server-side fallback available for high-fidelity exports.</footer>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+<script>
+/*
+  XLSX -> PDF (single-file)
+  - Uses SheetJS to read workbook
+  - Renders selected sheet(s) to HTML tables with merged cells and approximate column widths
+  - Uses html2pdf (html2canvas + jsPDF) to convert the HTML preview to PDF
+  - Supports page size (A4/Letter) and orientation
+  - Allows selecting row print range (simple)
+  - Shows progress and offers download link
+*/
+
+/* Globals & DOM */
+const fileInput = document.getElementById('fileInput');
+const fileMeta = document.getElementById('fileMeta');
+const sheetList = document.getElementById('sheetList');
+const previewWrap = document.getElementById('previewWrap');
+const btnRender = document.getElementById('btnRender');
+const btnExportPdf = document.getElementById('btnExportPdf');
+const btnDownload = document.getElementById('btnDownload');
+const progBar = document.getElementById('progBar');
+const statusEl = document.getElementById('status');
+const logEl = document.getElementById('log');
+const pageSizeSel = document.getElementById('pageSize');
+const orientationSel = document.getElementById('orientation');
+const printFrom = document.getElementById('printFrom');
+const printTo = document.getElementById('printTo');
+const applyRange = document.getElementById('applyRange');
+
+let workbook = null;
+let sheetNames = [];
+let currentRenderedHtml = null;
+let lastPdfBlobUrl = null;
+
+/* Helpers */
+function setStatus(txt, pct){
+  statusEl.textContent = txt || '';
+  if(pct!==undefined) progBar.style.width = pct + '%';
+}
+function log(msg){ logEl.textContent = '['+new Date().toLocaleTimeString()+'] '+msg+'\n'+logEl.textContent; }
+
+/* Read file */
+fileInput.addEventListener('change', async (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  if(!/\.(xlsx|xls)$/i.test(f.name)){
+    alert('Please upload an .xlsx or .xls file.');
+    return;
+  }
+  if(f.size > 120*1024*1024){ // 120MB limit
+    alert('File too large. Please upload a smaller file.');
+    return;
+  }
+  fileMeta.textContent = `${f.name} — ${Math.round(f.size/1024/1024)} MB`;
+  sheetList.innerHTML = '<div class="note">Reading workbook...</div>';
+  setStatus('Reading workbook...', 10);
+  try{
+    const ab = await f.arrayBuffer();
+    workbook = XLSX.read(ab, {type:'array', cellStyles:true, cellNF:true});
+    sheetNames = workbook.SheetNames.slice();
+    renderSheetList();
+    setStatus('Workbook loaded', 30);
+    log('Workbook loaded: ' + sheetNames.join(', '));
+  }catch(err){
+    console.error(err);
+    alert('Failed to read workbook: '+err.message);
+    setStatus('Error reading workbook');
+  }
+});
+
+/* Populate sheet list UI */
+function renderSheetList(){
+  sheetList.innerHTML = '';
+  if(!sheetNames.length){ sheetList.innerHTML = '<div class="note">No sheets</div>'; return; }
+  sheetNames.forEach((name, idx)=>{
+    const div = document.createElement('div');
+    div.className = 'sheetItem';
+    div.innerHTML = `<div style="font-weight:700">${idx+1}. ${name}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="small" data-name="${name}" onclick="previewSheet(event)">Preview</button>
+        <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" checked data-name="${name}" /> <span class="note">Include</span></label>
+      </div>`;
+    sheetList.appendChild(div);
+  });
+}
+
+/* Preview sheet (on right pane) */
+async function previewSheet(evt){
+  const btn = evt.currentTarget;
+  const name = btn.dataset.name;
+  if(!workbook) return;
+  setStatus('Rendering preview for ' + name + '...', 40);
+  const ws = workbook.Sheets[name];
+  const html = sheetToHtml(ws);
+  currentRenderedHtml = `<div style="padding:12px;background:white;color:black">${html}</div>`;
+  // show preview (dark-themed container -> the inner HTML is light to reflect printable look)
+  previewWrap.innerHTML = currentRenderedHtml;
+  setStatus('Preview ready', 60);
+}
+
+/* Convert a sheet object to HTML table preserving merges and column widths (best-effort) */
+function sheetToHtml(ws){
+  // get range
+  const range = XLSX.utils.decode_range(ws['!ref'] || 'A1:A1');
+  const merges = ws['!merges'] || [];
+  const cols = ws['!cols'] || []; // may include width info
+  // build map for merged cells
+  const mergeMap = {};
+  merges.forEach(m=>{
+    const key = `${m.s.r}_${m.s.c}`; // start cell row_col
+    mergeMap[key] = { rspan: m.e.r - m.s.r + 1, cspan: m.e.c - m.s.c + 1 };
+  });
+
+  // optional print range
+  const fromRow = parseInt(printFrom.value) || null;
+  const toRow = parseInt(printTo.value) || null;
+
+  // start building table
+  let html = `<table class="previewTable" role="table" style="border-collapse:collapse;width:100%;table-layout:fixed">`;
+  // inline style for column widths if available (approx in px)
+  // build colgroup
+  html += '<colgroup>';
+  for(let C=range.s.c; C<=range.e.c; C++){
+    const colDef = cols[C] || {};
+    // width in characters -> approximate px: char * 7 (very rough)
+    const w = colDef.wpx || (colDef.wch ? Math.round(colDef.wch * 7) : 100);
+    html += `<col style="width:${w}px"/>`;
+  }
+  html += '</colgroup>';
+
+  for(let R=range.s.r; R<=range.e.r; R++){
+    const rowNumber = R+1;
+    if(fromRow && rowNumber < fromRow) continue;
+    if(toRow && rowNumber > toRow) break;
+    html += '<tr>';
+    for(let C=range.s.c; C<=range.e.c; C++){
+      // skip if this cell is covered by a merge that started earlier
+      let skip = false;
+      for(const m of merges){
+        if(R >= m.s.r && R <= m.e.r && C >= m.s.c && C <= m.e.c){
+          // if not the starting cell, skip (it will be covered by rowspan/colspan)
+          if(!(R === m.s.r && C === m.s.c)) { skip = true; break; }
+        }
+      }
+      if(skip) continue;
+      const cellAddress = XLSX.utils.encode_cell({r:R,c:C});
+      const cell = ws[cellAddress];
+      const key = `${R}_${C}`;
+      let attrs = '';
+      if(mergeMap[key]){
+        const m = mergeMap[key];
+        if(m.cspan>1) attrs += ` colspan="${m.cspan}"`;
+        if(m.rspan>1) attrs += ` rowspan="${m.rspan}"`;
+      }
+      // basic formatting: number/date formatting via XLSX.utils
+      let text = '';
+      if(cell){
+        if(cell.w !== undefined) text = cell.w; // formatted text
+        else if(cell.v !== undefined) text = String(cell.v);
+        else text = '';
+      } else {
+        text = '';
+      }
+      // basic alignment if provided
+      let style = '';
+      if(cell && cell.s && cell.s.alignment){
+        if(cell.s.alignment.horizontal) style += `text-align:${cell.s.alignment.horizontal};`;
+        if(cell.s.alignment.vertical) style += `vertical-align:${cell.s.alignment.vertical};`;
+      }
+      // preserve some cell formatting (bold/italics/background) if styles present (best-effort)
+      if(cell && cell.s && cell.s.font){
+        const f = cell.s.font;
+        if(f.bold) style += 'font-weight:700;';
+        if(f.italic) style += 'font-style:italic;';
+        if(f.sz) style += `font-size:${f.sz}px;`;
+        if(f.color && f.color.rgb) style += `color:#${f.color.rgb};`;
+      }
+      if(cell && cell.s && cell.s.fill && cell.s.fill.fgColor && cell.s.fill.fgColor.rgb){
+        style += `background:#${cell.s.fill.fgColor.rgb};`;
+      }
+
+      html += `<td ${attrs} style="${style}">${escapeHtml(text)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</table>';
+  return html;
+}
+
+/* Utility to escape HTML */
+function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+/* Render sheets selected (renders first included sheet as preview if multiple) */
+btnRender.addEventListener('click', ()=>{
+  if(!workbook){ alert('Load a workbook first'); return; }
+  // find included sheets
+  const checks = Array.from(sheetList.querySelectorAll('input[type=checkbox]'));
+  const included = checks.filter(ch=>ch.checked).map(ch=>ch.getAttribute('data-name'));
+  if(!included.length){ alert('Select at least one sheet to include'); return; }
+  setStatus('Rendering preview for first included sheet...', 30);
+  const ws = workbook.Sheets[included[0]];
+  const html = sheetToHtml(ws);
+  currentRenderedHtml = `<div style="background:white;color:black;padding:12px">${html}</div>`;
+  previewWrap.innerHTML = currentRenderedHtml;
+  setStatus('Preview ready', 60);
+  log('Preview rendered for: ' + included.join(', '));
+});
+
+/* Export to PDF (multi-sheet support: concatenate rendered HTMLs into one long document) */
+btnExportPdf.addEventListener('click', async ()=>{
+  if(!workbook){ alert('Load a workbook first'); return; }
+  const checks = Array.from(sheetList.querySelectorAll('input[type=checkbox]'));
+  const included = checks.filter(ch=>ch.checked).map(ch=>ch.getAttribute('data-name'));
+  if(!included.length) { alert('Select at least one sheet'); return; }
+  setStatus('Preparing HTML for PDF...', 40);
+  // build a wrapper div with each sheet's HTML and a page-break between sheets
+  let docHtml = '';
+  for(let i=0;i<included.length;i++){
+    const name = included[i];
+    const ws = workbook.Sheets[name];
+    const sheetHtml = sheetToHtml(ws);
+    // header for sheet
+    docHtml += `<div style="page-break-after:always;padding:12px;background:white;color:black;"><h3 style="margin:0 0 6px 0">${escapeHtml(name)}</h3>${sheetHtml}</div>`;
+  }
+  // place docHtml into a hidden container for html2pdf to render
+  const hidden = document.createElement('div');
+  hidden.style.position='fixed';
+  hidden.style.left='10000px';
+  hidden.style.top='0';
+  hidden.style.background='white';
+  hidden.style.color='black';
+  hidden.innerHTML = docHtml;
+  document.body.appendChild(hidden);
+  setStatus('Rendering PDF (this may take a moment)...', 60);
+  // choose page size/orientation mapping for jsPDF
+  const pageSize = pageSizeSel.value === 'a4' ? 'a4' : 'letter';
+  const orientation = orientationSel.value === 'portrait' ? 'portrait' : 'landscape';
+  try{
+    const opt = {
+      margin: [10,10,10,10],
+      filename: 'converted.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+      jsPDF: { unit: 'mm', format: pageSize, orientation: orientation }
+    };
+    await html2pdf().from(hidden).set(opt).save(); // triggers download
+    setStatus('PDF generated & download started', 100);
+    log('PDF exported for sheets: ' + included.join(', '));
+    document.body.removeChild(hidden);
+    btnDownload.style.display = 'inline-block';
+    // Note: html2pdf saves automatically. We could capture blob via outputPdf('blob') if needed.
+  }catch(err){
+    console.error(err);
+    alert('PDF export failed: ' + err.message);
+    setStatus('Export error');
+    document.body.removeChild(hidden);
+  }
+});
+
+/* Optional: capture blob and provide download link (not used above) */
+async function exportPdfToBlob(htmlEl, opt){
+  // returns a blob via html2pdf outputPdf('blob')
+  return await html2pdf().from(htmlEl).set(opt).outputPdf('blob');
+}
+
+/* Apply print range (just updates preview for first included sheet) */
+applyRange.addEventListener('click', ()=>{
+  if(!workbook){ alert('Load workbook first'); return; }
+  // re-run preview render for first included sheet
+  const checks = Array.from(sheetList.querySelectorAll('input[type=checkbox]'));
+  const included = checks.filter(ch=>ch.checked).map(ch=>ch.getAttribute('data-name'));
+  if(!included.length) { alert('Select at least one sheet'); return; }
+  const ws = workbook.Sheets[included[0]];
+  const html = sheetToHtml(ws);
+  currentRenderedHtml = `<div style="background:white;color:black;padding:12px">${html}</div>`;
+  previewWrap.innerHTML = currentRenderedHtml;
+  setStatus('Preview updated with print range applied', 50);
+});
+
+/* Download fallback button (if needed) */
+btnDownload.addEventListener('click', ()=>{
+  alert('If the browser blocked automatic download, check your downloads folder. html2pdf triggers a download automatically.');
+});
+
+/* Initial */
+setStatus('Idle');
+log('Ready');
+</script>
+
+</body>
+</html>
