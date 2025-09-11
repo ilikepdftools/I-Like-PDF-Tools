@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Cutter & Joiner</title>
+<style>
+body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+.container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+button:hover { background:#0ea5e9; }
+.status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+audio { width:100%; margin-top:1rem; border-radius:8px; }
+a { display:block; margin-top:1rem; color:#38bdf8; font-weight:bold; text-decoration:none; }
+.flex { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.flex > * { flex:1; }
+</style>
+</head>
+<body>
+
+<header>🎵 Audio Cutter & Joiner</header>
+
+<div class="container">
+  <input type="file" id="audioInput" accept="audio/*" multiple>
+  
+  <label>Trim Start (seconds):</label>
+  <input type="number" id="startTime" placeholder="0">
+
+  <label>Trim End (seconds, leave blank for full length):</label>
+  <input type="number" id="endTime" placeholder="">
+
+  <label>Fade In/Out (seconds):</label>
+  <input type="number" id="fadeTime" placeholder="0">
+
+  <label>Output Format:</label>
+  <select id="format">
+    <option value="mp3">MP3</option>
+    <option value="wav">WAV</option>
+    <option value="ogg">OGG</option>
+    <option value="flac">FLAC</option>
+  </select>
+
+  <button onclick="processAudio()">Trim & Merge Audio</button>
+
+  <div class="status" id="status">Select audio files to start.</div>
+  <div id="previewContainer"></div>
+  <a id="downloadLink" style="display:none;">💾 Download Processed Audio</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.1/dist/ffmpeg.min.js"></script>
+<script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log:true });
+
+async function processAudio(){
+  const files = document.getElementById('audioInput').files;
+  const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+  const endTime = parseFloat(document.getElementById('endTime').value);
+  const fadeTime = parseFloat(document.getElementById('fadeTime').value) || 0;
+  const format = document.getElementById('format').value;
+  const status = document.getElementById('status');
+  const previewContainer = document.getElementById('previewContainer');
+  const downloadLink = document.getElementById('downloadLink');
+
+  if(!files.length){ status.textContent="❌ Please select audio files."; return; }
+  status.textContent = "⏳ Loading FFmpeg core...";
+  if(!ffmpeg.isLoaded()) await ffmpeg.load();
+
+  previewContainer.innerHTML = '';
+  downloadLink.style.display = 'none';
+
+  // Write files to FFmpeg FS
+  for(let i=0;i<files.length;i++){
+    ffmpeg.FS('writeFile', files[i].name, await fetchFile(files[i]));
+  }
+
+  status.textContent = "⚙️ Processing audio...";
+
+  const tempOutputs = [];
+
+  for(let i=0;i<files.length;i++){
+    const inputName = files[i].name;
+    const outputName = `trimmed_${i}.${format}`;
+    let args = ['-i', inputName];
+
+    if(startTime>0 || endTime){
+      let duration = endTime ? endTime-startTime : undefined;
+      if(duration>0){
+        args.push('-ss', startTime.toString(), '-t', duration.toString());
+      } else {
+        args.push('-ss', startTime.toString());
+      }
+    } else if(startTime>0){
+      args.push('-ss', startTime.toString());
+    }
+
+    if(fadeTime>0){
+      args.push('-af', `afade=t=in:ss=0:d=${fadeTime},afade=t=out:st=${endTime?endTime-startTime-fadeTime:0}:d=${fadeTime}`);
+    }
+
+    args.push(outputName);
+    await ffmpeg.run(...args);
+    tempOutputs.push(outputName);
+  }
+
+  // Merge if more than 1 file
+  let finalOutput = `output.${format}`;
+  if(tempOutputs.length>1){
+    const listFile = 'file_list.txt';
+    const fileListContent = tempOutputs.map(f=>`file '${f}'`).join('\n');
+    ffmpeg.FS('writeFile', listFile, fileListContent);
+    await ffmpeg.run('-f','concat','-safe','0','-i',listFile,'-c','copy',finalOutput);
+  } else {
+    finalOutput = tempOutputs[0];
+  }
+
+  const data = ffmpeg.FS('readFile', finalOutput);
+  const blob = new Blob([data.buffer], { type:'audio/'+format });
+  const url = URL.createObjectURL(blob);
+
+  // Preview
+  const audioEl = document.createElement('audio');
+  audioEl.controls = true;
+  audioEl.src = url;
+  previewContainer.appendChild(audioEl);
+
+  downloadLink.href = url;
+  downloadLink.download = `processed_audio.${format}`;
+  downloadLink.style.display = 'inline-block';
+  downloadLink.textContent = "💾 Download Processed Audio";
+
+  status.textContent = "✅ Audio processing complete!";
+}
+</script>
+
+</body>
+</html>
