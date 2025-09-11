@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotate PDF Pages | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input[type=file],button{padding:8px;margin:6px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;max-height:300px;overflow-x:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start}
+.preview-item{position:relative;width:80px;height:100px;border:1px solid #334155;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:2px;font-size:0.75rem;text-align:center;cursor:pointer}
+.preview-item.selected{border:2px solid #38bdf8;}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header>🔄 Rotate PDF Pages Online</header>
+
+<div class="card">
+  <div class="controls">
+    <input type="file" id="fileInput" accept="application/pdf">
+    <button id="rotateCWBtn">Rotate 90° CW</button>
+    <button id="rotateCCWBtn">Rotate 90° CCW</button>
+    <button id="undoBtn">Undo Selection</button>
+    <button id="downloadBtn">Download PDF</button>
+  </div>
+
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const rotateCWBtn = document.getElementById('rotateCWBtn');
+const rotateCCWBtn = document.getElementById('rotateCCWBtn');
+const undoBtn = document.getElementById('undoBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const statusEl = document.getElementById('status');
+const progressBar = document.getElementById('progressBar');
+
+let pdfBytes = null;
+let pdfDoc = null;
+let totalPages = 0;
+
+// Load PDF and render thumbnails
+fileInput.addEventListener('change', async e => {
+  preview.innerHTML = '';
+  pdfBytes = null;
+  pdfDoc = null;
+  const file = e.target.files[0];
+  if(!file || file.type!=='application/pdf'){statusEl.textContent='❌ Please upload a PDF'; return;}
+
+  statusEl.textContent='Loading PDF...';
+  const arrayBuffer = await file.arrayBuffer();
+  pdfBytes = arrayBuffer;
+  pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+  const pdf = await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  totalPages = pdf.numPages;
+
+  for(let i=1;i<=totalPages;i++){
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({scale:0.2});
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({canvasContext:ctx, viewport}).promise;
+
+    const div = document.createElement('div');
+    div.className='preview-item';
+    div.dataset.page=i-1;
+    div.appendChild(canvas);
+    div.appendChild(document.createTextNode(`Page ${i}`));
+    preview.appendChild(div);
+
+    div.addEventListener('click',()=>div.classList.toggle('selected'));
+  }
+
+  statusEl.textContent=`PDF loaded (${totalPages} pages)`;
+});
+
+// Undo selection
+undoBtn.addEventListener('click',()=>{
+  Array.from(preview.getElementsByClassName('preview-item')).forEach(div=>div.classList.remove('selected'));
+  statusEl.textContent='Selections cleared';
+});
+
+// Rotate pages
+async function rotatePages(degrees){
+  if(!pdfDoc){alert('No PDF loaded'); return;}
+  const selected = Array.from(preview.getElementsByClassName('preview-item')).filter(div=>div.classList.contains('selected')).map(div=>parseInt(div.dataset.page));
+  if(selected.length===0){alert('No pages selected'); return;}
+  statusEl.textContent='Rotating pages...';
+  progressBar.style.width='0%';
+
+  selected.forEach((pageIndex,i)=>{
+    const page = pdfDoc.getPage(pageIndex);
+    const currentRotation = page.getRotation().angle;
+    page.setRotation(PDFLib.degrees((currentRotation+degrees+360)%360));
+    progressBar.style.width=`${Math.round(((i+1)/selected.length)*100)}%`;
+  });
+
+  // Update preview thumbnails
+  const pdfBytesNew = await pdfDoc.save();
+  const pdfNew = await pdfjsLib.getDocument({data:pdfBytesNew}).promise;
+
+  for(let i=0;i<selected.length;i++){
+    const pageNum = selected[i]+1;
+    const page = await pdfNew.getPage(pageNum);
+    const viewport = page.getViewport({scale:0.2});
+    const canvas = preview.children[selected[i]].querySelector('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({canvasContext:ctx, viewport}).promise;
+  }
+  statusEl.textContent='Rotation applied';
+}
+
+// Event listeners
+rotateCWBtn.addEventListener('click',()=>rotatePages(90));
+rotateCCWBtn.addEventListener('click',()=>rotatePages(-90));
+
+// Download PDF
+downloadBtn.addEventListener('click', async ()=>{
+  if(!pdfDoc){alert('No PDF loaded'); return;}
+  const bytes = await pdfDoc.save();
+  const blob = new Blob([bytes],{type:'application/pdf'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download='rotated.pdf';
+  a.click();
+  statusEl.textContent='✅ PDF ready for download';
+});
+</script>
+</body>
+</html>
