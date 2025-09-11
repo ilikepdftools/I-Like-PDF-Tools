@@ -118,6 +118,11 @@
         .logo i {
             font-size: 24px;
             color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .logo:hover i {
+            transform: rotate(10deg);
         }
 
         .logo h1 {
@@ -130,30 +135,101 @@
             cursor: pointer;
             color: var(--gold);
             display: none;
+            transition: var(--transition);
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
         }
 
         .search-container {
             flex: 1;
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 20px;
             position: relative;
         }
 
-        .search-container input {
+        .search-input-container {
+            position: relative;
             width: 100%;
-            padding: 10px 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
             border: none;
             border-radius: 30px;
             background: rgba(255, 255, 255, 0.1);
             color: var(--light-gray);
-            padding-left: 40px;
+            font-size: 16px;
+            transition: var(--transition);
         }
 
-        .search-container i {
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 2px var(--gold);
+        }
+
+        .search-icon {
             position: absolute;
-            left: 15px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
+            color: var(--light-gray);
+            cursor: pointer;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-result-item:hover {
+            background: var(--gold);
+            color: var(--dark-blue);
+        }
+
+        .search-result-item:hover h4 {
+            color: var(--dark-blue);
+        }
+
+        .search-result-item i {
+            color: var(--gold);
+            font-size: 18px;
+        }
+
+        .search-result-item:hover i {
+            color: var(--dark-blue);
+        }
+
+        .search-result-item h4 {
+            font-size: 14px;
+            margin: 0;
+            color: var(--light-gray);
+        }
+
+        .no-results {
+            padding: 15px;
+            text-align: center;
             color: var(--light-gray);
         }
 
@@ -184,6 +260,11 @@
             font-size: 24px;
             cursor: pointer;
             color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .sidebar-close:hover {
+            transform: rotate(90deg);
         }
 
         .sidebar-menu {
@@ -231,36 +312,6 @@
         .sidebar-overlay.active {
             opacity: 1;
             visibility: visible;
-        }
-
-        /* Navigation */
-        nav {
-            background: var(--deep-red);
-            padding: 10px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .nav-item {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .nav-item.active {
-            background: var(--gold);
-            color: var(--dark-blue);
         }
 
         /* Hero Section */
@@ -421,6 +472,12 @@
             text-align: justify;
         }
 
+        @media (max-width: 768px) {
+            .article-content {
+                column-count: 1;
+            }
+        }
+
         .article-content p {
             margin-bottom: 20px;
         }
@@ -442,6 +499,12 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
         }
 
         .contact-info {
@@ -511,6 +574,18 @@
             gap: 30px;
         }
 
+        @media (max-width: 992px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .footer-col h4 {
             font-size: 18px;
             margin-bottom: 20px;
@@ -567,21 +642,6 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 992px) {
-            .about-content,
-            .contact-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .article-content {
-                column-count: 1;
-            }
-        }
-
         @media (max-width: 768px) {
             .header-container {
                 flex-wrap: wrap;
@@ -597,10 +657,6 @@
                 display: block;
             }
             
-            .nav-container {
-                display: none;
-            }
-            
             .tools-container {
                 grid-template-columns: 1fr;
             }
@@ -611,12 +667,6 @@
             
             .hero p {
                 font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .footer-container {
-                grid-template-columns: 1fr;
             }
             
             .hero-buttons {
@@ -667,29 +717,16 @@
             </div>
             
             <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search for tools...">
+                <div class="search-input-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search for tools...">
+                    <div class="search-icon" id="searchIcon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
+                </div>
             </div>
         </div>
     </header>
-    
-    <nav>
-        <div class="container nav-container">
-            <a href="#home" class="nav-item">Home</a>
-            <a href="#all-tools" class="nav-item active">All Tools</a>
-            <a href="#about" class="nav-item">About</a>
-            <a href="#article" class="nav-item">Article</a>
-            <a href="#contact" class="nav-item">Contact</a>
-            <a href="#pdf-conversion" class="nav-item">PDF Conversion</a>
-            <a href="#pdf-editing" class="nav-item">PDF Editing</a>
-            <a href="#pdf-security" class="nav-item">PDF Security</a>
-            <a href="#pdf-compression" class="nav-item">PDF Compression</a>
-            <a href="#image-tools" class="nav-item">Image Tools</a>
-            <a href="#video-tools" class="nav-item">Video Tools</a>
-            <a href="#audio-tools" class="nav-item">Audio Tools</a>
-            <a href="#ai-tools" class="nav-item">AI Tools</a>
-        </div>
-    </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -1198,34 +1235,39 @@
             
             // Setup search functionality
             const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            
+            // Fast responsive search with debouncing
+            let searchTimeout;
             searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
+                clearTimeout(searchTimeout);
+                const searchTerm = this.value.trim().toLowerCase();
                 
-                if (searchTerm.length < 2) {
-                    // If search term is too short, show all tools
-                    const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
-                    let filteredTools;
-                    
-                    if (activeFilter === 'all') {
-                        filteredTools = tools;
-                    } else {
-                        filteredTools = tools.filter(tool => tool.category === activeFilter);
-                    }
-                    
-                    container.innerHTML = '';
-                    renderTools(filteredTools, container);
+                if (searchTerm.length === 0) {
+                    searchResults.style.display = 'none';
                     return;
                 }
                 
-                // Filter tools based on search term
-                const filteredTools = tools.filter(tool => {
-                    return tool.name.toLowerCase().includes(searchTerm) || 
-                           tool.description.toLowerCase().includes(searchTerm);
-                });
+                // Show loading state
+                searchResults.innerHTML = '<div class="no-results">Searching...</div>';
+                searchResults.style.display = 'block';
                 
-                // Clear and render filtered tools
-                container.innerHTML = '';
-                renderTools(filteredTools, container);
+                // Debounce the search to improve performance
+                searchTimeout = setTimeout(() => {
+                    performSearch(searchTerm);
+                }, 100);
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+            
+            // Keep results open when clicking on them
+            searchResults.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
             
             // Setup sidebar toggle
@@ -1281,6 +1323,39 @@
                 });
             });
         });
+
+        // Function to perform search
+        function performSearch(searchTerm) {
+            const searchResults = document.getElementById('searchResults');
+            
+            // Filter tools based on search term
+            const filteredTools = tools.filter(tool => {
+                return tool.name.toLowerCase().includes(searchTerm) || 
+                       tool.description.toLowerCase().includes(searchTerm) ||
+                       tool.category.toLowerCase().includes(searchTerm);
+            });
+            
+            // Display results
+            if (filteredTools.length === 0) {
+                searchResults.innerHTML = '<div class="no-results">No tools found matching your search</div>';
+            } else {
+                searchResults.innerHTML = '';
+                filteredTools.forEach(tool => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                        <i class="fas ${tool.icon}"></i>
+                        <h4>${tool.name}</h4>
+                    `;
+                    resultItem.addEventListener('click', function() {
+                        window.location.href = tool.url;
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+            }
+            
+            searchResults.style.display = 'block';
+        }
 
         // Function to render tools
         function renderTools(toolsArray, container) {
