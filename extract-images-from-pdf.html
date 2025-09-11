@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extract Images from PDF | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px;text-align:center}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input[type=file],button,select{padding:8px;margin:6px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;overflow-x:auto}
+.preview-item{position:relative;width:100px;border:1px solid #334155;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;font-size:0.75rem;text-align:center;padding:4px}
+.preview-item img{max-width:90px;max-height:90px;margin-bottom:2px}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+</style>
+</head>
+<body>
+
+<header>📷 Extract Embedded Images from PDF</header>
+
+<div class="card">
+  <input type="file" id="fileInput" accept="application/pdf">
+  <button id="zipBtn">Download All as ZIP</button>
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.11.0/jszip.min.js"></script>
+<script>
+const fileInput=document.getElementById('fileInput');
+const preview=document.getElementById('preview');
+const statusEl=document.getElementById('status');
+const progressBar=document.getElementById('progressBar');
+const zipBtn=document.getElementById('zipBtn');
+
+let images=[];
+
+fileInput.addEventListener('change',async e=>{
+  preview.innerHTML='';
+  images=[];
+  const file=e.target.files[0];
+  if(!file || file.type!=='application/pdf'){statusEl.textContent='❌ Please upload a PDF'; return;}
+
+  statusEl.textContent='Extracting images...';
+  const arrayBuffer=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const totalPages=pdf.numPages;
+  let count=0;
+
+  for(let i=1;i<=totalPages;i++){
+    const page=await pdf.getPage(i);
+    const operatorList=await page.getOperatorList();
+    const fnArray=operatorList.fnArray;
+    const argsArray=operatorList.argsArray;
+
+    // Scan for images using pdf.js internal 'paintImageXObject' fn
+    for(let j=0;j<fnArray.length;j++){
+      if(fnArray[j]===pdfjsLib.OPS.paintImageXObject){
+        const objName=argsArray[j][0];
+        const imgObj=await page.objs.get(objName) || await page.commonObjs.get(objName);
+        if(imgObj){
+          const canvas=document.createElement('canvas');
+          canvas.width=imgObj.width;
+          canvas.height=imgObj.height;
+          const ctx=canvas.getContext('2d');
+          // Fill image data
+          const imageData=ctx.createImageData(imgObj.width,imgObj.height);
+          imageData.data.set(imgObj.data);
+          ctx.putImageData(imageData,0,0);
+          const dataURL=canvas.toDataURL('image/png');
+          const filename=`page-${i}-img-${count+1}.png`;
+          images.push({dataURL,filename});
+
+          const div=document.createElement('div');
+          div.className='preview-item';
+          const img=document.createElement('img');
+          img.src=dataURL;
+          div.appendChild(img);
+          div.appendChild(document.createTextNode(`Pg${i} #${count+1}`));
+          preview.appendChild(div);
+          count++;
+        }
+      }
+    }
+    progressBar.style.width=`${(i/totalPages)*100}%`;
+  }
+
+  if(images.length===0) statusEl.textContent='⚠️ No embedded images found.';
+  else statusEl.textContent=`✅ Extracted ${images.length} images`;
+  progressBar.style.width='100%';
+});
+
+// ZIP download
+zipBtn.addEventListener('click',async()=>{
+  if(!images.length){alert('No images to download'); return;}
+  statusEl.textContent='Creating ZIP...';
+  const zip=new JSZip();
+  images.forEach(img=>zip.file(img.filename,img.dataURL.split(',')[1],{base64:true}));
+  const blob=await zip.generateAsync({type:'blob'},metadata=>{
+    progressBar.style.width=`${metadata.percent}%`;
+  });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='images.zip';
+  a.click();
+  statusEl.textContent='✅ ZIP ready';
+  progressBar.style.width='100%';
+});
+</script>
+
+</body>
+</html>
