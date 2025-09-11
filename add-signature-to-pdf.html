@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drag & Drop PDF Signature | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px;text-align:center}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:900px;width:100%;margin-bottom:16px;display:flex;flex-direction:column;gap:8px}
+input[type=file],button,select,input[type=number],input[type=text]{padding:8px;margin:4px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#canvasContainer{position:relative;background:var(--bg);border:1px solid #334155;border-radius:8px;overflow:hidden}
+#pdfCanvas{display:block;width:100%;}
+#sigPreview{position:absolute;top:0;left:0;cursor:move;transform-origin:center center;display:none;pointer-events:auto}
+#controls{display:flex;gap:8px;flex-wrap:wrap}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+.pageNav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}
+.pageNav button{width:48%;font-size:0.9rem}
+</style>
+</head>
+<body>
+
+<header>✍️ Drag & Drop Signature to PDF</header>
+
+<div class="card">
+  <input type="file" id="pdfInput" accept="application/pdf">
+  
+  <select id="sigType">
+    <option value="draw">Draw Signature</option>
+    <option value="image">Upload Signature</option>
+    <option value="text">Type Signature</option>
+  </select>
+
+  <canvas id="sigCanvas" width="300" height="100" style="border:1px solid #334155;background:#1e293b;"></canvas>
+  <input type="file" id="imageSig" accept="image/*" style="display:none">
+  <input type="text" id="textSig" placeholder="Enter signature text" value="My Signature" style="display:none">
+
+  <div id="controls">
+    <input type="number" id="sigSize" placeholder="Size px/%" value="100">
+    <input type="number" id="rotation" placeholder="Rotation°" value="0">
+    <input type="number" id="opacity" placeholder="Opacity 0-1" step="0.1" value="1">
+  </div>
+
+  <div class="pageNav">
+    <button id="prevPage">⬅ Previous Page</button>
+    <span id="pageInfo">Page 0 / 0</span>
+    <button id="nextPage">Next Page ➡</button>
+  </div>
+
+  <div id="canvasContainer">
+    <canvas id="pdfCanvas"></canvas>
+    <img id="sigPreview">
+  </div>
+
+  <button id="applyBtn">Place Signature & Download PDF</button>
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.239/pdf.min.js"></script>
+<script>
+const pdfInput=document.getElementById('pdfInput');
+const sigType=document.getElementById('sigType');
+const sigCanvas=document.getElementById('sigCanvas');
+const imageSig=document.getElementById('imageSig');
+const textSig=document.getElementById('textSig');
+const sigSize=document.getElementById('sigSize');
+const rotation=document.getElementById('rotation');
+const opacity=document.getElementById('opacity');
+const applyBtn=document.getElementById('applyBtn');
+const statusEl=document.getElementById('status');
+const progressBar=document.getElementById('progressBar');
+const pdfCanvas=document.getElementById('pdfCanvas');
+const canvasContainer=document.getElementById('canvasContainer');
+const sigPreview=document.getElementById('sigPreview');
+const prevPageBtn=document.getElementById('prevPage');
+const nextPageBtn=document.getElementById('nextPage');
+const pageInfo=document.getElementById('pageInfo');
+
+let pdfDoc=null, currentPage=1, totalPages=0, pdfPages=[], scale=1.5;
+let sigData=null, dragOffset={x:0,y:0};
+let sigPositions={}; // store x,y per page
+
+const ctx=sigCanvas.getContext('2d');
+let drawing=false;
+sigCanvas.addEventListener('pointerdown',e=>{drawing=true;ctx.beginPath();ctx.moveTo(e.offsetX,e.offsetY)});
+sigCanvas.addEventListener('pointermove',e=>{if(drawing){ctx.lineTo(e.offsetX,e.offsetY);ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;ctx.stroke()}});
+sigCanvas.addEventListener('pointerup',()=>drawing=false);
+sigCanvas.addEventListener('pointerleave',()=>drawing=false);
+
+sigType.addEventListener('change',()=>{
+  sigCanvas.style.display='none';
+  imageSig.style.display='none';
+  textSig.style.display='none';
+  if(sigType.value==='draw'){sigCanvas.style.display='block'}
+  else if(sigType.value==='image'){imageSig.style.display='block'}
+  else if(sigType.value==='text'){textSig.style.display='block'}
+});
+
+pdfInput.addEventListener('change',async()=>{
+  const file=pdfInput.files[0];
+  if(!file)return;
+  const arrayBuffer=await file.arrayBuffer();
+  pdfDoc=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  totalPages=pdfDoc.numPages;
+  currentPage=1;
+  pageInfo.textContent=`Page ${currentPage} / ${totalPages}`;
+  renderPage(currentPage);
+});
+
+async function renderPage(pageNum){
+  const page=await pdfDoc.getPage(pageNum);
+  const viewport=page.getViewport({scale});
+  pdfCanvas.width=viewport.width;
+  pdfCanvas.height=viewport.height;
+  const renderCtx={canvasContext:pdfCanvas.getContext('2d'),viewport};
+  await page.render(renderCtx).promise;
+  // draw existing signature
+  const pos=sigPositions[pageNum];
+  if(pos && sigData){
+    sigPreview.src=sigData;
+    sigPreview.style.display='block';
+    sigPreview.style.left=pos.x+'px';
+    sigPreview.style.top=pos.y+'px';
+    sigPreview.style.width=sigCanvas.width*parseFloat(sigSize.value)/100+'px';
+    sigPreview.style.transform=`rotate(${rotation.value}deg)`;
+    sigPreview.style.opacity=opacity.value;
+  } else {sigPreview.style.display='none'}
+}
+
+sigPreview.onpointerdown=function(e){
+  e.preventDefault();
+  dragOffset.x=e.offsetX; dragOffset.y=e.offsetY;
+  document.onpointermove=function(ev){
+    sigPreview.style.left=(ev.clientX-canvasContainer.getBoundingClientRect().left-dragOffset.x)+'px';
+    sigPreview.style.top=(ev.clientY-canvasContainer.getBoundingClientRect().top-dragOffset.y)+'px';
+  }
+  document.onpointerup=function(){document.onpointermove=null;document.onpointerup=null}
+}
+
+prevPageBtn.onclick=()=>{if(currentPage>1){currentPage--;pageInfo.textContent=`Page ${currentPage} / ${totalPages}`;renderPage(currentPage)}}
+nextPageBtn.onclick=()=>{if(currentPage<totalPages){currentPage++;pageInfo.textContent=`Page ${currentPage} / ${totalPages}`;renderPage(currentPage)}}
+
+applyBtn.onclick=async()=>{
+  if(!pdfDoc){statusEl.textContent='❌ Upload PDF first';return;}
+  statusEl.textContent='Processing...';progressBar.style.width='0%';
+
+  // get signature
+  if(sigType.value==='draw'){
+    sigData=sigCanvas.toDataURL('image/png');
+  } else if(sigType.value==='image' && imageSig.files[0]){
+    sigData=URL.createObjectURL(imageSig.files[0]);
+  } else if(sigType.value==='text'){
+    const tempCanvas=document.createElement('canvas');
+    tempCanvas.width=400; tempCanvas.height=100;
+    const tCtx=tempCanvas.getContext('2d');
+    tCtx.fillStyle='#38bdf8'; tCtx.font='40px Arial';
+    tCtx.fillText(textSig.value,20,60);
+    sigData=tempCanvas.toDataURL('image/png');
+  }
+
+  const file=pdfInput.files[0];
+  const arrayBuffer=await file.arrayBuffer();
+  const pdfLibDoc=await PDFLib.PDFDocument.load(arrayBuffer);
+  const pngImageBytes=await fetch(sigData).then(r=>r.arrayBuffer());
+  const sigImage=await pdfLibDoc.embedPng(pngImageBytes);
+
+  for(let i=1;i<=totalPages;i++){
+    const page=pdfLibDoc.getPage(i-1);
+    const pos=sigPositions[i] || {x:page.getWidth()/2,y:page.getHeight()/2};
+    const scale=parseFloat(sigSize.value)/100;
+    const dims=sigImage.scale(scale);
+    page.drawImage(sigImage,{
+      x:pos.x,
+      y:pos.y,
+      width:dims.width,
+      height:dims.height,
+      opacity:parseFloat(opacity.value),
+      rotate:PDFLib.degrees(parseFloat(rotation.value))
+    });
+    progressBar.style.width=`${(i/totalPages)*100}%`;
+  }
+
+  const pdfBytes=await pdfLibDoc.save();
+  const blob=new Blob([pdfBytes],{type:'application/pdf'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=file.name.replace(/\.pdf$/i,'-signed.pdf');
+  a.click();
+
+  statusEl.textContent='✅ PDF signed successfully!';
+  progressBar.style.width='100%';
+}
+</script>
+</body>
+</html>
