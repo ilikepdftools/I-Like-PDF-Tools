@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protect PDF | I Like PDF Tools</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    padding: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #38bdf8;
+  }
+  .container {
+    background: #1e293b;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    max-width: 600px;
+    width: 95%;
+    margin-bottom: 2rem;
+  }
+  input, select, button {
+    margin: 0.5rem 0;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-size: 1rem;
+  }
+  button {
+    background: #38bdf8;
+    color: #0f172a;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { background: #0ea5e9; }
+  .status {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+  .permissions {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+  }
+  .permissions label { margin-bottom: 0.3rem; }
+</style>
+</head>
+<body>
+
+<header>🔒 Protect PDF Tool</header>
+
+<div class="container">
+  <input type="file" id="pdfFile" accept="application/pdf">
+  
+  <input type="text" id="userPassword" placeholder="User (open) password">
+  <input type="text" id="ownerPassword" placeholder="Owner (permission) password">
+
+  <div class="permissions">
+    <label><input type="checkbox" id="allowPrint"> Allow printing</label>
+    <label><input type="checkbox" id="allowCopy"> Allow copying</label>
+    <label><input type="checkbox" id="allowEdit"> Allow editing</label>
+  </div>
+
+  <button onclick="protectPDF()">Protect PDF</button>
+
+  <div id="status" class="status">Select a PDF and set passwords & permissions.</div>
+</div>
+
+<!-- pdf-lib -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.18.1/pdf-lib.min.js"></script>
+
+<script>
+async function protectPDF() {
+  const fileInput = document.getElementById('pdfFile');
+  const status = document.getElementById('status');
+  if (!fileInput.files.length) {
+    status.textContent = "❌ Please upload a PDF file.";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const userPass = document.getElementById('userPassword').value;
+  const ownerPass = document.getElementById('ownerPassword').value;
+  const allowPrint = document.getElementById('allowPrint').checked;
+  const allowCopy = document.getElementById('allowCopy').checked;
+  const allowEdit = document.getElementById('allowEdit').checked;
+
+  status.textContent = "Processing...";
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+    // pdf-lib currently supports simple password protection via encrypt
+    try {
+      await pdfDoc.encrypt({
+        ownerPassword: ownerPass || '',
+        userPassword: userPass || '',
+        permissions: {
+          printing: allowPrint ? 'highResolution' : 'none',
+          copying: allowCopy,
+          modifying: allowEdit,
+        }
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = file.name.replace(/\.pdf$/i, "_protected.pdf");
+      a.click();
+      status.textContent = "✅ PDF protected successfully!";
+    } catch(e) {
+      // If encryption not fully supported client-side
+      status.innerHTML = "⚠️ Client-side encryption limited. Use server fallback for full permissions.<br>" +
+        "Download your file and upload to our server-side protector for complete security.";
+      console.error(e);
+    }
+
+  } catch (err) {
+    status.textContent = "❌ Error processing PDF: " + err.message;
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
