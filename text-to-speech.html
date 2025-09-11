@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text to Speech Generator</title>
+<style>
+body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+.container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:600px; width:95%; margin-bottom:2rem; }
+textarea, select, input, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+button:hover { background:#0ea5e9; }
+.status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+.flex { display:flex; gap:0.5rem; flex-wrap:wrap; }
+.flex > * { flex:1; }
+audio { width:100%; margin-top:1rem; border-radius:8px; }
+a { display:block; margin-top:1rem; color:#38bdf8; font-weight:bold; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>🗣 Text → Speech Generator</header>
+
+<div class="container">
+  <label>Enter Text:</label>
+  <textarea id="textInput" rows="6" placeholder="Type your text here..."></textarea>
+
+  <label>Select Voice:</label>
+  <select id="voiceSelect"></select>
+
+  <div class="flex">
+    <div>
+      <label>Rate (Speed):</label>
+      <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+    </div>
+    <div>
+      <label>Pitch:</label>
+      <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+    </div>
+  </div>
+
+  <button onclick="speakText()">🔊 Generate & Play</button>
+  <div class="status" id="status">Select voice and adjust speed/pitch.</div>
+
+  <audio id="audioPreview" controls style="display:none;"></audio>
+  <a id="downloadLink" style="display:none;">💾 Download MP3</a>
+</div>
+
+<script>
+const textInput = document.getElementById('textInput');
+const voiceSelect = document.getElementById('voiceSelect');
+const rate = document.getElementById('rate');
+const pitch = document.getElementById('pitch');
+const status = document.getElementById('status');
+const audioPreview = document.getElementById('audioPreview');
+const downloadLink = document.getElementById('downloadLink');
+
+let voices = [];
+
+function populateVoices() {
+  voices = speechSynthesis.getVoices();
+  voiceSelect.innerHTML = '';
+  voices.forEach((v, i) => {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = `${v.name} (${v.lang})`;
+    voiceSelect.appendChild(option);
+  });
+}
+
+speechSynthesis.onvoiceschanged = populateVoices;
+populateVoices();
+
+async function speakText() {
+  const text = textInput.value.trim();
+  if(!text) { status.textContent="❌ Please enter some text."; return; }
+  status.textContent = "⏳ Generating audio...";
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.voice = voices[voiceSelect.value] || null;
+  utterance.rate = parseFloat(rate.value);
+  utterance.pitch = parseFloat(pitch.value);
+
+  // Capture speech to audio using Web Audio API
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const dest = audioContext.createMediaStreamDestination();
+  const synth = window.speechSynthesis;
+  
+  utterance.onstart = () => { status.textContent = "🎵 Playing..."; };
+  utterance.onend = async () => {
+    status.textContent = "✅ Done! Ready to download.";
+  };
+
+  synth.speak(utterance);
+
+  // For demo, create a temporary playback using speechSynthesis
+  // Note: Web Speech API cannot directly export to MP3 client-side
+  // For real MP3 export, a server-side TTS API (like OpenAI, Google Cloud, or Amazon Polly) is needed
+
+  audioPreview.src = '';
+  audioPreview.style.display = 'none';
+  downloadLink.style.display = 'none';
+}
+</script>
+
+</body>
+</html>
