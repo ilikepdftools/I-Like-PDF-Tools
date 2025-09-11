@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>I Like PDF Tools — PDF → JPG/PNG Exporter</title>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<style>
+  :root{
+    --bg:#071028; --panel:#0b1726; --muted:#9fb0c8; --accent:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#02101a);color:#e6eef6;padding:18px}
+  .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:16px}
+  @media(max-width:980px){.container{grid-template-columns:1fr}}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{font-size:18px;margin:0}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  .card{background:linear-gradient(180deg,var(--panel),#061526);padding:14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  input[type=file]{display:none}
+  label.btn{background:var(--accent);color:#022; padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700}
+  select,input,button{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  button.primary{background:var(--accent);color:#022;border:none}
+  .meta{color:var(--muted);font-size:13px}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;max-height:520px;overflow:auto}
+  .thumb{width:140px;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;text-align:center}
+  .thumb img{width:100%;height:auto;border-radius:6px}
+  .row{display:flex;gap:8px;align-items:center}
+  .progressBar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;margin-top:8px}
+  .progressBar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+  .small{font-size:13px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
+  .note{font-size:12px;color:var(--muted)}
+  footer{margin-top:12px;color:var(--muted);font-size:12px;text-align:center}
+  label.checkbox{display:flex;align-items:center;gap:8px;cursor:pointer}
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>📷 PDF → JPG / PNG Exporter</h1>
+      <p class="lead">Export PDF pages as images — download individually or as ZIP. Privacy-first: everything runs in your browser.</p>
+    </div>
+    <div class="meta">I Like PDF Tools</div>
+  </header>
+
+  <div class="container">
+    <!-- LEFT: main UI -->
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <label class="btn" for="fileInput">Upload PDF</label>
+          <input id="fileInput" type="file" accept="application/pdf" />
+        </div>
+        <div class="meta" id="fileMeta">No file</div>
+      </div>
+
+      <div class="controls">
+        <label for="format">Format</label>
+        <select id="format">
+          <option value="jpeg">JPG (jpeg)</option>
+          <option value="png">PNG</option>
+        </select>
+
+        <label for="quality">JPG Quality</label>
+        <select id="quality">
+          <option value="0.95">95%</option>
+          <option value="0.85" selected>85%</option>
+          <option value="0.75">75%</option>
+          <option value="0.6">60%</option>
+        </select>
+
+        <label for="scale">Resolution</label>
+        <select id="scale">
+          <option value="1">Normal (1x)</option>
+          <option value="1.5" selected>1.5x</option>
+          <option value="2">2x (higher DPI)</option>
+          <option value="3">3x (hi-res)</option>
+        </select>
+
+        <label for="pageFrom" class="note">Page from</label>
+        <input id="pageFrom" type="number" min="1" style="width:80px" />
+
+        <label for="pageTo" class="note">to</label>
+        <input id="pageTo" type="number" min="1" style="width:80px" />
+      </div>
+
+      <div style="margin-top:10px" class="row">
+        <button id="btnPreview" class="primary">Render Thumbnails</button>
+        <button id="btnExportSelected" class="small">Export Selected</button>
+        <button id="btnExportZip" class="small">Export ZIP</button>
+        <button id="btnClear" class="small">Clear</button>
+      </div>
+
+      <div class="progressBar" aria-hidden="false"><i id="globalProgress" style="width:0%"></i></div>
+      <div id="status" class="note" style="margin-top:8px">Idle</div>
+
+      <div class="note" style="margin-top:10px">Tip: use higher resolution (2x/3x) for print-quality images; higher scale increases memory & CPU.</div>
+
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <!-- RIGHT: preview & options -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Preview & Options</strong>
+        <div class="note">Select pages to include</div>
+      </div>
+
+      <div id="previewArea" style="margin-top:10px;min-height:220px;border-radius:8px;background:rgba(255,255,255,0.02);padding:8px;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center">
+        <div class="note">No preview</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label class="checkbox"><input type="checkbox" id="optIndividual" checked/> Download images individually (one click per image)</label>
+        <div class="note" style="margin-top:8px">If unchecked, the tool will create a ZIP of all selected images.</div>
+      </div>
+
+      <div style="margin-top:12px" class="row">
+        <button id="btnDownloadVisible" class="primary">Download Visible</button>
+        <button id="btnDownloadAll" class="small">Download All</button>
+      </div>
+
+      <div style="margin-top:12px" id="log" class="note">Logs will appear here</div>
+    </div>
+  </div>
+
+  <footer>© I Like PDF Tools — Client-side PDF image exporter</footer>
+
+  <!-- Libraries -->
+  <script src="https://unpkg.com/pdfjs-dist@3.7.107/build/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <script>
+  /* PDF → JPG/PNG exporter
+     - Uses pdf.js to render pages to canvas
+     - Exports as JPEG or PNG using canvas.toDataURL / toBlob
+     - Page-range selection, thumbnails, select/deselect pages, preview
+     - Single-image download or ZIP (JSZip)
+     - Progress updates and error handling
+  */
+
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.7.107/build/pdf.worker.min.js';
+
+  // DOM
+  const fileInput = document.getElementById('fileInput');
+  const btnPreview = document.getElementById('btnPreview');
+  const btnExportSelected = document.getElementById('btnExportSelected');
+  const btnExportZip = document.getElementById('btnExportZip');
+  const btnClear = document.getElementById('btnClear');
+  const thumbsEl = document.getElementById('thumbs');
+  const previewArea = document.getElementById('previewArea');
+  const statusEl = document.getElementById('status');
+  const globalProgress = document.getElementById('globalProgress');
+  const formatSel = document.getElementById('format');
+  const qualitySel = document.getElementById('quality');
+  const scaleSel = document.getElementById('scale');
+  const pageFromEl = document.getElementById('pageFrom');
+  const pageToEl = document.getElementById('pageTo');
+  const optIndividual = document.getElementById('optIndividual');
+  const btnDownloadVisible = document.getElementById('btnDownloadVisible');
+  const btnDownloadAll = document.getElementById('btnDownloadAll');
+  const logEl = document.getElementById('log');
+  const fileMeta = document.getElementById('fileMeta');
+
+  // State
+  let pdfDoc = null;
+  let renderedPages = []; // {pageNumber, thumbDataUrl, canvasWidth, canvasHeight, selected}
+  const MAX_FILE_SIZE = 150 * 1024 * 1024; // 150 MB limit
+
+  function log(msg){ logEl.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg + '\\n' + logEl.textContent; }
+
+  fileInput.addEventListener('change', async (e)=>{
+    const f = e.target.files[0];
+    if(!f){ return; }
+    if(!f.name.toLowerCase().endsWith('.pdf')) {
+      alert('Unsupported file type. Please upload a PDF.');
+      return;
+    }
+    if(f.size > MAX_FILE_SIZE){
+      alert('File too large. Max ' + (MAX_FILE_SIZE/1024/1024).toFixed(0) + ' MB.');
+      return;
+    }
+    fileMeta.textContent = f.name + ' — ' + Math.round(f.size/1024/1024) + ' MB';
+    // clear previous
+    clearAll();
+    // store pdf doc
+    try {
+      statusEl.textContent = 'Loading PDF...';
+      const ab = await f.arrayBuffer();
+      pdfDoc = await pdfjsLib.getDocument({data:ab}).promise;
+      log('PDF loaded with ' + pdfDoc.numPages + ' pages.');
+      // set default page range
+      pageFromEl.value = 1; pageToEl.value = pdfDoc.numPages;
+      statusEl.textContent = 'Ready to render thumbnails';
+    } catch(err){
+      console.error(err); alert('Error loading PDF: ' + err.message); statusEl.textContent = 'Error';
+    }
+  });
+
+  btnPreview.addEventListener('click', async ()=>{
+    if(!pdfDoc){ alert('Upload a PDF first'); return; }
+    const from = Math.max(1, parseInt(pageFromEl.value || 1));
+    const to = Math.min(pdfDoc.numPages, parseInt(pageToEl.value || pdfDoc.numPages));
+    if(from>to){ alert('Invalid page range'); return; }
+    await renderThumbnails(from, to);
+  });
+
+  btnClear.addEventListener('click', clearAll);
+
+  async function renderThumbnails(from, to){
+    thumbsEl.innerHTML = '';
+    previewArea.innerHTML = '<div class="note">Rendering thumbnails...</div>';
+    renderedPages = [];
+    const total = (to - from) + 1;
+    for(let p=from, idx=0; p<=to; p++, idx++){
+      try{
+        statusEl.textContent = `Rendering page ${p}/${to}...`;
+        // choose scale for thumbnail rendering (use a base scale but real export uses scaleSel)
+        const baseScale = 1.2;
+        const page = await pdfDoc.getPage(p);
+        const viewport = page.getViewport({scale: baseScale});
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+        const ctx = canvas.getContext('2d');
+        await page.render({canvasContext:ctx, viewport}).promise;
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        renderedPages.push({ pageNumber:p, thumbDataUrl:dataUrl, canvasWidth:canvas.width, canvasHeight:canvas.height, selected:true });
+        appendThumb(renderedPages[renderedPages.length-1]);
+        globalProgress.style.width = Math.round(((idx+1)/total) * 100) + '%';
+        await new Promise(r=>setTimeout(r,40)); // yield
+      }catch(err){
+        console.error(err);
+        log('Error rendering page ' + p + ': ' + err.message);
+      }
+    }
+    statusEl.textContent = `Rendered ${renderedPages.length} thumbnails`;
+    previewArea.innerHTML = '<div class="note">Click a thumbnail to preview. Use checkboxes to select pages.</div>';
+    globalProgress.style.width = '0%';
+  }
+
+  function appendThumb(obj){
+    const el = document.createElement('div'); el.className='thumb';
+    el.innerHTML = `<div style="position:relative"><img src="${obj.thumbDataUrl}" alt="Page ${obj.pageNumber}"/></div>
+      <div style="margin-top:6px;display:flex;align-items:center;justify-content:space-between">
+        <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" data-page="${obj.pageNumber}" checked/> <span class="note">Pg ${obj.pageNumber}</span></label>
+        <button class="small" data-page="${obj.pageNumber}">Preview</button>
+      </div>`;
+    // checkbox handler
+    const cb = el.querySelector('input[type=checkbox]');
+    cb.addEventListener('change', (e)=> {
+      const pn = Number(e.target.dataset.page);
+      const found = renderedPages.find(r=>r.pageNumber===pn);
+      if(found) found.selected = e.target.checked;
+    });
+    // preview button
+    const btn = el.querySelector('button');
+    btn.addEventListener('click', ()=> previewImage(obj.thumbDataUrl, obj.pageNumber));
+    thumbsEl.appendChild(el);
+  }
+
+  function previewImage(dataUrl, pageNumber){
+    previewArea.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.style.maxWidth='100%';
+    previewArea.appendChild(img);
+    const note = document.createElement('div'); note.className='note'; note.style.marginTop='8px'; note.textContent = 'Preview: page ' + pageNumber;
+    previewArea.appendChild(note);
+  }
+
+  // Export selected images individually (downloads each) — uses desired scale & quality
+  btnExportSelected.addEventListener('click', async ()=>{
+    if(!renderedPages.length){ alert('Render thumbnails first'); return; }
+    const selected = renderedPages.filter(p=>p.selected);
+    if(!selected.length){ alert('No pages selected'); return; }
+    await exportImages(selected, { asZip:false });
+  });
+
+  // Export ZIP
+  btnExportZip.addEventListener('click', async ()=>{
+    if(!renderedPages.length){ alert('Render thumbnails first'); return; }
+    const selected = renderedPages.filter(p=>p.selected);
+    if(!selected.length){ alert('No pages selected'); return; }
+    await exportImages(selected, { asZip:true });
+  });
+
+  // helper: export images (single downloads or zip)
+  async function exportImages(pagesToExport, opts={asZip:false}){
+    setStatus('Processing pages for export...');
+    const format = formatSel.value; // 'jpeg' or 'png'
+    const quality = parseFloat(qualitySel.value);
+    const scale = parseFloat(scaleSel.value);
+    const zip = new JSZip();
+    const promises = [];
+    const total = pagesToExport.length;
+    for(let i=0;i<total;i++){
+      const p = pagesToExport[i];
+      const promise = new Promise(async (resolve)=>{
+        try{
+          // Render page at requested scale to canvas
+          const page = await pdfDoc.getPage(p.pageNumber);
+          const viewport = page.getViewport({ scale: scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          const ctx = canvas.getContext('2d');
+          await page.render({canvasContext: ctx, viewport}).promise;
+
+          // Convert canvas to blob (PNG or JPEG) — prefer toBlob for memory efficiency
+          if(format === 'png'){
+            canvas.toBlob(async (blob)=>{
+              const name = `page-${p.pageNumber}.png`;
+              if(opts.asZip){
+                zip.file(name, blob);
+                globalProgress.style.width = Math.round(((i+1)/total)*100) + '%';
+                resolve();
+              } else {
+                downloadBlob(blob, name);
+                globalProgress.style.width = Math.round(((i+1)/total)*100) + '%';
+                resolve();
+              }
+            }, 'image/png');
+          } else {
+            // JPEG
+            canvas.toBlob(async (blob)=>{
+              const name = `page-${p.pageNumber}.jpg`;
+              if(opts.asZip){
+                zip.file(name, blob);
+                globalProgress.style.width = Math.round(((i+1)/total)*100) + '%';
+                resolve();
+              } else {
+                downloadBlob(blob, name);
+                globalProgress.style.width = Math.round(((i+1)/total)*100) + '%';
+                resolve();
+              }
+            }, 'image/jpeg', quality);
+          }
+        }catch(err){
+          log('Export error for page ' + p.pageNumber + ': ' + err.message);
+          resolve();
+        }
+      });
+      promises.push(promise);
+    }
+
+    // wait for all
+    await Promise.all(promises);
+
+    if(opts.asZip){
+      setStatus('Compressing into ZIP...');
+      const content = await zip.generateAsync({type:'blob'}, (meta)=> {
+        globalProgress.style.width = Math.round(meta.percent) + '%';
+      });
+      downloadBlob(content, 'pages.zip');
+    }
+
+    setStatus('Export finished');
+    globalProgress.style.width = '0%';
+  }
+
+  // Download helpers
+  function downloadBlob(blob, filename){
+    const a = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    log('Downloaded ' + filename);
+  }
+
+  // Download visible / all shortcuts
+  btnDownloadVisible.addEventListener('click', async ()=>{
+    const visible = renderedPages.filter(p=>p.selected);
+    if(!visible.length) return alert('No visible pages selected');
+    await exportImages(visible, { asZip: !optIndividual.checked });
+  });
+  btnDownloadAll.addEventListener('click', async ()=>{
+    if(!renderedPages.length) return alert('No pages rendered');
+    await exportImages(renderedPages, { asZip: true });
+  });
+
+  function clearAll(){
+    pdfDoc = null; renderedPages = []; thumbsEl.innerHTML = ''; previewArea.innerHTML = '<div class="note">No preview</div>'; statusEl.textContent = 'Idle'; fileMeta.textContent = 'No file'; logEl.textContent = ''; globalProgress.style.width='0%';
+  }
+  </script>
+</body>
+</html>
