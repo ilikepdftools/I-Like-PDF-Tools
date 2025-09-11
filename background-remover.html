@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Background Remover</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    header {
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 1rem;
+      color: #38bdf8;
+    }
+    .container {
+      background: #1e293b;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      max-width: 700px;
+      width: 95%;
+      margin-bottom: 2rem;
+    }
+    input, select, button {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.7rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background: #0ea5e9; }
+    #preview {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+    }
+    #preview img {
+      max-width: 100%;
+      border-radius: 6px;
+      border: 1px solid #94a3b8;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+<header>🖼️ AI Background Remover</header>
+
+<div class="container">
+  <input type="file" id="imageInput" accept="image/*">
+  
+  <button onclick="removeBackground()">Remove Background</button>
+  
+  <div class="status" id="status">Upload an image to start.</div>
+  
+  <div id="preview"></div>
+  
+  <button id="downloadBtn" style="display:none;" onclick="downloadImage()">Download PNG</button>
+</div>
+
+<script>
+  let outputBlob = null;
+
+  async function loadWasmModel() {
+    const modelUrl = 'https://example.com/u2net.wasm'; // Replace with actual URL
+    const wasmModule = await WebAssembly.instantiateStreaming(fetch(modelUrl));
+    return wasmModule.instance.exports;
+  }
+
+  async function removeBackground() {
+    const input = document.getElementById('imageInput');
+    const status = document.getElementById('status');
+    const preview = document.getElementById('preview');
+    const downloadBtn = document.getElementById('downloadBtn');
+    
+    if (!input.files.length) {
+      status.textContent = "❌ Please select an image first.";
+      return;
+    }
+    
+    status.textContent = "Processing background removal... ⏳";
+    preview.innerHTML = '';
+    downloadBtn.style.display = 'none';
+    
+    const file = input.files[0];
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = async () => {
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      
+      // Load WASM model
+      const wasm = await loadWasmModel();
+      
+      // Process image with WASM model
+      // Assuming the WASM model provides a function 'removeBackground' that takes image data and returns processed image data
+      const processedData = wasm.removeBackground(canvas);
+      
+      // Convert processed data to Blob
+      const processedBlob = new Blob([processedData], { type: 'image/png' });
+      outputBlob = processedBlob;
+      
+      // Create image URL and display preview
+      const url = URL.createObjectURL(processedBlob);
+      const resultImg = document.createElement('img');
+      resultImg.src = url;
+      preview.appendChild(resultImg);
+      
+      downloadBtn.style.display = 'block';
+      status.textContent = "✅ Background removal complete.";
+    };
+  }
+
+  function downloadImage() {
+    if (!outputBlob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(outputBlob);
+    a.download = 'transparent.png';
+    a.click();
+  }
+</script>
+
+</body>
+</html>
