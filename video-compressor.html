@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Compressor</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+  header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+  .container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+  input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+  button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+  button:hover { background:#0ea5e9; }
+  .status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+  video { max-width:100%; margin-top:1rem; border-radius:8px; }
+  a { display:block; margin-top:1rem; color:#38bdf8; font-weight:bold; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>🎬 Video Compressor</header>
+
+<div class="container">
+  <input type="file" id="videoInput" accept="video/*">
+
+  <label for="preset">Compression Preset:</label>
+  <select id="preset">
+    <option value="mobile">Mobile (480p, low)</option>
+    <option value="web">Web (720p, medium)</option>
+    <option value="high">High Quality (1080p, high)</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <div id="customSettings" style="display:none;">
+    <label for="bitrate">Bitrate (kbps):</label>
+    <input type="number" id="bitrate" placeholder="e.g., 1000">
+
+    <label for="resolution">Resolution Width (px):</label>
+    <input type="number" id="resolution" placeholder="e.g., 720">
+  </div>
+
+  <button onclick="compressVideo()">Compress Video</button>
+
+  <div class="status" id="status">Select a video to start.</div>
+
+  <video id="preview" controls style="display:none;"></video>
+  <a id="downloadLink" style="display:none;" download>Download Compressed Video</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.1/dist/ffmpeg.min.js"></script>
+<script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log:true });
+
+const presetSelect = document.getElementById('preset');
+const customSettings = document.getElementById('customSettings');
+presetSelect.addEventListener('change', () => {
+  customSettings.style.display = presetSelect.value === 'custom' ? 'block' : 'none';
+});
+
+async function compressVideo() {
+  const inputFile = document.getElementById('videoInput').files[0];
+  const status = document.getElementById('status');
+  const preview = document.getElementById('preview');
+  const downloadLink = document.getElementById('downloadLink');
+
+  if(!inputFile){ status.textContent = "❌ Please select a video."; return; }
+
+  status.textContent = "⏳ Loading FFmpeg core...";
+  if(!ffmpeg.isLoaded()) await ffmpeg.load();
+
+  ffmpeg.FS('writeFile', inputFile.name, await fetchFile(inputFile));
+
+  // Determine compression settings
+  let preset = presetSelect.value;
+  let bitrate, scaleArg;
+
+  if(preset === 'mobile'){
+    bitrate = '500k';
+    scaleArg = 'scale=640:-2';
+  } else if(preset === 'web'){
+    bitrate = '1000k';
+    scaleArg = 'scale=1280:-2';
+  } else if(preset === 'high'){
+    bitrate = '2000k';
+    scaleArg = 'scale=1920:-2';
+  } else if(preset === 'custom'){
+    bitrate = document.getElementById('bitrate').value ? document.getElementById('bitrate').value + 'k' : '1000k';
+    const width = document.getElementById('resolution').value || 720;
+    scaleArg = `scale=${width}:-2`;
+  }
+
+  status.textContent = "⚙️ Compressing video... This may take a while.";
+
+  try {
+    await ffmpeg.run(
+      '-i', inputFile.name,
+      '-b:v', bitrate,
+      '-vf', scaleArg,
+      '-preset', 'fast',
+      'output.mp4'
+    );
+
+    const data = ffmpeg.FS('readFile', 'output.mp4');
+    const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+
+    preview.src = url;
+    preview.style.display = 'block';
+    downloadLink.href = url;
+    downloadLink.download = 'compressed.mp4';
+    downloadLink.style.display = 'inline-block';
+    downloadLink.textContent = '💾 Download Compressed Video';
+
+    const originalSize = (inputFile.size / (1024*1024)).toFixed(2);
+    const compressedSize = (data.length / (1024*1024)).toFixed(2);
+    status.textContent = `✅ Compression complete! Original: ${originalSize} MB, Compressed: ${compressedSize} MB`;
+  } catch(err) {
+    console.error(err);
+    status.textContent = "❌ Compression failed. For large videos, consider server-side processing.";
+  }
+}
+</script>
+
+</body>
+</html>
