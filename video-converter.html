@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Converter</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; margin:0; padding:0; display:flex; flex-direction:column; align-items:center; min-height:100vh;}
+  header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+  .container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem;}
+  input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+  button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+  button:hover { background:#0ea5e9; }
+  video { max-width:100%; margin-top:1rem; border-radius:8px; }
+  .status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+</style>
+</head>
+<body>
+
+<header>🎬 Video Converter</header>
+
+<div class="container">
+  <input type="file" id="videoInput" accept="video/*">
+  
+  <label for="format">Output Format:</label>
+  <select id="format">
+    <option value="mp4">MP4</option>
+    <option value="mov">MOV</option>
+    <option value="avi">AVI</option>
+    <option value="webm">WEBM</option>
+  </select>
+
+  <label for="resolution">Resolution:</label>
+  <select id="resolution">
+    <option value="original">Original</option>
+    <option value="1920x1080">1920x1080</option>
+    <option value="1280x720">1280x720</option>
+    <option value="854x480">854x480</option>
+  </select>
+
+  <label for="bitrate">Bitrate (optional, e.g., 1000k):</label>
+  <input type="text" id="bitrate" placeholder="Default">
+
+  <button onclick="convertVideo()">Convert Video</button>
+
+  <div class="status" id="status">Select a video to start.</div>
+  <video id="preview" controls style="display:none;"></video>
+  <a id="downloadLink" style="display:none;" download>Download Converted Video</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.1/dist/ffmpeg.min.js"></script>
+<script>
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  const ffmpeg = createFFmpeg({ log: true });
+  
+  async function convertVideo() {
+    const input = document.getElementById('videoInput');
+    const format = document.getElementById('format').value;
+    const resolution = document.getElementById('resolution').value;
+    const bitrate = document.getElementById('bitrate').value;
+    const status = document.getElementById('status');
+    const preview = document.getElementById('preview');
+    const downloadLink = document.getElementById('downloadLink');
+
+    if (!input.files.length) { status.textContent = "❌ Please select a video."; return; }
+
+    const file = input.files[0];
+    status.textContent = "⏳ Loading FFmpeg core...";
+    
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+    status.textContent = "📥 Reading video...";
+    ffmpeg.FS('writeFile', file.name, await fetchFile(file));
+
+    let scale = '';
+    if (resolution !== 'original') scale = `-vf scale=${resolution}`;
+
+    let bitrateArg = '';
+    if (bitrate) bitrateArg = `-b:v ${bitrate}`;
+
+    status.textContent = "⚙️ Converting video... This may take some time for large files.";
+
+    try {
+      await ffmpeg.run(
+        '-i', file.name,
+        ...(scale ? ['-vf', `scale=${resolution}`] : []),
+        ...(bitrateArg ? ['-b:v', bitrate] : []),
+        `output.${format}`
+      );
+
+      const data = ffmpeg.FS('readFile', `output.${format}`);
+      const url = URL.createObjectURL(new Blob([data.buffer], { type: `video/${format}` }));
+      
+      preview.src = url;
+      preview.style.display = 'block';
+      downloadLink.href = url;
+      downloadLink.download = `converted.${format}`;
+      downloadLink.style.display = 'inline-block';
+      downloadLink.textContent = '💾 Download Converted Video';
+
+      status.textContent = "✅ Conversion complete!";
+    } catch (err) {
+      console.error(err);
+      status.textContent = "❌ Conversion failed. For large files, consider using a server-side converter.";
+    }
+  }
+</script>
+
+</body>
+</html>
