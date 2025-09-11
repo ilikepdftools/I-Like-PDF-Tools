@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Watermark to PDF | I Like PDF Tools</title>
+<style>
+:root{
+  --bg:#0f172a; --panel:#1e293b; --accent:#38bdf8; --muted:#94a3b8;
+}
+body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:#e2e8f0;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:12px}
+header{font-size:1.5rem;font-weight:bold;color:var(--accent);margin-bottom:12px;text-align:center}
+.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.5);max-width:800px;width:100%;margin-bottom:16px}
+input[type=file],button,select,input[type=number],input[type=text]{padding:8px;margin:6px 0;border-radius:8px;border:none;width:100%;font-size:1rem}
+button{background:var(--accent);color:var(--bg);font-weight:bold;cursor:pointer;transition:0.2s}
+button:hover{background:#0ea5e9}
+#preview{margin-top:8px;background:var(--bg);padding:8px;border-radius:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;overflow-x:auto}
+.preview-item{position:relative;width:80px;border:1px solid #334155;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;align-items:center;font-size:0.75rem;text-align:center;padding:4px}
+.preview-item canvas{max-width:75px;max-height:75px;margin-bottom:2px}
+.status{margin-top:4px;color:var(--muted)}
+.progress{height:10px;background:rgba(255,255,255,0.03);border-radius:10px;overflow:hidden;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%}
+</style>
+</head>
+<body>
+
+<header>💧 Add Watermark to PDF</header>
+
+<div class="card">
+  <input type="file" id="fileInput" accept="application/pdf">
+  <select id="watermarkType">
+    <option value="text">Text Watermark</option>
+    <option value="image">Image Watermark</option>
+  </select>
+  <input type="text" id="textWatermark" placeholder="Enter watermark text" value="Sample Watermark">
+  <input type="file" id="imageWatermark" accept="image/*">
+  <input type="number" id="fontSize" placeholder="Font Size / Image scale (px/% default 50)" value="50">
+  <input type="number" id="rotation" placeholder="Rotation (degrees)" value="45">
+  <input type="number" id="opacity" placeholder="Opacity (0-1)" step="0.1" value="0.3">
+  <select id="position">
+    <option value="center">Center</option>
+    <option value="tile">Tile</option>
+  </select>
+  <button id="applyBtn">Apply Watermark</button>
+  <div class="status" id="status">Idle</div>
+  <div class="progress"><i id="progressBar"></i></div>
+  <div id="preview"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+<script>
+const fileInput=document.getElementById('fileInput');
+const imageWatermarkInput=document.getElementById('imageWatermark');
+const textWatermarkInput=document.getElementById('textWatermark');
+const applyBtn=document.getElementById('applyBtn');
+const preview=document.getElementById('preview');
+const statusEl=document.getElementById('status');
+const progressBar=document.getElementById('progressBar');
+
+applyBtn.addEventListener('click',async()=>{
+  const file=fileInput.files[0];
+  if(!file){statusEl.textContent='❌ Upload a PDF first'; return;}
+  
+  statusEl.textContent='Processing...';
+  progressBar.style.width='0%';
+  preview.innerHTML='';
+
+  const arrayBuffer=await file.arrayBuffer();
+  const pdfDoc=await PDFLib.PDFDocument.load(arrayBuffer);
+  const pages=pdfDoc.getPages();
+  const wmType=document.getElementById('watermarkType').value;
+  const rotation=parseFloat(document.getElementById('rotation').value)||0;
+  const opacity=parseFloat(document.getElementById('opacity').value)||0.3;
+  const fontSize=parseFloat(document.getElementById('fontSize').value)||50;
+  const position=document.getElementById('position').value;
+
+  let wmImageBytes;
+  if(wmType==='image' && imageWatermarkInput.files[0]){
+    wmImageBytes=await imageWatermarkInput.files[0].arrayBuffer();
+  }
+
+  for(let i=0;i<pages.length;i++){
+    const page=pages[i];
+    const {width,height}=page.getSize();
+
+    if(wmType==='text'){
+      page.drawText(textWatermarkInput.value,{x:width/2,y:height/2,size:fontSize,rotate:PDFLib.degrees(rotation),xSkew:0,ySkew:0,opacity,color:PDFLib.rgb(0.8,0.8,0.8),rotateDegrees:rotation,textAlign:PDFLib.TextAlign.Center});
+      if(position==='tile'){
+        const stepX=fontSize*4;
+        const stepY=fontSize*4;
+        for(let x=0;x<width;x+=stepX){
+          for(let y=0;y<height;y+=stepY){
+            page.drawText(textWatermarkInput.value,{x,y,size:fontSize,opacity,rotate:PDFLib.degrees(rotation),color:PDFLib.rgb(0.8,0.8,0.8)});
+          }
+        }
+      }
+    } else if(wmType==='image' && wmImageBytes){
+      const img=await pdfDoc.embedPng(wmImageBytes).catch(async()=>await pdfDoc.embedJpg(wmImageBytes));
+      const imgDims=img.scale(fontSize/img.width);
+      if(position==='center'){
+        page.drawImage(img,{x:(width-imgDims.width)/2,y:(height-imgDims.height)/2,width:imgDims.width,height:imgDims.height,opacity});
+      } else if(position==='tile'){
+        const stepX=imgDims.width*1.5;
+        const stepY=imgDims.height*1.5;
+        for(let x=0;x<width;x+=stepX){
+          for(let y=0;y<height;y+=stepY){
+            page.drawImage(img,{x,y,width:imgDims.width,height:imgDims.height,opacity});
+          }
+        }
+      }
+    }
+
+    progressBar.style.width=`${((i+1)/pages.length)*100}%`;
+  }
+
+  const pdfBytes=await pdfDoc.save();
+  const blob=new Blob([pdfBytes],{type:'application/pdf'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=file.name.replace(/\.pdf$/i,'-watermarked.pdf');
+  a.click();
+
+  statusEl.textContent='✅ Watermark applied!';
+  progressBar.style.width='100%';
+});
+</script>
+
+</body>
+</html>
