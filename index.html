@@ -827,6 +827,72 @@
             color: var(--gold);
         }
 
+        /* Top Tools Section for Mobile */
+        .mobile-top-tools {
+            display: none;
+            background: var(--section-bg);
+            padding: 30px 0;
+            margin-top: 20px;
+        }
+
+        .mobile-top-tools .section-title {
+            margin-bottom: 20px;
+        }
+
+        .mobile-tools-carousel {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 5px 20px;
+            scrollbar-width: thin;
+            -ms-overflow-style: none;
+            scrollbar-color: var(--gold) var(--dark-blue);
+        }
+
+        .mobile-tools-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .mobile-tools-carousel::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+
+        .mobile-tool-card {
+            flex: 0 0 auto;
+            width: 280px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-tool-card i {
+            font-size: 36px;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .mobile-tool-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--light-gray);
+        }
+
+        .mobile-tool-card p {
+            font-size: 14px;
+            color: var(--light-gray);
+            margin-bottom: 15px;
+        }
+
+        .mobile-tool-card .btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header-container {
@@ -913,6 +979,10 @@
                 display: block;
             }
             
+            .mobile-top-tools {
+                display: block;
+            }
+            
             .contact-item {
                 flex-direction: column;
                 text-align: center;
@@ -961,6 +1031,10 @@
             
             .contact-form {
                 padding: 20px 15px;
+            }
+            
+            .mobile-tool-card {
+                width: 250px;
             }
         }
 
@@ -1143,6 +1217,60 @@
             
             <div class="tools-container" id="toolsContainer">
                 <!-- Tool cards will be inserted by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Top Tools Section -->
+    <section class="mobile-top-tools">
+        <div class="container">
+            <div class="section-title">
+                <h2>Top PDF Tools for Mobile</h2>
+                <p>Most popular tools optimized for mobile devices</p>
+            </div>
+            
+            <div class="mobile-tools-carousel">
+                <div class="mobile-tool-card">
+                    <i class="fas fa-file-word"></i>
+                    <h3>PDF to Word</h3>
+                    <p>Convert PDF to editable Word documents</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
+                
+                <div class="mobile-tool-card">
+                    <i class="fas fa-object-group"></i>
+                    <h3>Merge PDF</h3>
+                    <p>Combine multiple PDFs into one</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
+                
+                <div class="mobile-tool-card">
+                    <i class="fas fa-compress"></i>
+                    <h3>Compress PDF</h3>
+                    <p>Reduce PDF file size without quality loss</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
+                
+                <div class="mobile-tool-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Protect PDF</h3>
+                    <p>Add password encryption to your PDFs</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
+                
+                <div class="mobile-tool-card">
+                    <i class="fas fa-file-image"></i>
+                    <h3>PDF to JPG</h3>
+                    <p>Convert PDF pages to JPG images</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
+                
+                <div class="mobile-tool-card">
+                    <i class="fas fa-unlock"></i>
+                    <h3>Unlock PDF</h3>
+                    <p>Remove password from PDF files</p>
+                    <a href="#" class="btn">Use Tool</a>
+                </div>
             </div>
         </div>
     </section>
