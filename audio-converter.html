@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audio Converter</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:Arial,sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+  header { font-size:1.5rem; font-weight:bold; padding:1rem; color:#38bdf8; }
+  .container { background:#1e293b; padding:1.5rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.5); max-width:700px; width:95%; margin-bottom:2rem; }
+  input, select, button { width:100%; margin:0.5rem 0; padding:0.7rem; border-radius:8px; border:none; font-size:1rem; }
+  button { background:#38bdf8; color:#0f172a; font-weight:bold; cursor:pointer; transition:0.2s; }
+  button:hover { background:#0ea5e9; }
+  .status { margin-top:0.5rem; font-size:0.9rem; color:#94a3b8; }
+  audio { width:100%; margin-top:1rem; border-radius:8px; }
+  a { display:block; margin-top:1rem; color:#38bdf8; font-weight:bold; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<header>🎵 Audio Converter</header>
+
+<div class="container">
+  <input type="file" id="audioInput" accept="audio/*" multiple>
+
+  <label for="format">Output Format:</label>
+  <select id="format">
+    <option value="mp3">MP3</option>
+    <option value="wav">WAV</option>
+    <option value="ogg">OGG</option>
+    <option value="flac">FLAC</option>
+  </select>
+
+  <label for="bitrate">Bitrate (kbps):</label>
+  <input type="number" id="bitrate" placeholder="e.g., 192">
+
+  <label for="samplerate">Sample Rate (Hz):</label>
+  <input type="number" id="samplerate" placeholder="e.g., 44100">
+
+  <button onclick="convertAudio()">Convert Audio</button>
+
+  <div class="status" id="status">Select audio files to start.</div>
+
+  <div id="previewContainer"></div>
+  <a id="downloadZip" style="display:none;">💾 Download All Converted Audio (ZIP)</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.1/dist/ffmpeg.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({ log:true });
+
+async function convertAudio() {
+  const files = document.getElementById('audioInput').files;
+  const format = document.getElementById('format').value;
+  const bitrate = document.getElementById('bitrate').value;
+  const samplerate = document.getElementById('samplerate').value;
+  const status = document.getElementById('status');
+  const previewContainer = document.getElementById('previewContainer');
+  const downloadZipLink = document.getElementById('downloadZip');
+
+  if(!files.length){ status.textContent="❌ Please select audio files."; return; }
+
+  status.textContent = "⏳ Loading FFmpeg core...";
+  if(!ffmpeg.isLoaded()) await ffmpeg.load();
+
+  previewContainer.innerHTML = '';
+  downloadZipLink.style.display = 'none';
+  const zip = new JSZip();
+
+  for(let i=0;i<files.length;i++){
+    const file = files[i];
+    const inputName = file.name;
+    const outputName = inputName.replace(/\.[^/.]+$/,"")+"."+format;
+
+    status.textContent = `⚙️ Converting (${i+1}/${files.length}): ${file.name}`;
+
+    ffmpeg.FS('writeFile', inputName, await fetchFile(file));
+
+    const args = ['-i', inputName];
+    if(bitrate) args.push('-b:a', bitrate+'k');
+    if(samplerate) args.push('-ar', samplerate);
+    args.push(outputName);
+
+    try{
+      await ffmpeg.run(...args);
+      const data = ffmpeg.FS('readFile', outputName);
+      const url = URL.createObjectURL(new Blob([data.buffer], { type:'audio/'+format }));
+
+      // Preview audio
+      const audioEl = document.createElement('audio');
+      audioEl.controls = true;
+      audioEl.src = url;
+      previewContainer.appendChild(audioEl);
+
+      // Add to ZIP
+      zip.file(outputName, data.buffer);
+    } catch(err){
+      console.error(err);
+      status.textContent = "❌ Conversion failed. Check file format or settings.";
+    }
+  }
+
+  // Generate ZIP
+  status.textContent = "📦 Generating ZIP file...";
+  const zipBlob = await zip.generateAsync({type:'blob'});
+  downloadZipLink.href = URL.createObjectURL(zipBlob);
+  downloadZipLink.style.display = 'inline-block';
+  downloadZipLink.download = 'converted_audio.zip';
+  downloadZipLink.textContent = "💾 Download All Converted Audio (ZIP)";
+
+  status.textContent = `✅ Conversion complete! Processed ${files.length} file(s).`;
+}
+</script>
+
+</body>
+</html>
