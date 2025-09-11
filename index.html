@@ -102,11 +102,13 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .header-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;  
+    gap: 15px;
+}
 
         .logo {
             display: flex;
@@ -145,28 +147,27 @@
             transform: scale(1.1);
         }
 
-        .search-container {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-            position: center;
-        }
+    .search-container {
+    flex: 1 1 360px;  
+    max-width: 500px;
+    margin: 0 20px;
+    position: relative; 
+}
 
         .search-input-container {
-            position: center;
-            width: 100%;
-        }
+    width: 100%;
+    position: relative;
+}
 
-        .search-input {
-            width: 100%;
-            padding: 14px 50px 14px 20px;
-            border: none;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light-gray);
-            font-size: 16px;
-            transition: var(--transition);
-        }
+     .search-input {
+    width: 100%;
+    padding: 12px 45px 12px 18px;
+    border: none;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light-gray);
+    font-size: 16px;
+}
 
         .search-input:focus {
             outline: none;
@@ -174,14 +175,15 @@
             box-shadow: 0 0 0 2px var(--gold);
         }
 
-        .search-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--light-gray);
-            cursor: pointer;
-        }
+        
+     .search-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--light-gray);
+    cursor: pointer;
+}
 
         .search-results {
             position: absolute;
@@ -524,11 +526,14 @@
             text-align: justify;
         }
 
-        @media (max-width: 768px) {
-            .article-content {
-                column-count: 1;
-            }
-        }
+        @media (max-width: 600px) {
+    .search-container {
+        order: 3;          /* neeche aa jaye */
+        flex: 1 1 100%;
+        max-width: 100%;
+        margin-top: 10px;
+    }
+}
 
         .article-content p {
             margin-bottom: 20px;
