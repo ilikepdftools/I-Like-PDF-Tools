@@ -1,75 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AI Background Remover — Demo (Client-side + Refine)</title>
+<title>Background Remover — Functional Demo</title>
 <style>
   :root{
-    --bg:#0f172a; --panel:#111827; --muted:#94a3b8; --accent:#38bdf8; --glass: rgba(255,255,255,0.03);
+    --bg:#0f172a; --panel:#0f172a; --card:#0f172a; --muted:#9aa8bf; --accent:#38bdf8;
+    --glass: rgba(255,255,255,0.03);
   }
   *{box-sizing:border-box}
   body{
     margin:0; font-family:Inter,Segoe UI,Roboto,Arial,sans-serif; background:var(--bg); color:#e6eef8;
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
-  header{padding:18px 20px; display:flex; align-items:center; gap:12px}
-  header h1{margin:0;font-size:1.15rem;color:var(--accent)}
-  .wrap{max-width:1100px;margin:12px auto;padding:16px;display:grid;grid-template-columns:1fr 360px;gap:16px}
-  .panel{background:var(--panel);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-  .uploader{display:flex;gap:8px;align-items:center}
+  header{padding:14px 18px; display:flex; align-items:center; gap:10px}
+  header h1{margin:0;font-size:1.05rem;color:var(--accent)}
+  .wrap{max-width:1120px;margin:12px auto;padding:12px;display:grid;grid-template-columns:1fr 360px;gap:14px}
+  .panel{background:#0b1220;border-radius:12px;padding:12px;box-shadow:0 8px 26px rgba(0,0,0,0.6)}
+  .uploader{display:flex;gap:10px;align-items:center}
   .uploader input[type=file]{display:none}
-  .btn{background:var(--accent);color:#042033;border:none;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
-  .btn.secondary{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.06)}
-  .controls{display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);color:#022129;border:none;padding:10px 12px;border-radius:9px;cursor:pointer;font-weight:700}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.04)}
+  .controls{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+  .row{display:flex;gap:10px;align-items:center}
   label.small{font-size:0.85rem;color:var(--muted)}
-  #canvasContainer{position:relative;min-height:360px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);overflow:hidden}
-  canvas#sourceCanvas{max-width:100%;height:auto;display:block}
-  /* signature overlay to show brush cursor */
-  .tools{display:flex;flex-wrap:wrap;gap:8px}
+  #canvasWrap{position:relative;border-radius:8px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);display:flex;align-items:center;justify-content:center;min-height:420px}
+  canvas{max-width:100%;height:auto;display:block}
+  #maskCanvas,#brushCanvas{position:absolute;left:0;top:0;pointer-events:none}
+  .toolRow{display:flex;gap:8px;flex-wrap:wrap}
   input[type=range]{width:100%}
-  .previewMini{display:flex;flex-direction:column;gap:8px}
-  .status{font-size:0.9rem;color:var(--muted)}
-  .downloadRow{display:flex;gap:8px;flex-wrap:wrap}
   select,input[type=color]{background:transparent;color:inherit;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px}
-  footer{max-width:1100px;margin:10px auto;color:var(--muted);font-size:0.85rem;padding:8px}
-  @media (max-width:980px){ .wrap{grid-template-columns:1fr; padding:12px} .panel{padding:10px} }
+  .status{font-size:0.9rem;color:var(--muted)}
+  .progressOuter{height:10px;background:var(--glass);border-radius:6px;overflow:hidden;margin-top:8px}
+  .progressInner{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#7c3aed)}
+  .smallNote{font-size:0.82rem;color:var(--muted)}
+  footer{max-width:1120px;margin:10px auto;color:var(--muted);font-size:0.82rem;padding:6px}
+  @media (max-width:980px){ .wrap{grid-template-columns:1fr; padding:8px} }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🪄 Background Remover — Demo</h1>
-  <div style="margin-left:auto;font-size:0.9rem;color:var(--muted)">Privacy-first • Client-side demo</div>
+  <h1>🪄 Background Remover — Functional</h1>
+  <div style="margin-left:auto;font-size:0.9rem;color:var(--muted)">Client-side • No upload required</div>
 </header>
 
 <div class="wrap">
-  <!-- LEFT: Canvas and tools -->
-  <div class="panel" style="display:flex;flex-direction:column;gap:12px">
-    <div class="uploader">
-      <label class="btn" id="btnSelect">Upload Image</label>
-      <input type="file" id="fileInput" accept="image/*">
-      <button class="btn secondary" id="btnAuto">Auto Remove (fast)</button>
-      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="status" id="status">No image loaded</div>
+
+  <!-- LEFT: canvas & brush -->
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:8px">
+      <label class="btn" id="btnChoose">Choose Image</label>
+      <input id="fileInput" type="file" accept="image/*">
+      <button class="btn ghost" id="btnAuto">Auto Remove</button>
+      <div style="margin-left:auto">
+        <button class="btn ghost" id="btnResetAll">Reset</button>
       </div>
     </div>
 
-    <div id="canvasContainer" style="height:520px" class="panel">
-      <!-- two canvases stacked: source and mask overlay (for brush editing) -->
-      <canvas id="sourceCanvas"></canvas>
-      <canvas id="maskCanvas" style="position:absolute;left:0;top:0;pointer-events:none"></canvas>
-      <!-- brush preview -->
-      <canvas id="brushCanvas" style="position:absolute;left:0;top:0;pointer-events:none"></canvas>
+    <div id="canvasWrap" style="margin-top:12px">
+      <canvas id="workCanvas"></canvas>
+      <canvas id="maskCanvas"></canvas>
+      <canvas id="brushCanvas"></canvas>
     </div>
 
     <div class="controls">
-      <div class="tools">
-        <button class="btn secondary" id="modeAdd">Restore</button>
-        <button class="btn secondary" id="modeErase">Erase</button>
-        <button class="btn secondary" id="invertMask">Invert</button>
-        <button class="btn secondary" id="resetMask">Reset Mask</button>
+      <div class="toolRow">
+        <button class="btn ghost" id="modeErase">Erase (make transparent)</button>
+        <button class="btn ghost" id="modeRestore">Restore (bring back)</button>
+        <button class="btn ghost" id="invertMask">Invert mask</button>
       </div>
 
       <div class="row">
@@ -79,439 +79,460 @@
         </div>
         <div style="width:120px">
           <label class="small">Feather</label>
-          <input type="range" id="feather" min="0" max="40" value="8">
+          <input type="range" id="feather" min="0" max="60" value="8">
         </div>
       </div>
 
       <div class="row">
         <div style="flex:1">
           <label class="small">Output size</label>
-          <select id="outputSize">
+          <select id="outSize">
             <option value="orig">Original</option>
             <option value="half">½ size</option>
             <option value="quarter">¼ size</option>
           </select>
         </div>
-        <div style="width:150px">
-          <label class="small">Output format</label>
+        <div style="width:160px">
+          <label class="small">Format</label>
           <select id="outFmt">
             <option value="png">PNG (transparent)</option>
-            <option value="jpg">JPG (bg color)</option>
+            <option value="jpg">JPG (background color)</option>
           </select>
         </div>
       </div>
 
-      <div class="row" id="bgColorRow" style="align-items:center">
-        <label class="small">JPG background:</label>
-        <input type="color" id="bgColor" value="#ffffff">
+      <div class="row" style="align-items:center">
+        <label class="small">JPG background</label>
+        <input type="color" id="bgColor" value="#ffffff" style="margin-left:8px">
         <div style="flex:1"></div>
-        <button class="btn" id="downloadBtn">Download</button>
+        <button class="btn" id="btnDownload">Download</button>
       </div>
 
+      <div style="margin-top:8px">
+        <div class="status" id="status">No image loaded</div>
+        <div class="progressOuter"><div class="progressInner" id="progressFill"></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- RIGHT: Preview, info & server instructions -->
-  <div class="panel previewMini">
+  <!-- RIGHT: preview and info -->
+  <div class="panel">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-weight:700">Preview</div>
-        <div class="status">Refine with brush, then download.</div>
-      </div>
+      <div style="font-weight:700">Preview</div>
       <div style="text-align:right">
-        <div class="status" id="infoSize">—</div>
-        <div class="status" id="infoRes">—</div>
+        <div class="smallNote" id="imgInfo">—</div>
+        <div class="smallNote" id="workInfo">—</div>
       </div>
     </div>
 
-    <div style="display:flex;gap:8px">
-      <canvas id="previewCanvas" style="border-radius:6px;width:100%;background:transparent"></canvas>
+    <div style="margin-top:10px">
+      <canvas id="previewCanvas" style="width:100%;border-radius:6px;background:#0b0e12"></canvas>
     </div>
 
-    <div style="margin-top:8px">
-      <div class="status" style="margin-bottom:6px">Progress</div>
-      <div id="progressBar" style="height:10px;background:var(--glass);border-radius:8px;overflow:hidden">
-        <div id="progressFill" style="width:0%;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed)"></div>
+    <div style="margin-top:10px">
+      <div style="font-weight:700;margin-bottom:6px">Notes & Server</div>
+      <div class="smallNote">
+        This client demo uses a color-clustering auto-mask (fast, privacy-first). For best quality (hair, fine detail) replace the auto step with a U²-Net TF/ONNX/WASM model or call a server that runs U²-Net and returns a transparent PNG.
       </div>
-      <div style="margin-top:8px" class="status" id="log">Idle</div>
-    </div>
-
-    <hr style="border:none;height:1px;background:rgba(255,255,255,0.03);margin:12px 0">
-
-    <div>
-      <div style="font-weight:700;margin-bottom:6px">Model / Server (optional)</div>
-      <div class="status" style="margin-bottom:8px">
-        This demo runs a lightweight client fallback mask automatically. For high-quality background removal use a U²-Net WASM build or a server-side API (recommended for large images).
-      </div>
-
-      <div style="font-size:0.9rem;color:var(--muted);margin-bottom:10px">
-        Quick server example (you should never put credentials in client JS):
-      </div>
-
-      <pre style="background:#0b1220;padding:8px;border-radius:8px;color:#cbd5e1;font-size:0.85rem;overflow:auto">
+      <pre style="background:#07101a;color:#a8c0d8;padding:8px;border-radius:8px;margin-top:8px;font-size:0.8rem;overflow:auto">
+# Server example (pseudo)
 POST /api/remove-bg
-FormData:
-  file: &lt;image&gt;
-
-Server:
-  - Run U2Net or call remove.bg / custom model
-  - Return transparent PNG
-</pre>
-
-      <div class="status" style="margin-top:8px">Server example returned images instantly (mocked).</div>
+FormData: file=...
+Server runs U2Net -> returns PNG with alpha
+      </pre>
     </div>
   </div>
 </div>
 
-<footer style="text-align:center">
-  This is a privacy-first client-side demo. For production-level quality use a WASM U²-Net or server API — see comments in the source for integration notes.
+<footer>
+  Fully client-side demo — no uploads. For production-grade auto-masks, integrate a WASM U²-Net or a server endpoint.
 </footer>
 
 <script>
-/*
-  Background Remover Demo (single-file)
-  - Client-side fallback: radial/saliency initial mask
-  - Manual refine: brush add/erase, feather (mask blur)
-  - Output: PNG (transparent) or JPG with background
-  - Server integration: commented placeholder for uploading to an API (U2Net / remove.bg / custom)
-*/
+/* =========================
+   Fully functional client-side background remover
+   - Auto mask: k-means color clustering on downsampled image
+   - Manual refine: brush erase/restore with feather
+   - Export: PNG transparent or JPG with bg color
+   - Single-file, no external libs
+   ========================= */
 
 // DOM
 const fileInput = document.getElementById('fileInput');
-const btnSelect = document.getElementById('btnSelect');
+const btnChoose = document.getElementById('btnChoose');
 const btnAuto = document.getElementById('btnAuto');
-const status = document.getElementById('status');
-const srcCanvas = document.getElementById('sourceCanvas');
+const btnResetAll = document.getElementById('btnResetAll');
+const workCanvas = document.getElementById('workCanvas');
 const maskCanvas = document.getElementById('maskCanvas');
 const brushCanvas = document.getElementById('brushCanvas');
 const previewCanvas = document.getElementById('previewCanvas');
+const statusEl = document.getElementById('status');
 const progressFill = document.getElementById('progressFill');
-const logEl = document.getElementById('log');
+const previewCtx = previewCanvas.getContext('2d');
 
-const modeAddBtn = document.getElementById('modeAdd');
-const modeEraseBtn = document.getElementById('modeErase');
-const invertMaskBtn = document.getElementById('invertMask');
-const resetMaskBtn = document.getElementById('resetMask');
+const btnErase = document.getElementById('modeErase');
+const btnRestore = document.getElementById('modeRestore');
+const btnInvert = document.getElementById('invertMask');
 
 const brushSizeInput = document.getElementById('brushSize');
 const featherInput = document.getElementById('feather');
-const outputSizeSelect = document.getElementById('outputSize');
-const outFmtSelect = document.getElementById('outFmt');
-const bgColorInput = document.getElementById('bgColor');
-const downloadBtn = document.getElementById('downloadBtn');
-const infoSize = document.getElementById('infoSize');
-const infoRes = document.getElementById('infoRes');
-const progressBarText = document.getElementById('log');
+const outSize = document.getElementById('outSize');
+const outFmt = document.getElementById('outFmt');
+const bgColor = document.getElementById('bgColor');
+const btnDownload = document.getElementById('btnDownload');
+
+const imgInfo = document.getElementById('imgInfo');
+const workInfo = document.getElementById('workInfo');
 
 // contexts
-const sctx = srcCanvas.getContext('2d', { alpha: true });
+const wctx = workCanvas.getContext('2d', { alpha:true });
 const mctx = maskCanvas.getContext('2d', { willReadFrequently: true });
-const bctx = brushCanvas.getContext('2d');
-const pctx = previewCanvas.getContext('2d');
+const bctx = brushCanvas.getContext('2d', { willReadFrequently: true });
 
+// state
 let img = new Image();
+let origFile = null;
 let imgLoaded = false;
-let maskImageData = null; // Uint8ClampedArray alpha mask values 0..255
-let workingWidth = 0, workingHeight = 0;
-let drawMode = 'erase'; // 'erase' removes foreground (transparent), 'add' restores
+
+let workingW = 0, workingH = 0;   // resized working canvas (for UI)
+let maskW = 0, maskH = 0;         // mask resolution (proc)
+let mask = null;                  // Float32Array mask values [0..1] at working size
+let drawMode = 'erase';           // 'erase' or 'restore'
 let isDrawing = false;
+let brushSize = parseInt(brushSizeInput.value,10);
+let feather = parseInt(featherInput.value,10);
 
-// utils
-function setStatus(t){ status.textContent = t; }
-function setLog(t){ logEl.textContent = t; }
-function setProgress(p){
-  progressFill.style.width = `${Math.max(0,Math.min(100,p))}%`;
-}
-
-// initialize
-btnSelect.addEventListener('click', ()=> fileInput.click());
-fileInput.addEventListener('change', async (e) => {
-  const f = e.target.files[0];
-  if(!f) return;
-  clearAll();
-  await loadImageFromFile(f);
+// setup events
+btnChoose.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', async (e)=> {
+  if(!e.target.files || !e.target.files[0]) return;
+  origFile = e.target.files[0];
+  await loadImageFromFile(origFile);
 });
 
 btnAuto.addEventListener('click', async ()=>{
-  if(!imgLoaded){ alert('Upload an image first'); return; }
-  await runAutoMask();
+  if(!imgLoaded){ alert('Load an image first'); return; }
+  await autoMask();
 });
 
-// modes
-modeAddBtn.onclick = ()=>{ drawMode='add'; modeAddBtn.classList.add('active'); modeEraseBtn.classList.remove('active'); }
-modeEraseBtn.onclick = ()=>{ drawMode='erase'; modeEraseBtn.classList.add('active'); modeAddBtn.classList.remove('active'); }
-invertMaskBtn.onclick = ()=>{ if(!maskImageData) return; invertMask(); updatePreview(); }
-resetMaskBtn.onclick = ()=>{ if(!imgLoaded) return; initMaskRadial(); updatePreview(); }
+btnResetAll.addEventListener('click', ()=>{
+  if(!imgLoaded) return;
+  initMaskDefault();
+  updatePreview();
+  setStatus('Mask reset');
+});
 
-// brush UI & drawing
-let brushSize = parseInt(brushSizeInput.value,10);
-brushSizeInput.oninput = ()=>{ brushSize = parseInt(brushSizeInput.value,10); drawBrushPreview(); }
-let feather = parseInt(featherInput.value,10);
-featherInput.oninput = ()=>{ feather = parseInt(featherInput.value,10); }
+btnErase.addEventListener('click', ()=> { drawMode = 'erase'; setStatus('Draw mode: Erase (make transparent)'); toggleModeButtons(); });
+btnRestore.addEventListener('click', ()=> { drawMode = 'restore'; setStatus('Draw mode: Restore (bring back)'); toggleModeButtons(); });
+btnInvert.addEventListener('click', ()=> { if(!mask) return; invertMask(); updatePreview(); setStatus('Mask inverted'); });
 
-// canvas sizing helper
-function resizeCanvases(w,h){
-  [srcCanvas,maskCanvas,brushCanvas,previewCanvas].forEach(c=>{
-    c.width = w; c.height = h;
-    c.style.width = '100%';
-  });
-  workingWidth = w; workingHeight = h;
-}
+brushSizeInput.addEventListener('input', ()=>{ brushSize = parseInt(brushSizeInput.value,10); drawBrushPreview(); });
+featherInput.addEventListener('input', ()=>{ feather = parseInt(featherInput.value,10); });
 
-// load image
+btnDownload.addEventListener('click', ()=> exportResult());
+
+// pointer events for drawing
+maskCanvas.addEventListener('pointerdown', (e)=> { if(!imgLoaded) return; isDrawing = true; handlePointer(e); maskCanvas.setPointerCapture(e.pointerId); });
+maskCanvas.addEventListener('pointermove', (e)=> { if(!imgLoaded) return; handlePointer(e); });
+window.addEventListener('pointerup', (e)=> { if(isDrawing) { isDrawing = false; lastPointer = null; } });
+
+// helper to draw brush cursor
+let lastPointer = null;
+maskCanvas.addEventListener('pointermove', (e)=> {
+  if(!imgLoaded) return;
+  drawBrushCursor(e);
+});
+
+// init
+toggleModeButtons();
+setStatus('No image loaded');
+setProgress(0);
+
+// ---------------------------
+// Loading image
+// ---------------------------
 async function loadImageFromFile(file){
   setStatus('Loading image...');
   setProgress(5);
   const url = URL.createObjectURL(file);
-  await new Promise((res,rej)=>{
+  await new Promise((res, rej)=>{
+    img = new Image();
     img.onload = ()=> res();
-    img.onerror = rej;
+    img.onerror = (err)=> rej(err);
     img.src = url;
   });
-  // downscale very large images to keep UI snappy, preserve aspect ratio
-  const MAX_DIM = 2200; // keep reasonable for client-side
+  // compute working size to keep UI responsive
+  const MAX_DIM = 1200; // working cap
   let w = img.naturalWidth, h = img.naturalHeight;
   let scale = 1;
   if(Math.max(w,h) > MAX_DIM){
     scale = MAX_DIM / Math.max(w,h);
-    w = Math.round(w * scale);
-    h = Math.round(h * scale);
+    w = Math.round(w*scale); h = Math.round(h*scale);
   }
-  resizeCanvases(w,h);
-  // draw source
-  sctx.clearRect(0,0,w,h);
-  sctx.drawImage(img,0,0,w,h);
-  // initial mask
-  initMaskRadial();
-  updatePreview();
+  // set working canvas sizes
+  workingW = w; workingH = h;
+  workCanvas.width = workingW; workCanvas.height = workingH;
+  maskCanvas.width = workingW; maskCanvas.height = workingH;
+  brushCanvas.width = workingW; brushCanvas.height = workingH;
+  previewCanvas.width = workingW; previewCanvas.height = workingH;
+
+  // draw image to working canvas
+  wctx.clearRect(0,0,workingW,workingH);
+  wctx.drawImage(img,0,0, img.naturalWidth, img.naturalHeight, 0,0, workingW, workingH);
+
+  // init mask same size
+  mask = new Float32Array(workingW * workingH);
+  initMaskDefault();
+
   imgLoaded = true;
   setProgress(100);
-  setStatus(`Image loaded — ${img.naturalWidth}×${img.naturalHeight} (${Math.round((file.size/1024)/1024*100)/100} MB)`);
-  infoSize.textContent = `${img.naturalWidth}×${img.naturalHeight}`;
-  infoRes.textContent = `Working: ${w}×${h}`;
+  setStatus(`Loaded: ${img.naturalWidth}×${img.naturalHeight}`);
+  imgInfo.textContent = `${img.naturalWidth}×${img.naturalHeight} (${Math.round((file.size/1024)/1024*100)/100} MB)`;
+  workInfo.textContent = `Work: ${workingW}×${workingH}`;
+  updatePreview();
   drawBrushPreview();
 }
 
-// create a simple radial mask as baseline: center = foreground
-function initMaskRadial(){
-  const w = workingWidth, h = workingHeight;
-  maskImageData = new Uint8ClampedArray(w*h); // single channel alpha (0..255)
+// default mask = centered subject (radial) as gentle starting point
+function initMaskDefault(){
+  if(!imgLoaded) return;
+  const w = workingW, h = workingH;
   const cx = w/2, cy = h/2;
-  const maxR = Math.hypot(cx,cy) * 0.9;
+  const maxR = Math.hypot(cx, cy) * 0.9;
   for(let y=0;y<h;y++){
     for(let x=0;x<w;x++){
-      const dx = x-cx, dy = y-cy;
-      const d = Math.hypot(dx,dy);
-      // closer to center -> more likely foreground
-      let alpha = 255 * Math.max(0, 1 - (d/maxR)**1.6);
-      alpha = Math.round(alpha);
-      maskImageData[y*w + x] = alpha;
+      const d = Math.hypot(x-cx,y-cy);
+      let v = 1 - Math.min(1, d / maxR);
+      v = Math.pow(v, 1.2); // sharpen center
+      mask[y*w + x] = v;
     }
   }
-  // optionally apply a quick blur to the mask to feather initial edges
-  maskImageData = boxBlurMask(maskImageData, w, h, Math.max(3, Math.round(feather/2)));
+  // small blur
+  mask = boxBlurFloat(mask, w,h, Math.max(2, Math.round(feather/4)));
 }
 
-// auto mask (placeholder for real model)
-// This function demonstrates where a WASM model or server call would be made.
-// Currently it simulates processing time and slightly adjusts the radial mask.
-async function runAutoMask(){
+// ---------------------------
+// Auto mask (k-means color clustering on downsampled image)
+// ---------------------------
+async function autoMask(){
   if(!imgLoaded) return;
-  setLog('Running fast auto-segmentation (client fallback)...');
+  setStatus('Auto mask: preparing...');
   setProgress(5);
-  // Simulate computation for UX
-  await new Promise(res => setTimeout(res, 450));
-  // For demo, create a pseudo-saliency by sampling brightness
-  const imgData = sctx.getImageData(0,0,workingWidth,workingHeight);
-  const w = workingWidth, h = workingHeight;
-  const sal = new Float32Array(w*h);
-  // compute simple laplacian-like saliency (edges/contrast)
-  for(let y=1;y<h-1;y++){
-    for(let x=1;x<w-1;x++){
-      const i = (y*w + x)*4;
-      const lum = 0.299*imgData.data[i] + 0.587*imgData.data[i+1] + 0.114*imgData.data[i+2];
-      const lumL = 0.299*imgData.data[i-4] + 0.587*imgData.data[i-3] + 0.114*imgData.data[i-2];
-      const lumR = 0.299*imgData.data[i+4] + 0.587*imgData.data[i+5] + 0.114*imgData.data[i+6];
-      const lumU = 0.299*imgData.data[i - w*4] + 0.587*imgData.data[i - w*4 +1] + 0.114*imgData.data[i - w*4 +2];
-      const lumD = 0.299*imgData.data[i + w*4] + 0.587*imgData.data[i + w*4 +1] + 0.114*imgData.data[i + w*4 +2];
-      const edge = Math.abs(lum - lumL) + Math.abs(lum - lumR) + Math.abs(lum - lumU) + Math.abs(lum - lumD);
-      sal[y*w + x] = edge;
+
+  // downsample to processing size
+  const PROC_MAX = 480; // keep small for speed
+  const scale = Math.min(1, PROC_MAX / Math.max(workingW, workingH));
+  maskW = Math.max(1, Math.round(workingW * scale));
+  maskH = Math.max(1, Math.round(workingH * scale));
+  // create temp canvas
+  const tmp = document.createElement('canvas');
+  tmp.width = maskW; tmp.height = maskH;
+  const tctx = tmp.getContext('2d');
+  // draw scaled image into tmp
+  tctx.drawImage(img, 0,0, img.naturalWidth, img.naturalHeight, 0,0, maskW, maskH);
+
+  setProgress(12);
+  setStatus('Auto mask: sampling colors...');
+
+  const imgd = tctx.getImageData(0,0,maskW,maskH).data;
+  // create samples uniformly but limit to maxSamples
+  const maxSamples = 5000;
+  const pixels = [];
+  const stride = Math.max(1, Math.floor(Math.sqrt((maskW*maskH)/maxSamples)));
+  for(let y=0;y<maskH;y+=stride){
+    for(let x=0;x<maskW;x+=stride){
+      const i = (y*maskW + x) * 4;
+      const r = imgd[i], g = imgd[i+1], b = imgd[i+2];
+      pixels.push([r,g,b]);
     }
   }
-  // normalize and combine with center preference
-  let maxS = 0;
-  for(let i=0;i<w*h;i++) if(sal[i] > maxS) maxS = sal[i];
-  if(maxS === 0) maxS = 1;
-  for(let y=0;y<h;y++){
-    for(let x=0;x<w;x++){
-      const i = y*w + x;
-      const cx = w/2, cy = h/2;
-      const d = Math.hypot(x-cx, y-cy);
-      const centerBias = 1 - Math.min(1, d / Math.hypot(cx,cy));
-      const score = 0.6 * (sal[i]/maxS) + 0.4 * centerBias;
-      maskImageData[i] = Math.round(255 * Math.min(1, score * 1.5));
+
+  setProgress(30);
+  setStatus('Auto mask: clustering colors...');
+  // run k-means on sample pixels
+  const k = 3; // clusters
+  const {centroids, labels:sampleLabels} = kmeans(pixels, k, 12);
+
+  setProgress(55);
+  setStatus('Auto mask: labeling image...');
+
+  // label every pixel in small image
+  const labels = new Uint8Array(maskW*maskH);
+  for(let y=0;y<maskH;y++){
+    for(let x=0;x<maskW;x++){
+      const i = (y*maskW + x) * 4;
+      const r = imgd[i], g = imgd[i+1], b = imgd[i+2];
+      let best = 0, bestDist = 1e9;
+      for(let c=0;c<k;c++){
+        const dx = r - centroids[c][0], dy = g - centroids[c][1], dz = b - centroids[c][2];
+        const d = dx*dx + dy*dy + dz*dz;
+        if(d < bestDist){ bestDist = d; best = c; }
+      }
+      labels[y*maskW + x] = best;
     }
   }
-  // blur to feather
-  maskImageData = boxBlurMask(maskImageData, w, h, Math.max(3, Math.round(feather/2)));
-  updatePreview();
+
+  setProgress(70);
+  setStatus('Auto mask: picking background clusters...');
+  // determine which cluster(s) appear on borders -> background
+  const borderCounts = new Array(k).fill(0);
+  const borderTotal = (maskW+maskH)*2;
+  const borderWidth = Math.max(2, Math.floor(Math.min(maskW, maskH) * 0.06));
+  // top/bottom rows within borderWidth
+  for(let y=0;y<maskH;y++){
+    for(let x=0;x<maskW;x++){
+      if(y < borderWidth || y >= maskH-borderWidth || x < borderWidth || x >= maskW-borderWidth){
+        borderCounts[labels[y*maskW + x]]++;
+      }
+    }
+  }
+  // decide background clusters: those with border fraction > threshold
+  const bgClusters = new Set();
+  for(let c=0;c<k;c++){
+    const frac = borderCounts[c] / borderTotal;
+    if(frac > 0.08) bgClusters.add(c); // tuned threshold
+  }
+  if(bgClusters.size === 0){
+    // fallback: pick cluster with max border count
+    let maxc = 0, maxv = 0;
+    for(let c=0;c<k;c++) if(borderCounts[c] > maxv){ maxv = borderCounts[c]; maxc = c; }
+    bgClusters.add(maxc);
+  }
+
+  setProgress(80);
+  setStatus('Auto mask: composing mask...');
+  // compose mask in small resolution (maskW x maskH): 1 for foreground clusters, 0 for bg clusters
+  const smallMask = new Float32Array(maskW*maskH);
+  for(let i=0;i<maskW*maskH;i++){
+    smallMask[i] = bgClusters.has(labels[i]) ? 0 : 1;
+  }
+
+  // blur and morphological smoothing
+  const blurRadius = Math.max(1, Math.round(Math.max(maskW,maskH) * 0.01 + feather/6));
+  const smoothed = boxBlurFloat(smallMask, maskW, maskH, blurRadius);
+
+  // upscale mask to workingW x workingH using bilinear sampling
+  mask = new Float32Array(workingW * workingH);
+  for(let y=0;y<workingH;y++){
+    for(let x=0;x<workingW;x++){
+      const fx = x / (workingW - 1) * (maskW - 1);
+      const fy = y / (workingH - 1) * (maskH - 1);
+      const ix = Math.floor(fx), iy = Math.floor(fy);
+      const dx = fx - ix, dy = fy - iy;
+      const i00 = (iy)*maskW + ix;
+      const i10 = (iy)*maskW + Math.min(ix+1,maskW-1);
+      const i01 = Math.min(iy+1,maskH-1)*maskW + ix;
+      const i11 = Math.min(iy+1,maskH-1)*maskW + Math.min(ix+1,maskW-1);
+      const v00 = smoothed[i00], v10 = smoothed[i10], v01 = smoothed[i01], v11 = smoothed[i11];
+      const v0 = v00*(1-dx) + v10*dx;
+      const v1 = v01*(1-dx) + v11*dx;
+      mask[y*workingW + x] = v0*(1-dy) + v1*dy;
+    }
+  }
+
+  // final big blur to feather
+  mask = boxBlurFloat(mask, workingW, workingH, Math.max(1, Math.round(feather/2)));
+
   setProgress(100);
-  setLog('Auto mask ready. Use brush to refine.');
-}
-
-/* -------------------------------------------------------
-   Brush / Manual editing
-   - We keep maskImageData single-channel [0..255]
-   - Drawing modifies mask values locally using a soft brush
---------------------------------------------------------*/
-function canvasPosToXY(e, canvas){
-  const rect = canvas.getBoundingClientRect();
-  // support touch events
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  const x = Math.round((clientX - rect.left) * (canvas.width / rect.width));
-  const y = Math.round((clientY - rect.top) * (canvas.height / rect.height));
-  return {x,y};
-}
-
-function drawBrushPreview(){
-  brushCanvas.width = workingWidth; brushCanvas.height = workingHeight;
-  bctx.clearRect(0,0,brushCanvas.width, brushCanvas.height);
-  // draw semi transparent circle at center
-  // actual cursor preview drawn on mousemove
-}
-
-let lastPos = null;
-
-function startDrawing(e){
-  if(!imgLoaded) return;
-  isDrawing = true;
-  const pos = canvasPosToXY(e, maskCanvas);
-  lastPos = pos;
-  handleBrushStroke(pos.x, pos.y);
-  drawBrushCursor(pos.x, pos.y);
-}
-
-function stopDrawing(){
-  isDrawing = false;
-  lastPos = null;
-  drawBrushPreview();
-}
-
-function drawBrushCursor(x,y){
-  bctx.clearRect(0,0,brushCanvas.width, brushCanvas.height);
-  bctx.beginPath();
-  bctx.fillStyle = 'rgba(56,189,248,0.25)';
-  bctx.strokeStyle = 'rgba(56,189,248,0.6)';
-  bctx.lineWidth = 2;
-  bctx.arc(x,y,brushSize/2,0,Math.PI*2);
-  bctx.fill(); bctx.stroke();
-}
-
-function handleBrushStroke(x,y){
-  if(!maskImageData) return;
-  const w = workingWidth, h = workingHeight;
-  const r = brushSize/2;
-  const r2 = r*r;
-  const minX = Math.max(0, Math.floor(x - r));
-  const maxX = Math.min(w-1, Math.ceil(x + r));
-  const minY = Math.max(0, Math.floor(y - r));
-  const maxY = Math.min(h-1, Math.ceil(y + r));
-  for(let yy=minY; yy<=maxY; yy++){
-    for(let xx=minX; xx<=maxX; xx++){
-      const dx = xx - x, dy = yy - y;
-      const d2 = dx*dx + dy*dy;
-      if(d2 <= r2){
-        // soft brush falloff
-        const dist = Math.sqrt(d2);
-        const t = Math.max(0, 1 - (dist / r)); // 1..0
-        const influence = Math.pow(t, 1.2); // softness
-        const idx = yy*w + xx;
-        if(drawMode === 'erase'){
-          // erase foreground -> lower alpha
-          const delta = Math.round(255 * influence * 0.25); // step
-          maskImageData[idx] = Math.max(0, maskImageData[idx] - delta);
-        } else {
-          // add foreground -> increase alpha
-          const delta = Math.round(255 * influence * 0.25);
-          maskImageData[idx] = Math.min(255, maskImageData[idx] + delta);
-        }
-      }
-    }
-  }
-  // local blur to simulate brush softness, applying a small box blur around stroke
-  maskImageData = boxBlurMask(maskImageData, w, h, Math.max(1, Math.round(brushSize/20)));
+  setStatus('Auto mask ready — refine with brush if needed');
   updatePreview();
 }
 
-// mouse/touch events for brush
-maskCanvas.style.pointerEvents = 'auto';
-maskCanvas.addEventListener('pointerdown', (e)=>{ e.preventDefault(); startDrawing(e);});
-document.addEventListener('pointermove', (e)=>{
-  if(!imgLoaded) return;
-  const pos = canvasPosToXY(e, maskCanvas);
-  drawBrushCursor(pos.x, pos.y);
-  if(isDrawing){
-    // draw along line from lastPos to current
-    if(lastPos){
-      const dx = pos.x - lastPos.x, dy = pos.y - lastPos.y;
-      const dist = Math.hypot(dx,dy);
-      const steps = Math.max(1, Math.floor(dist / (brushSize/4)));
-      for(let i=0;i<=steps;i++){
-        const t = i/steps;
-        const ix = Math.round(lastPos.x + dx * t);
-        const iy = Math.round(lastPos.y + dy * t);
-        handleBrushStroke(ix, iy);
+// ---------------------------
+// K-means clustering (simple, on RGB samples)
+// - samples: array of [r,g,b]
+// - k: clusters
+// - iterMax: iterations
+// returns {centroids, labels}
+// ---------------------------
+function kmeans(samples, k, iterMax=10){
+  const n = samples.length;
+  if(n === 0) return {centroids: Array.from({length:k}, ()=> [0,0,0]), labels: []};
+  // init centroids by picking k random distinct samples
+  const centroids = [];
+  const used = new Set();
+  while(centroids.length < k){
+    const idx = Math.floor(Math.random()*n);
+    if(used.has(idx)) continue;
+    used.add(idx);
+    centroids.push(samples[idx].slice());
+  }
+  const labels = new Array(n).fill(0);
+  for(let iter=0; iter<iterMax; iter++){
+    let changed = false;
+    // assign
+    for(let i=0;i<n;i++){
+      const p = samples[i];
+      let best = 0, bestD = Infinity;
+      for(let c=0;c<k;c++){
+        const cent = centroids[c];
+        const dx = p[0]-cent[0], dy = p[1]-cent[1], dz = p[2]-cent[2];
+        const d = dx*dx + dy*dy + dz*dz;
+        if(d < bestD){ bestD = d; best = c; }
       }
-    } else {
-      handleBrushStroke(pos.x,pos.y);
+      if(labels[i] !== best){ labels[i] = best; changed = true; }
     }
-    lastPos = pos;
+    // recompute centroids
+    const sums = Array.from({length:k}, ()=> [0,0,0]);
+    const counts = new Array(k).fill(0);
+    for(let i=0;i<n;i++){
+      const l = labels[i];
+      sums[l][0] += samples[i][0];
+      sums[l][1] += samples[i][1];
+      sums[l][2] += samples[i][2];
+      counts[l]++;
+    }
+    for(let c=0;c<k;c++){
+      if(counts[c] > 0){
+        centroids[c][0] = sums[c][0] / counts[c];
+        centroids[c][1] = sums[c][1] / counts[c];
+        centroids[c][2] = sums[c][2] / counts[c];
+      } else {
+        // reinit empty centroid
+        const idx = Math.floor(Math.random()*n);
+        centroids[c] = samples[idx].slice();
+      }
+    }
+    if(!changed) break;
   }
-});
-document.addEventListener('pointerup', ()=>{ if(isDrawing) stopDrawing(); });
-
-// invert mask
-function invertMask(){
-  const w = workingWidth, h = workingHeight;
-  for(let i=0;i<w*h;i++){
-    maskImageData[i] = 255 - maskImageData[i];
-  }
+  return {centroids, labels};
 }
 
-// box blur mask (approx)
-function boxBlurMask(src, w, h, radius){
+// ---------------------------
+// Mask helpers: blur, invert
+// ---------------------------
+function boxBlurFloat(src, w,h, radius){
   if(radius < 1) return src.slice(0);
-  const tmp = new Uint8ClampedArray(w*h);
-  const out = new Uint8ClampedArray(w*h);
-  const rad = radius|0;
-  // horizontal pass
-  const kernel = rad*2 + 1;
+  const tmp = new Float32Array(w*h);
+  const out = new Float32Array(w*h);
+  const r = Math.floor(radius);
+  const kernel = r*2 + 1;
+  // horizontal
   for(let y=0;y<h;y++){
-    let sum=0;
-    for(let x=-rad;x<=rad;x++){
+    let sum = 0;
+    for(let x=-r;x<=r;x++){
       const ix = Math.min(w-1, Math.max(0, x));
       sum += src[y*w + ix];
     }
     for(let x=0;x<w;x++){
-      tmp[y*w + x] = Math.round(sum / kernel);
-      const left = x - rad;
-      const right = x + rad + 1;
+      tmp[y*w + x] = sum / kernel;
+      const left = x - r;
+      const right = x + r + 1;
       if(left >= 0) sum -= src[y*w + left];
       if(right < w) sum += src[y*w + right];
     }
   }
-  // vertical pass
+  // vertical
   for(let x=0;x<w;x++){
-    let sum=0;
-    for(let y=-rad;y<=rad;y++){
+    let sum = 0;
+    for(let y=-r;y<=r;y++){
       const iy = Math.min(h-1, Math.max(0, y));
       sum += tmp[iy*w + x];
     }
     for(let y=0;y<h;y++){
-      out[y*w + x] = Math.round(sum / kernel);
-      const top = y - rad;
-      const bottom = y + rad + 1;
+      out[y*w + x] = sum / kernel;
+      const top = y - r;
+      const bottom = y + r + 1;
       if(top >= 0) sum -= tmp[top*w + x];
       if(bottom < h) sum += tmp[bottom*w + x];
     }
@@ -519,149 +540,188 @@ function boxBlurMask(src, w, h, radius){
   return out;
 }
 
-// compose preview: show source with transparent area masked
-function updatePreview(){
-  if(!imgLoaded || !maskImageData) return;
-  const w = workingWidth, h = workingHeight;
-  // create imageData for compositing
-  const src = sctx.getImageData(0,0,w,h);
-  const out = pctx.createImageData(w,h);
-  // apply feather blur if requested (post-blur on mask)
-  let mask = maskImageData;
-  if(parseInt(featherInput.value,10) > 0){
-    const f = parseInt(featherInput.value,10);
-    mask = boxBlurMask(maskImageData, w, h, Math.max(1, Math.round(f/2)));
-  }
-  for(let i=0;i<w*h;i++){
-    const si = i*4;
-    const alpha = mask[i] / 255; // 0..1
-    // We want foreground alpha = mask, background transparent
-    out.data[si]   = src.data[si];
-    out.data[si+1] = src.data[si+1];
-    out.data[si+2] = src.data[si+2];
-    out.data[si+3] = Math.round(255 * alpha);
-  }
-  pctx.clearRect(0,0,w,h);
-  pctx.putImageData(out,0,0);
-  // update small mask overlay for editing (semi-transparent red where removed)
-  drawMaskOverlay();
-  // set preview canvas display size properly
-  // previewCanvas.style.width = '100%';
+function invertMask(){
+  if(!mask) return;
+  for(let i=0;i<mask.length;i++) mask[i] = 1 - mask[i];
 }
 
-// draw mask overlay onto maskCanvas (visual guide)
-function drawMaskOverlay(){
-  const w = workingWidth, h = workingHeight;
+// ---------------------------
+// Brush drawing
+// ---------------------------
+function handlePointer(e){
+  if(!imgLoaded) return;
+  const rect = maskCanvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
+  const py = (e.clientY - rect.top) * (maskCanvas.height / rect.height);
+  if(e.type === 'pointerdown' || isDrawing){
+    applyBrush(Math.round(px), Math.round(py));
+  }
+}
+
+function applyBrush(cx, cy){
+  const w = workingW, h = workingH;
+  const r = Math.max(1, Math.round(brushSize/2));
+  const r2 = r*r;
+  // modify mask in circle
+  for(let y = Math.max(0, cy - r); y <= Math.min(h-1, cy + r); y++){
+    for(let x = Math.max(0, cx - r); x <= Math.min(w-1, cx + r); x++){
+      const dx = x - cx, dy = y - cy;
+      const d2 = dx*dx + dy*dy;
+      if(d2 <= r2){
+        const t = 1 - Math.sqrt(d2) / r; // 1 at center -> 0 at edge
+        const influence = Math.pow(t, 1.3) * 0.9; // softness
+        const idx = y*w + x;
+        if(drawMode === 'erase'){
+          mask[idx] = clamp(mask[idx] - influence * 0.25, 0, 1);
+        } else {
+          mask[idx] = clamp(mask[idx] + influence * 0.25, 0, 1);
+        }
+      }
+    }
+  }
+  // small blur for smoothness around stroke
+  const blurR = Math.max(1, Math.round(brushSize/20));
+  mask = boxBlurFloat(mask, w, h, blurR);
+  updatePreview();
+}
+
+function drawBrushCursor(e){
+  if(!imgLoaded) return;
+  const rect = maskCanvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (maskCanvas.width / rect.width);
+  const py = (e.clientY - rect.top) * (maskCanvas.height / rect.height);
+  bctx.clearRect(0,0,brushCanvas.width, brushCanvas.height);
+  bctx.beginPath();
+  bctx.fillStyle = 'rgba(56,189,248,0.14)';
+  bctx.strokeStyle = 'rgba(56,189,248,0.7)';
+  bctx.lineWidth = 2;
+  bctx.arc(px, py, brushSize/2, 0, Math.PI*2);
+  bctx.fill(); bctx.stroke();
+}
+
+// draw initial simple preview
+function drawBrushPreview(){
+  bctx.clearRect(0,0,brushCanvas.width, brushCanvas.height);
+}
+
+// ---------------------------
+// Preview & overlay
+// ---------------------------
+function updatePreview(){
+  if(!imgLoaded || !mask) return;
+  const w = workingW, h = workingH;
+  // get source pixels from work canvas (already drawn)
+  const src = wctx.getImageData(0,0,w,h);
+  const out = previewCtx.createImageData(w,h);
+  // apply mask as alpha
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const i = (y*w + x);
+      const si = i*4;
+      const alpha = Math.round(clamp(mask[i],0,1) * 255);
+      out.data[si] = src.data[si];
+      out.data[si+1] = src.data[si+1];
+      out.data[si+2] = src.data[si+2];
+      out.data[si+3] = alpha;
+    }
+  }
+  previewCtx.clearRect(0,0,w,h);
+  previewCtx.putImageData(out, 0,0);
+  // draw mask overlay into maskCanvas for visualizing removed areas (semi-transparent red)
   mctx.clearRect(0,0,w,h);
   const overlay = mctx.createImageData(w,h);
   for(let i=0;i<w*h;i++){
-    const si = i*4;
-    const alpha = maskImageData[i]/255;
-    // where alpha is low (background), show faint red overlay
-    overlay.data[si] = 220;
-    overlay.data[si+1] = 72;
-    overlay.data[si+2] = 88;
-    overlay.data[si+3] = Math.round(120 * (1 - alpha) * 0.7);
+    const idx = i*4;
+    const alpha = 1 - clamp(mask[i],0,1); // background more -> more red
+    overlay.data[idx] = 220;
+    overlay.data[idx+1] = 72;
+    overlay.data[idx+2] = 88;
+    overlay.data[idx+3] = Math.round(110 * alpha);
   }
   mctx.putImageData(overlay,0,0);
-  maskCanvas.style.pointerEvents = 'auto';
 }
 
-// download/export
-downloadBtn.addEventListener('click', async ()=>{
-  if(!imgLoaded || !maskImageData) { alert('No image to export'); return; }
-  setLog('Rendering final image...');
+// ---------------------------
+// Export / Download
+// ---------------------------
+async function exportResult(){
+  if(!imgLoaded || !mask) { alert('No image'); return; }
+  setStatus('Rendering export...');
   setProgress(10);
-  // build final canvas at desired size
-  let outScale = 1;
-  if(outputSizeSelect.value === 'half') outScale = 0.5;
-  if(outputSizeSelect.value === 'quarter') outScale = 0.25;
-  const ow = Math.max(1, Math.round(img.naturalWidth * outScale));
-  const oh = Math.max(1, Math.round(img.naturalHeight * outScale));
-  const tmpCanvas = document.createElement('canvas');
-  tmpCanvas.width = ow; tmpCanvas.height = oh;
-  const tctx = tmpCanvas.getContext('2d');
 
-  // draw original image at natural resolution scaled to output size
-  // using drawImage from original img ensures highest pixels
-  tctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, ow, oh);
+  // output size
+  let scale = 1;
+  if(outSize.value === 'half') scale = 0.5;
+  if(outSize.value === 'quarter') scale = 0.25;
+  const ow = Math.max(1, Math.round(img.naturalWidth * scale));
+  const oh = Math.max(1, Math.round(img.naturalHeight * scale));
+  setProgress(25);
+  // create canvas for final output at ow x oh
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = ow; outCanvas.height = oh;
+  const octx = outCanvas.getContext('2d');
 
-  // rescale mask to output size
-  // create mask imageData at output res using simple nearest/linear sampling
-  // we will sample maskImageData (which is at workingWidth x workingHeight) and map to ow x oh
-  const srcW = workingWidth, srcH = workingHeight;
-  const maskScaled = new Uint8ClampedArray(ow*oh);
+  // draw original image scaled to output size
+  octx.drawImage(img, 0,0, img.naturalWidth, img.naturalHeight, 0,0, ow, oh);
+  setProgress(50);
+
+  // create mask scaled to output
+  const scaledMask = new Uint8ClampedArray(ow*oh);
   for(let y=0;y<oh;y++){
     for(let x=0;x<ow;x++){
-      // map to src coords
-      const fx = x / (ow - 1) * (srcW - 1);
-      const fy = y / (oh - 1) * (srcH - 1);
+      const fx = x / (ow - 1) * (workingW - 1);
+      const fy = y / (oh - 1) * (workingH - 1);
       const ix = Math.floor(fx), iy = Math.floor(fy);
       const dx = fx - ix, dy = fy - iy;
-      // bilinear
-      const v00 = maskImageData[iy*srcW + ix] || 0;
-      const v10 = maskImageData[iy*srcW + Math.min(ix+1,srcW-1)] || 0;
-      const v01 = maskImageData[Math.min(iy+1,srcH-1)*srcW + ix] || 0;
-      const v11 = maskImageData[Math.min(iy+1,srcH-1)*srcW + Math.min(ix+1,srcW-1)] || 0;
+      const i00 = iy*workingW + ix;
+      const i10 = iy*workingW + Math.min(ix+1,workingW-1);
+      const i01 = Math.min(iy+1,workingH-1)*workingW + ix;
+      const i11 = Math.min(iy+1,workingH-1)*workingW + Math.min(ix+1,workingW-1);
+      const v00 = mask[i00], v10 = mask[i10], v01 = mask[i01], v11 = mask[i11];
       const v0 = v00*(1-dx) + v10*dx;
       const v1 = v01*(1-dx) + v11*dx;
       const v = v0*(1-dy) + v1*dy;
-      maskScaled[y*ow + x] = Math.round(v);
+      scaledMask[y*ow + x] = Math.round(clamp(v,0,1) * 255);
     }
   }
+  setProgress(70);
 
-  // apply feather (again) optionally
-  if(parseInt(featherInput.value,10) > 0){
-    const f = parseInt(featherInput.value,10);
-    // scale feather relative to size
-    const scaledF = Math.max(1, Math.round(f * (ow / workingWidth)));
-    const ms = boxBlurMask(maskScaled, ow, oh, scaledF);
-    // replace maskScaled
-    for(let i=0;i<ow*oh;i++) maskScaled[i] = ms[i];
-  }
-
-  // compose final RGBA where alpha = maskScaled
-  const outImg = tctx.getImageData(0,0,ow,oh);
+  // compose final RGBA
+  const outImg = octx.getImageData(0,0,ow,oh);
   for(let i=0;i<ow*oh;i++){
-    const si = i*4;
-    outImg.data[si+3] = maskScaled[i]; // set alpha
+    outImg.data[i*4 + 3] = scaledMask[i];
   }
-  // if PNG desired, keep alpha and export
-  if(outFmtSelect.value === 'png'){
-    // put image with alpha into canvas and export as PNG
-    tctx.putImageData(outImg,0,0);
-    setProgress(70);
-    setLog('Encoding PNG...');
-    const blob = await new Promise(res=> tmpCanvas.toBlob(res,'image/png'));
-    setProgress(100);
-    setLog('Done — download should start');
-    downloadBlob(blob, generateFilename('png'));
-  } else {
-    // JPG: composite over selected background then export
-    const bg = bgColorInput.value || '#ffffff';
-    // draw background
-    const compCanvas = document.createElement('canvas'); compCanvas.width = ow; compCanvas.height = oh;
-    const cctx = compCanvas.getContext('2d');
-    cctx.fillStyle = bg; cctx.fillRect(0,0,ow,oh);
-    // put image with alpha over background
-    tctx.putImageData(outImg,0,0);
-    cctx.drawImage(tmpCanvas,0,0);
-    setProgress(70);
-    setLog('Encoding JPG...');
-    const blob = await new Promise(res=> compCanvas.toBlob(res,'image/jpeg',0.92));
-    setProgress(100);
-    setLog('Done — download should start');
-    downloadBlob(blob, generateFilename('jpg'));
-  }
-});
 
-// helper to generate unique filename
-function generateFilename(ext){
-  const t = new Date().toISOString().replace(/[:.]/g,'-');
-  return `bg-removed-${t}.${ext}`;
+  if(outFmt.value === 'png'){
+    octx.putImageData(outImg,0,0);
+    setProgress(85);
+    setStatus('Encoding PNG...');
+    const blob = await new Promise(res => outCanvas.toBlob(res,'image/png'));
+    setProgress(100);
+    setStatus('Export ready — starting download');
+    triggerDownload(blob, makeFilename('png'));
+  } else {
+    // JPG: composite over bg color
+    const comp = document.createElement('canvas'); comp.width = ow; comp.height = oh;
+    const cctx = comp.getContext('2d');
+    cctx.fillStyle = bgColor.value || '#ffffff'; cctx.fillRect(0,0,ow,oh);
+    // draw image with alpha onto bg: putImageData handles alpha
+    octx.putImageData(outImg,0,0);
+    cctx.drawImage(outCanvas,0,0);
+    setProgress(85);
+    setStatus('Encoding JPG...');
+    const blob = await new Promise(res => comp.toBlob(res,'image/jpeg',0.92));
+    setProgress(100);
+    setStatus('Export ready — starting download');
+    triggerDownload(blob, makeFilename('jpg'));
+  }
 }
 
-function downloadBlob(blob, name){
+function makeFilename(ext){
+  const dt = new Date().toISOString().replace(/[:.]/g,'-');
+  return `bg-removed-${dt}.${ext}`;
+}
+function triggerDownload(blob, name){
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = name;
@@ -670,58 +730,20 @@ function downloadBlob(blob, name){
   a.remove();
 }
 
-// download helper for preview - not used currently
-function previewGenerated(){
-  // rendered preview already in previewCanvas from updatePreview
+// ---------------------------
+// Utility functions
+// ---------------------------
+function setStatus(t){ statusEl.textContent = t; }
+function setProgress(p){ progressFill.style.width = Math.max(0,Math.min(100,p)) + '%'; }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function toggleModeButtons(){
+  btnErase.style.boxShadow = drawMode === 'erase' ? 'inset 0 0 0 2px rgba(56,189,248,0.18)' : 'none';
+  btnRestore.style.boxShadow = drawMode === 'restore' ? 'inset 0 0 0 2px rgba(56,189,248,0.18)' : 'none';
 }
 
-// basic cleanup
-function clearAll(){
-  img = new Image();
-  imgLoaded = false;
-  maskImageData = null;
-  sctx.clearRect(0,0,srcCanvas.width, srcCanvas.height);
-  pctx.clearRect(0,0,previewCanvas.width, previewCanvas.height);
-  mctx.clearRect(0,0,maskCanvas.width, maskCanvas.height);
-  setStatus('No image loaded');
-  setLog('Idle');
-  setProgress(0);
-}
-
-/* ===============================
-   Server API example (commented)
-   ===============================
-   To plug in a server-side high-quality remover, run e.g. a Flask/Express endpoint that accepts multipart/form-data
-   and returns a transparent PNG. Example client-side call:
-
-async function sendToServerForRemoval(file){
-  const fd = new FormData();
-  fd.append('file', file);
-  // Example endpoint that runs U2Net or calls remove.bg
-  const resp = await fetch('https://your-server.example/api/remove-bg', {
-    method: 'POST',
-    body: fd,
-    // DO NOT include API keys on client-side. Keys must be on server.
-  });
-  if(!resp.ok) throw new Error('Server failed');
-  const blob = await resp.blob(); // should be PNG
-  // load blob into image and display
-  const url = URL.createObjectURL(blob);
-  img.onload = ()=> { /*...*/ };
-  img.src = url;
-}
-
-Server-side (very high-level):
- - Receive uploaded image
- - Preprocess (resize if needed)
- - Run U2Net/TorchScript/ONNX model inference
- - Postprocess mask (threshold/blend)
- - Composite subject over transparent background and return PNG
-
-Important: keep user privacy policy & retention notices. Remove server copies after processing.
-*/
-
-/* End of script */
+// ---------------------------
+// Finished
+// ---------------------------
 </script>
 </body>
 </html>
