@@ -4,67 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Free online PDF tools to convert, edit, compress, and transform your PDFs and other files. No installation needed - work directly in your browser!">
-    <meta name="keywords" content="PDF tools, PDF converter, edit PDF, compress PDF, free online tools, document conversion">
+    <meta name="keywords" content="PDF tools, PDF converter, edit PDF, compress PDF, online tools, free PDF tools">
     <meta name="author" content="I Like PDF Tools">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://www.yourdomain.com/">
-    
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="I Like PDF Tools - Your All-in-One PDF Solution">
+    <meta property="og:title" content="I Like PDF Tools - Free Online PDF Converter and Editor">
     <meta property="og:description" content="Free online tools to convert, edit, compress, and transform your PDFs and other files with ease.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://www.yourdomain.com/">
-    <meta property="og:image" content="https://www.yourdomain.com/images/og-image.jpg">
+    <link rel="canonical" href="https://www.yourdomain.com/">
     
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="I Like PDF Tools - Your All-in-One PDF Solution">
-    <meta name="twitter:description" content="Free online tools to convert, edit, compress, and transform your PDFs and other files with ease.">
-    <meta name="twitter:image" content="https://www.yourdomain.com/images/twitter-image.jpg">
-    
-    <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "I Like PDF Tools",
-      "url": "https://www.yourdomain.com/",
-      "description": "Free online PDF tools to convert, edit, compress, and transform your PDFs and other files.",
-      "applicationCategory": "UtilityApplication",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
-    }
-    </script>
+    <title>I Like PDF Tools - Free Online PDF Converter and Editor</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
         :root {
-            --primary-gold: #2563eb;
-            --dark-blue: #1e40af;
-            --deep-blue: #1e293b;
-            --light-gold: #3b82f6;
-            --accent-blue: #60a5fa;
-            --neutral-dark: #1f2937;
-            --neutral-medium: #374151;
-            --neutral-light: #f3f4f6;
-            --white: #ffffff;
+            --primary-blue: #2563eb;
+            --primary-blue-dark: #1d4ed8;
+            --primary-blue-light: #93c5fd;
             --accent-gold: #f59e0b;
-            --accent-gold-light: #fbbf24;
+            --accent-gold-dark: #d97706;
+            --neutral-dark: #1e293b;
+            --neutral-dark-light: #334155;
+            --neutral-gray: #64748b;
+            --neutral-light: #f1f5f9;
+            --neutral-white: #ffffff;
             --success: #10b981;
             --warning: #f59e0b;
             --error: #ef4444;
             --card-bg: #ffffff;
-            --card-bg-alt: #f8fafc;
-            --card-hover-bg: #2563eb;
-            --card-hover-text: #ffffff;
-            --section-bg-light: #f1f5f9;
-            --section-bg-dark: #1e293b;
+            --card-bg-dark: #1e293b;
+            --card-hover-bg: #fef3c7;
+            --card-hover-text: #1e293b;
+            --section-bg-light: #f8fafc;
+            --section-bg-dark: #0f172a;
             --shadow: rgba(0, 0, 0, 0.1);
-            --shadow-hover: rgba(37, 99, 235, 0.2);
+            --shadow-gold: rgba(245, 158, 11, 0.2);
             --transition: all 0.3s ease;
         }
 
@@ -76,10 +49,15 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--neutral-light);
+            background: var(--section-bg-light);
             color: var(--neutral-dark);
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background: var(--section-bg-dark);
+            color: var(--neutral-light);
         }
 
         h1, h2, h3, h4, h5, h6 {
@@ -88,9 +66,17 @@
             color: var(--primary-blue);
         }
 
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6 {
+            color: var(--accent-gold);
+        }
+
         p {
             margin-bottom: 1rem;
-            color: var(--neutral-medium);
         }
 
         a {
@@ -99,8 +85,16 @@
             transition: var(--transition);
         }
 
+        body.dark-mode a {
+            color: var(--accent-gold);
+        }
+
         a:hover {
-            color: var(--dark-blue);
+            color: var(--primary-blue-dark);
+        }
+
+        body.dark-mode a:hover {
+            color: var(--accent-gold-dark);
         }
 
         .container {
@@ -120,9 +114,9 @@
 
         .btn {
             display: inline-block;
-            padding: 12px 28px;
+            padding: 12px 24px;
             background: var(--primary-blue);
-            color: var(--white);
+            color: var(--neutral-white);
             border: none;
             border-radius: 6px;
             font-weight: 500;
@@ -132,31 +126,35 @@
         }
 
         .btn:hover {
-            background: var(--dark-gold);
+            background: var(--primary-blue-dark);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px var(--shadow-hover);
+            box-shadow: 0 6px 12px var(--shadow);
         }
 
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid var(--primary-gold);
-            color: var(--primary-blue);
+        .btn-accent {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
         }
 
-        .btn-secondary:hover {
-            background: var(--primary-gold);
-            color: var(--white);
+        .btn-accent:hover {
+            background: var(--accent-gold-dark);
+            color: var(--neutral-white);
         }
 
         /* Header */
         header {
-            background: var(--white);
+            background: var(--neutral-white);
             color: var(--neutral-dark);
             padding: 15px 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        body.dark-mode header {
+            background: var(--neutral-dark);
+            color: var(--neutral-light);
         }
 
         .header-container {
@@ -175,8 +173,12 @@
 
         .logo i {
             font-size: 28px;
-            color: var(--primary-gold);
+            color: var(--primary-blue);
             transition: var(--transition);
+        }
+
+        body.dark-mode .logo i {
+            color: var(--accent-gold);
         }
 
         .logo:hover i {
@@ -186,7 +188,9 @@
         .logo h1 {
             font-size: 24px;
             margin: 0;
-            color: var(--primary-blue);
+            background: linear-gradient(45deg, var(--primary-blue), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-weight: 700;
         }
 
@@ -198,8 +202,31 @@
             transition: var(--transition);
         }
 
+        body.dark-mode .nav-toggle {
+            color: var(--accent-gold);
+        }
+
         .nav-toggle:hover {
             transform: scale(1.1);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--neutral-gray);
+            transition: var(--transition);
+            margin-right: 15px;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-blue);
+            transform: rotate(30deg);
+        }
+
+        body.dark-mode .theme-toggle {
+            color: var(--accent-gold);
         }
 
         .search-container {
@@ -219,16 +246,27 @@
             padding: 12px 45px 12px 18px;
             border: 2px solid var(--neutral-light);
             border-radius: 30px;
-            background: var(--white);
+            background: var(--neutral-white);
             color: var(--neutral-dark);
             font-size: 16px;
             transition: var(--transition);
         }
 
+        body.dark-mode .search-input {
+            background: var(--neutral-dark-light);
+            border-color: var(--neutral-dark-light);
+            color: var(--neutral-light);
+        }
+
         .search-input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 0 3px var(--primary-blue-light);
+        }
+
+        body.dark-mode .search-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
         }
 
         .search-icon {
@@ -236,7 +274,7 @@
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--neutral-medium);
+            color: var(--neutral-gray);
             cursor: pointer;
         }
 
@@ -245,15 +283,20 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: var(--card-bg);
+            background: var(--neutral-white);
             border-radius: 0 0 10px 10px;
             max-height: 300px;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 5px 15px var(--shadow);
             z-index: 1000;
             display: none;
             border: 1px solid var(--neutral-light);
             border-top: none;
+        }
+
+        body.dark-mode .search-results {
+            background: var(--neutral-dark);
+            border-color: var(--neutral-dark-light);
         }
 
         .search-result-item {
@@ -265,13 +308,22 @@
             border-bottom: 1px solid var(--neutral-light);
         }
 
+        body.dark-mode .search-result-item {
+            border-bottom: 1px solid var(--neutral-dark-light);
+        }
+
         .search-result-item:hover {
-            background: var(--primary-blue);
-            color: var(--white);
+            background: var(--primary-blue-light);
+            color: var(--neutral-dark);
+        }
+
+        body.dark-mode .search-result-item:hover {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
         }
 
         .search-result-item:hover h4 {
-            color: var(--white);
+            color: var(--neutral-dark);
         }
 
         .search-result-item i {
@@ -279,8 +331,12 @@
             font-size: 18px;
         }
 
+        body.dark-mode .search-result-item i {
+            color: var(--accent-gold);
+        }
+
         .search-result-item:hover i {
-            color: var(--white);
+            color: var(--neutral-dark);
         }
 
         .search-result-item h4 {
@@ -289,10 +345,14 @@
             color: var(--neutral-dark);
         }
 
+        body.dark-mode .search-result-item h4 {
+            color: var(--neutral-light);
+        }
+
         .no-results {
             padding: 15px;
             text-align: center;
-            color: var(--neutral-medium);
+            color: var(--neutral-gray);
         }
 
         /* Sidebar */
@@ -302,13 +362,18 @@
             left: -300px;
             width: 300px;
             height: 100%;
-            background: var(--white);
+            background: var(--neutral-white);
             color: var(--neutral-dark);
             transition: var(--transition);
             padding-top: 70px;
             overflow-y: auto;
             z-index: 999;
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 5px 0 15px var(--shadow);
+        }
+
+        body.dark-mode .sidebar {
+            background: var(--neutral-dark);
+            color: var(--neutral-light);
         }
 
         .sidebar.active {
@@ -323,6 +388,10 @@
             cursor: pointer;
             color: var(--primary-blue);
             transition: var(--transition);
+        }
+
+        body.dark-mode .sidebar-close {
+            color: var(--accent-gold);
         }
 
         .sidebar-close:hover {
@@ -347,9 +416,18 @@
             transition: var(--transition);
         }
 
+        body.dark-mode .sidebar-menu a {
+            color: var(--neutral-light);
+        }
+
         .sidebar-menu a:hover {
-            background: var(--primary-blue);
-            color: var(--white);
+            background: var(--primary-blue-light);
+            color: var(--neutral-dark);
+        }
+
+        body.dark-mode .sidebar-menu a:hover {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
         }
 
         .sidebar-menu i {
@@ -364,7 +442,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 998;
             opacity: 0;
             visibility: hidden;
@@ -378,12 +456,11 @@
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            padding: 120px 0 100px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--neutral-dark) 100%);
+            padding: 120px 0;
             text-align: center;
             position: relative;
             overflow: hidden;
-            color: var(--white);
         }
 
         .hero::before {
@@ -398,17 +475,17 @@
         }
 
         .hero h2 {
-            font-size: 3rem;
+            font-size: 3.2rem;
             margin-bottom: 20px;
-            color: var(--white);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--neutral-white);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             max-width: 800px;
             margin: 0 auto 30px;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--neutral-light);
         }
 
         .hero-buttons {
@@ -423,14 +500,14 @@
             background: var(--section-bg-light);
         }
 
+        body.dark-mode .tools-section {
+            background: var(--section-bg-dark);
+        }
+
         .section-title {
             text-align: center;
             margin-bottom: 40px;
             position: relative;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
         }
 
         .section-title::after {
@@ -443,6 +520,10 @@
             border-radius: 2px;
         }
 
+        body.dark-mode .section-title::after {
+            background: var(--accent-gold);
+        }
+
         .tools-filter {
             display: flex;
             justify-content: center;
@@ -453,19 +534,29 @@
 
         .filter-btn {
             padding: 10px 24px;
-            background: var(--white);
-            color: var(--neutral-medium);
-            border: 1px solid var(--neutral-light);
+            background: var(--neutral-light);
+            color: var(--neutral-dark);
+            border: none;
             border-radius: 30px;
             cursor: pointer;
             transition: var(--transition);
             font-weight: 500;
         }
 
+        body.dark-mode .filter-btn {
+            background: var(--neutral-dark-light);
+            color: var(--neutral-light);
+        }
+
         .filter-btn.active, .filter-btn:hover {
             background: var(--primary-blue);
-            color: var(--white);
-            border-color: var(--primary-blue);
+            color: var(--neutral-white);
+        }
+
+        body.dark-mode .filter-btn.active, 
+        body.dark-mode .filter-btn:hover {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
         }
 
         .tools-container {
@@ -489,6 +580,11 @@
             border: 1px solid var(--neutral-light);
         }
 
+        body.dark-mode .tool-card {
+            background: var(--card-bg-dark);
+            border-color: var(--neutral-dark-light);
+        }
+
         .tool-card::before {
             content: '';
             position: absolute;
@@ -501,20 +597,35 @@
             transition: var(--transition);
         }
 
+        body.dark-mode .tool-card::before {
+            background: var(--accent-gold);
+        }
+
         .tool-card:hover::before {
             transform: scaleX(1);
         }
 
         .tool-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 25px var(--shadow-hover);
+            box-shadow: 0 12px 25px var(--shadow);
             background: var(--card-hover-bg);
             color: var(--card-hover-text);
+            border-color: var(--accent-gold);
+        }
+
+        body.dark-mode .tool-card:hover {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
         }
 
         .tool-card:hover h3,
         .tool-card:hover p {
             color: var(--card-hover-text);
+        }
+
+        body.dark-mode .tool-card:hover h3,
+        body.dark-mode .tool-card:hover p {
+            color: var(--neutral-dark);
         }
 
         .tool-card i {
@@ -523,8 +634,16 @@
             color: var(--primary-blue);
         }
 
+        body.dark-mode .tool-card i {
+            color: var(--accent-gold);
+        }
+
         .tool-card:hover i {
-            color: var(--white);
+            color: var(--card-hover-text);
+        }
+
+        body.dark-mode .tool-card:hover i {
+            color: var(--neutral-dark);
         }
 
         .tool-card h3 {
@@ -533,27 +652,39 @@
             color: var(--neutral-dark);
         }
 
+        body.dark-mode .tool-card h3 {
+            color: var(--neutral-light);
+        }
+
         .tool-card p {
             font-size: 15px;
-            color: var(--neutral-medium);
+            color: var(--neutral-gray);
             margin-bottom: 25px;
             flex-grow: 1;
+        }
+
+        body.dark-mode .tool-card p {
+            color: var(--neutral-light);
         }
 
         .tool-card .btn {
             width: 100%;
             background: var(--primary-blue);
-            color: var(--white);
+            color: var(--neutral-white);
             font-weight: 500;
         }
 
         .tool-card .btn:hover {
-            background: var(--dark-blue);
+            background: var(--primary-blue-dark);
         }
 
         /* About Section */
         .about-section {
-            background: var(--white);
+            background: var(--neutral-white);
+        }
+
+        body.dark-mode .about-section {
+            background: var(--neutral-dark);
         }
 
         .about-content {
@@ -583,9 +714,17 @@
             font-size: 20px;
         }
 
+        body.dark-mode .feature-item i {
+            color: var(--accent-gold);
+        }
+
         /* Article Section */
         .article-section {
             background: var(--section-bg-light);
+        }
+
+        body.dark-mode .article-section {
+            background: var(--section-bg-dark);
         }
 
         .article-content {
@@ -613,9 +752,18 @@
             font-weight: 500;
         }
 
+        body.dark-mode .highlight {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-gold);
+        }
+
         /* FAQ Section */
         .faq-section {
-            background: var(--white);
+            background: var(--neutral-white);
+        }
+
+        body.dark-mode .faq-section {
+            background: var(--neutral-dark);
         }
 
         .faq-container {
@@ -624,12 +772,17 @@
         }
 
         .faq-item {
-            background: var(--card-bg-alt);
+            background: var(--card-bg);
             border-radius: 8px;
             margin-bottom: 15px;
             overflow: hidden;
             box-shadow: 0 3px 10px var(--shadow);
             border: 1px solid var(--neutral-light);
+        }
+
+        body.dark-mode .faq-item {
+            background: var(--card-bg-dark);
+            border-color: var(--neutral-dark-light);
         }
 
         .faq-question {
@@ -639,7 +792,6 @@
             justify-content: space-between;
             align-items: center;
             font-weight: 500;
-            color: var(--neutral-dark);
         }
 
         .faq-answer {
@@ -657,6 +809,10 @@
         /* Contact Section */
         .contact-section {
             background: var(--section-bg-light);
+        }
+
+        body.dark-mode .contact-section {
+            background: var(--section-bg-dark);
         }
 
         .contact-container {
@@ -687,7 +843,7 @@
             width: 45px;
             height: 45px;
             background: var(--primary-blue);
-            color: var(--white);
+            color: var(--neutral-white);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -695,12 +851,22 @@
             font-size: 20px;
         }
 
+        body.dark-mode .contact-item i {
+            background: var(--accent-gold);
+            color: var(--neutral-dark);
+        }
+
         .contact-form {
-            background: var(--white);
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 5px 15px var(--shadow);
             border: 1px solid var(--neutral-light);
+        }
+
+        body.dark-mode .contact-form {
+            background: var(--card-bg-dark);
+            border-color: var(--neutral-dark-light);
         }
 
         .form-group {
@@ -711,25 +877,37 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: var(--neutral-dark);
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
             padding: 14px;
-            border: 1px solid var(--neutral-light);
+            border: 2px solid var(--neutral-light);
             border-radius: 6px;
-            background: var(--white);
+            background: var(--neutral-white);
             color: var(--neutral-dark);
             transition: var(--transition);
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group textarea {
+            background: var(--neutral-dark-light);
+            border-color: var(--neutral-dark-light);
+            color: var(--neutral-light);
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 0 3px var(--primary-blue-light);
+        }
+
+        body.dark-mode .form-group input:focus,
+        body.dark-mode .form-group textarea:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
         }
 
         .form-group textarea {
@@ -739,9 +917,9 @@
 
         /* Footer */
         footer {
-            background: var(--deep-blue);
+            background: var(--neutral-dark);
             padding: 50px 0 20px;
-            color: var(--white);
+            color: var(--neutral-light);
         }
 
         .footer-container {
@@ -765,7 +943,7 @@
         .footer-col h4 {
             font-size: 18px;
             margin-bottom: 20px;
-            color: var(--white);
+            color: var(--accent-gold);
             position: relative;
             padding-bottom: 10px;
         }
@@ -781,10 +959,6 @@
             border-radius: 2px;
         }
 
-        .footer-col p, .footer-col ul li a {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
         .footer-col ul {
             list-style: none;
             padding: 0;
@@ -795,11 +969,12 @@
         }
 
         .footer-col ul li a {
+            color: var(--neutral-light);
             transition: var(--transition);
         }
 
         .footer-col ul li a:hover {
-            color: var(--accent-gold-light);
+            color: var(--accent-gold);
             padding-left: 5px;
         }
 
@@ -822,7 +997,7 @@
 
         .social-links a:hover {
             background: var(--accent-gold);
-            color: var(--deep-blue);
+            color: var(--neutral-dark);
             transform: translateY(-3px);
         }
 
@@ -831,14 +1006,17 @@
             margin-top: 50px;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
         }
 
         /* Breadcrumb */
         .breadcrumb {
             padding: 15px 0;
-            background: var(--section-bg-light);
+            background: var(--neutral-light);
             margin-bottom: 30px;
+        }
+
+        body.dark-mode .breadcrumb {
+            background: var(--neutral-dark-light);
         }
 
         .breadcrumb-container {
@@ -859,12 +1037,24 @@
             color: var(--primary-blue);
         }
 
+        body.dark-mode .breadcrumb-item:not(:last-child)::after {
+            color: var(--accent-gold);
+        }
+
         .breadcrumb-item a {
-            color: var(--neutral-medium);
+            color: var(--neutral-dark);
+        }
+
+        body.dark-mode .breadcrumb-item a {
+            color: var(--neutral-light);
         }
 
         .breadcrumb-item a:hover {
             color: var(--primary-blue);
+        }
+
+        body.dark-mode .breadcrumb-item a:hover {
+            color: var(--accent-gold);
         }
 
         /* Responsive Design */
@@ -901,23 +1091,49 @@
             }
         }
 
-        /* Loading animation */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: var(--white);
-            animation: spin 1s ease-in-out infinite;
+        /* Accessibility Improvements */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary-blue);
+            color: white;
+            padding: 8px;
+            z-index: 10000;
+            transition: top 0.3s;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .skip-to-content:focus {
+            top: 0;
+        }
+
+        /* Focus styles for accessibility */
+        button:focus,
+        input:focus,
+        textarea:focus,
+        a:focus {
+            outline: 2px solid var(--primary-blue);
+            outline-offset: 2px;
+        }
+
+        /* Structured data schema */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
 <body>
+
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -931,7 +1147,7 @@
             <li><a href="#article"><i class="fas fa-newspaper"></i> Article</a></li>
             <li><a href="#faq"><i class="fas fa-question-circle"></i> FAQ</a></li>
             <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
-            <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+            <li><a href="privacy-policy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
             <hr>
             <li><a href="#pdf-conversion"><i class="fas fa-exchange-alt"></i> PDF Conversion</a></li>
             <li><a href="#pdf-editing"><i class="fas fa-edit"></i> PDF Editing</a></li>
@@ -954,6 +1170,10 @@
                 <i class="fa-solid fa-file-pdf"></i>
                 <h1>I Like PDF Tools</h1>
             </div>
+            
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
             
             <div class="nav-toggle" id="navToggle">
                 <i class="fas fa-bars"></i>
@@ -993,270 +1213,273 @@
             <p>Free online tools to convert, edit, compress, and transform your PDFs and other files with ease. No installation needed - work directly in your browser!</p>
             <div class="hero-buttons">
                 <a href="#all-tools" class="btn">Explore Tools</a>
-                <a href="#contact" class="btn btn-secondary">Contact Us</a>
+                <a href="#contact" class="btn btn-accent">Contact Us</a>
             </div>
         </div>
     </section>
 
-    <!-- Tools Section -->
-    <section class="section tools-section" id="all-tools">
-        <div class="container">
-            <div class="section-title">
-                <h2>All Free Online Tools</h2>
-                <p>Discover our collection of powerful tools to handle all your file conversion and editing needs</p>
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Tools Section -->
+        <section class="section tools-section" id="all-tools">
+            <div class="container">
+                <div class="section-title">
+                    <h2>All Free Online Tools</h2>
+                    <p>Discover our collection of powerful tools to handle all your file conversion and editing needs</p>
+                </div>
+                
+                <div class="tools-filter">
+                    <button class="filter-btn active" data-filter="all">All Tools</button>
+                    <button class="filter-btn" data-filter="pdf">PDF Tools</button>
+                    <button class="filter-btn" data-filter="image">Image Tools</button>
+                    <button class="filter-btn" data-filter="video">Video Tools</button>
+                    <button class="filter-btn" data-filter="audio">Audio Tools</button>
+                    <button class="filter-btn" data-filter="ai">AI Tools</button>
+                </div>
+                
+                <div class="tools-container" id="toolsContainer">
+                    <!-- Tool cards will be inserted by JS -->
+                </div>
             </div>
-            
-            <div class="tools-filter">
-                <button class="filter-btn active" data-filter="all">All Tools</button>
-                <button class="filter-btn" data-filter="pdf">PDF Tools</button>
-                <button class="filter-btn" data-filter="image">Image Tools</button>
-                <button class="filter-btn" data-filter="video">Video Tools</button>
-                <button class="filter-btn" data-filter="audio">Audio Tools</button>
-                <button class="filter-btn" data-filter="ai">AI Tools</button>
-            </div>
-            
-            <div class="tools-container" id="toolsContainer">
-                <!-- Tool cards will be inserted by JS -->
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- About Section -->
-    <section class="section about-section" id="about">
-        <div class="container">
-            <div class="section-title">
-                <h2>About I Like PDF Tools</h2>
-                <p>Your complete PDF solution platform</p>
-            </div>
-            
-            <div class="about-content">
-                <div class="about-text">
-                    <h3>Your Complete PDF Solution Platform</h3>
-                    <p>I Like PDF Tools is a comprehensive online platform offering a wide range of file conversion and manipulation tools. Our mission is to provide users with reliable, fast, and completely free tools to handle their document needs without requiring expensive software or technical expertise.</p>
-                    
-                    <p>Founded in 2020, our platform has helped millions of users worldwide convert, edit, and manage their documents efficiently. We believe that everyone should have access to powerful PDF tools without the burden of subscriptions or complicated software installations.</p>
-                    
-                    <p>Our team of developers is constantly working to improve existing tools and add new features based on user feedback. We prioritize security and privacy, ensuring that all file processing happens securely and that files are deleted from our servers after processing.</p>
-                    
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>100% free online tools with no registration required</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Secure processing - files are deleted after conversion</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Works on all devices - desktop, tablet, and mobile</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>High-quality conversions with accurate formatting</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Regular updates with new tools and features</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>No watermarks on processed files</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Fast processing with no file size limits</span>
-                        </div>
-                    </div>
-                    
-                    <p>Whether you're a student, professional, or occasional user, our tools are designed to make your document workflow seamless and efficient. From simple conversions to advanced editing features, we've got you covered.</p>
-                    
-                    <a href="#contact" class="btn">Get In Touch</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Article Section -->
-    <section class="section article-section" id="article">
-        <div class="container">
-            <div class="section-title">
-                <h2>The Complete Guide to PDF Tools and Conversions</h2>
-                <p>Everything you need to know about PDF tools and file conversions</p>
-            </div>
-            
-            <div class="article-content">
-                <p>In today's digital world, <span class="highlight">PDF tools</span> have become essential for professionals, students, and everyday computer users. The Portable Document Format (PDF) remains the standard for sharing documents while preserving their formatting across different devices and platforms. However, working with PDFs often requires specialized tools for editing, conversion, and manipulation.</p>
-                
-                <p>Our comprehensive suite of <span class="highlight">PDF conversion tools</span> allows you to transform your documents between various formats. With <span class="highlight">PDF to Word conversion</span>, you can easily extract text from PDF files and make edits in Microsoft Word. This is particularly useful for contracts, reports, and other documents that need occasional updates. Similarly, our <span class="highlight">PDF to Excel tool</span> helps you extract tables from PDFs and convert them into editable spreadsheets, saving you from the tedious task of manual data entry.</p>
-                
-                <p>For presentations and visual content, <span class="highlight">PDF to PowerPoint conversion</span> enables you to transform your PDF slides into editable presentation files. This is invaluable when you need to update or repurpose existing presentation materials. Additionally, our <span class="highlight">PDF to JPG/PNG tool</span> lets you export each page of your PDF as a high-quality image, perfect for sharing specific pages on social media or embedding in websites.</p>
-                
-                <p>Creating PDFs from other formats is just as important. Our <span class="highlight">Word to PDF conversion</span> tool preserves your document formatting while converting it to the universal PDF format. The <span class="highlight">Excel to PDF</span> and <span class="highlight">PowerPoint to PDF</span> converters ensure your spreadsheets and presentations look exactly as intended when shared with others. For simpler text documents, the <span class="highlight">TXT to PDF tool</span> creates properly formatted PDFs from plain text files.</p>
-                
-                <p>Beyond conversion, our <span class="highlight">PDF editing tools</span> provide comprehensive functionality for manipulating PDF documents. The <span class="highlight">Merge PDFs tool</span> allows you to combine multiple documents into a single file, perfect for compiling reports or combining chapters of a book. Conversely, the <span class="highlight">Split PDF tool</span> lets you extract specific pages or separate a large document into smaller files.</p>
-                
-                <p>Sometimes you need to remove unnecessary content from your documents, and that's where our <span class="highlight">Delete PDF Pages tool</span> comes in handy. For documents that were scanned incorrectly or need reorientation, the <span class="highlight">Rotate PDF Pages tool</span> allows you to correct page orientations in just a few clicks. When you need to reorganize your document, the <span class="highlight">Rearrange PDF Pages tool</span> provides an intuitive drag-and-drop interface for changing page order.</p>
-                
-                <p>PDFs often contain valuable images that you might want to use elsewhere. Our <span class="highlight">Extract Images from PDF tool</span> identifies and extracts all embedded images in high quality. To add professional touches to your documents, the <span class="highlight">Add Watermark to PDF tool</span> lets you insert text or image watermarks, while the <span class="highlight">Add Signature to PDF tool</span> provides multiple options for signing documents digitally.</p>
-                
-                <p>Document security is crucial in the digital age. Our <span class="highlight">Protect PDF tool</span> allows you to add password encryption and permissions to sensitive documents, preventing unauthorized access. If you've received a protected document that you need to edit, the <span class="highlight">Unlock PDF tool</span> can remove password restrictions (when you have the proper authorization).</p>
-                
-                <p>Large PDF files can be difficult to share via email or messaging apps. Our <span class="highlight">Compress PDF tool</span> reduces file size without significant quality loss, making sharing easier and faster. The compression algorithm smartly balances file size and quality based on your needs.</p>
-                
-                <p>Beyond PDF tools, we offer a comprehensive set of media conversion tools. Our <span class="highlight">Image Converter</span> supports all major formats including JPG, PNG, WEBP, and GIF. The <span class="highlight">Image Background Remover</span> uses advanced AI technology to isolate subjects from their backgrounds, creating professional-looking transparent images. For optimizing web content, the <span class="highlight">Image Compressor</span> reduces file sizes while maintaining visual quality.</p>
-                
-                <p>Video content continues to grow in importance, and our video tools help you work with various formats. The <span class="highlight">Video Converter</span> transforms files between MP4, AVI, MOV, and other popular formats. For creating engaging social media content, the <span class="highlight">Video to GIF Maker</span> converts video clips into animated GIFs. When file size is a concern, the <span class="highlight">Video Compressor</span> reduces video sizes without significant quality loss.</p>
-                
-                <p>Audio tools round out our media conversion offerings. The <span class="highlight">Audio Converter</span> supports MP3, WAV, OGG, and other common audio formats. For editing audio files, the <span class="highlight">Audio Cutter & Joiner</span> lets you trim audio clips or combine multiple files into one. These tools are perfect for podcasters, musicians, and audio enthusiasts.</p>
-                
-                <p>Our AI-powered tools represent the cutting edge of digital technology. The <span class="highlight">Text to Speech tool</span> converts written text into natural-sounding audio using advanced AI voices, perfect for creating audio content or assisting those with reading difficulties. The <span class="highlight">Speech to Text tool</span> does the reverse, transcribing spoken audio into written text with impressive accuracy.</p>
-                
-                <p>For ultimate convenience, our <span class="highlight">All-in-One Converter</span> provides a unified interface for converting between various document, image, audio, and video formats. This versatile tool eliminates the need to switch between different converters for different file types.</p>
-                
-                <p>All our tools are designed with user experience in mind. They feature intuitive interfaces, fast processing speeds, and reliable results. We prioritize your privacy and security by processing files entirely in your browser when possible, or on secure servers that automatically delete your files after processing.</p>
-                
-                <p>Whether you're a student preparing assignments, a professional handling business documents, or someone who occasionally needs to work with digital files, I Like PDF Tools provides everything you need in one convenient location. Our platform is constantly evolving with new tools and improvements based on user feedback and technological advancements.</p>
-                
-                <p>Best of all, every tool on our platform is completely free to use, with no hidden fees, watermarks, or limitations. We believe that powerful digital tools should be accessible to everyone, regardless of budget or technical expertise. Try our tools today and experience the convenience of comprehensive file conversion and editing capabilities right in your web browser.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="section faq-section" id="faq">
-        <div class="container">
-            <div class="section-title">
-                <h2>Frequently Asked Questions</h2>
-                <p>Find answers to common questions about our PDF tools</p>
-            </div>
-            
-            <div class="faq-container">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Are these PDF tools really free to use?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, all our PDF tools are completely free to use. We don't charge any fees, and there are no hidden costs. You can use our tools as much as you want without any limitations.</p>
-                    </div>
+        <!-- About Section -->
+        <section class="section about-section" id="about">
+            <div class="container">
+                <div class="section-title">
+                    <h2>About I Like PDF Tools</h2>
+                    <p>Your complete PDF solution platform</p>
                 </div>
                 
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Is my data secure when using your tools?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Absolutely. We take security seriously. All file processing happens on secure servers, and we automatically delete your files after processing. We don't store or access your files for any other purpose.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Do I need to create an account to use the tools?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>No, you don't need to create an account or register to use our tools. They are available for immediate use without any sign-up process.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What file formats do you support?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We support a wide range of file formats including PDF, DOCX, XLSX, PPTX, JPG, PNG, GIF, WEBP, MP4, AVI, MOV, MP3, WAV, and many more. Our all-in-one converter handles most common file types.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Is there a file size limit for uploads?</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We don't impose strict file size limits for most tools. However, very large files may take longer to process. For optimal performance, we recommend files under 100MB for most tools.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="section contact-section" id="contact">
-        <div class="container">
-            <div class="section-title">
-                <h2>Get In Touch</h2>
-                <p>Have questions or need support? Reach out to our team</p>
-            </div>
-            
-            <div class="contact-container">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h4>Email Us</h4>
-                            <p>helpilikepdftools@gmail.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <h4>Response Time</h4>
-                            <p>We typically respond within 24 hours</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-info-circle"></i>
-                        <div>
-                            <h4>Support</h4>
-                            <p>Our support team is here to help you with any issues</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-lightbulb"></i>
-                        <div>
-                            <h4>Suggestions</h4>
-                            <p>We welcome feedback and tool suggestions</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="contact-form">
-                    <h3>Send us a Message</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">Your Name</label>
-                            <input type="text" id="name" required>
+                <div class="about-content">
+                    <div class="about-text">
+                        <h3>Your Complete PDF Solution Platform</h3>
+                        <p>I Like PDF Tools is a comprehensive online platform offering a wide range of file conversion and manipulation tools. Our mission is to provide users with reliable, fast, and completely free tools to handle their document needs without requiring expensive software or technical expertise.</p>
+                        
+                        <p>Founded in 2020, our platform has helped millions of users worldwide convert, edit, and manage their documents efficiently. We believe that everyone should have access to powerful PDF tools without the burden of subscriptions or complicated software installations.</p>
+                        
+                        <p>Our team of developers is constantly working to improve existing tools and add new features based on user feedback. We prioritize security and privacy, ensuring that all file processing happens securely and that files are deleted from our servers after processing.</p>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>100% free online tools with no registration required</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Secure processing - files are deleted after conversion</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Works on all devices - desktop, tablet, and mobile</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>High-quality conversions with accurate formatting</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Regular updates with new tools and features</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>No watermarks on processed files</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Fast processing with no file size limits</span>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" required>
-                        </div>
+                        <p>Whether you're a student, professional, or occasional user, our tools are designed to make your document workflow seamless and efficient. From simple conversions to advanced editing features, we've got you covered.</p>
                         
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Your Message</label>
-                            <textarea id="message" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn">Send Message</button>
-                    </form>
+                        <a href="#contact" class="btn">Get In Touch</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Article Section -->
+        <section class="section article-section" id="article">
+            <div class="container">
+                <div class="section-title">
+                    <h2>The Complete Guide to PDF Tools and Conversions</h2>
+                    <p>Everything you need to know about PDF tools and file conversions</p>
+                </div>
+                
+                <div class="article-content">
+                    <p>In today's digital world, <span class="highlight">PDF tools</span> have become essential for professionals, students, and everyday computer users. The Portable Document Format (PDF) remains the standard for sharing documents while preserving their formatting across different devices and platforms. However, working with PDFs often requires specialized tools for editing, conversion, and manipulation.</p>
+                    
+                    <p>Our comprehensive suite of <span class="highlight">PDF conversion tools</span> allows you to transform your documents between various formats. With <span class="highlight">PDF to Word conversion</span>, you can easily extract text from PDF files and make edits in Microsoft Word. This is particularly useful for contracts, reports, and other documents that need occasional updates. Similarly, our <span class="highlight">PDF to Excel tool</span> helps you extract tables from PDFs and convert them into editable spreadsheets, saving you from the tedious task of manual data entry.</p>
+                    
+                    <p>For presentations and visual content, <span class="highlight">PDF to PowerPoint conversion</span> enables you to transform your PDF slides into editable presentation files. This is invaluable when you need to update or repurpose existing presentation materials. Additionally, our <span class="highlight">PDF to JPG/PNG tool</span> lets you export each page of your PDF as a high-quality image, perfect for sharing specific pages on social media or embedding in websites.</p>
+                    
+                    <p>Creating PDFs from other formats is just as important. Our <span class="highlight">Word to PDF conversion</span> tool preserves your document formatting while converting it to the universal PDF format. The <span class="highlight">Excel to PDF</span> and <span class="highlight">PowerPoint to PDF</span> converters ensure your spreadsheets and presentations look exactly as intended when shared with others. For simpler text documents, the <span class="highlight">TXT to PDF tool</span> creates properly formatted PDFs from plain text files.</p>
+                    
+                    <p>Beyond conversion, our <span class="highlight">PDF editing tools</span> provide comprehensive functionality for manipulating PDF documents. The <span class="highlight">Merge PDFs tool</span> allows you to combine multiple documents into a single file, perfect for compiling reports or combining chapters of a book. Conversely, the <span class="highlight">Split PDF tool</span> lets you extract specific pages or separate a large document into smaller files.</p>
+                    
+                    <p>Sometimes you need to remove unnecessary content from your documents, and that's where our <span class="highlight">Delete PDF Pages tool</span> comes in handy. For documents that were scanned incorrectly or need reorientation, the <span class="highlight">Rotate PDF Pages tool</span> allows you to correct page orientations in just a few clicks. When you need to reorganize your document, the <span class="highlight">Rearrange PDF Pages tool</span> provides an intuitive drag-and-drop interface for changing page order.</p>
+                    
+                    <p>PDFs often contain valuable images that you might want to use elsewhere. Our <span class="highlight">Extract Images from PDF tool</span> identifies and extracts all embedded images in high quality. To add professional touches to your documents, the <span class="highlight">Add Watermark to PDF tool</span> lets you insert text or image watermarks, while the <span class="highlight">Add Signature to PDF tool</span> provides multiple options for signing documents digitally.</p>
+                    
+                    <p>Document security is crucial in the digital age. Our <span class="highlight">Protect PDF tool</span> allows you to add password encryption and permissions to sensitive documents, preventing unauthorized access. If you've received a protected document that you need to edit, the <span class="highlight">Unlock PDF tool</span> can remove password restrictions (when you have the proper authorization).</p>
+                    
+                    <p>Large PDF files can be difficult to share via email or messaging apps. Our <span class="highlight">Compress PDF tool</span> reduces file size without significant quality loss, making sharing easier and faster. The compression algorithm smartly balances file size and quality based on your needs.</p>
+                    
+                    <p>Beyond PDF tools, we offer a comprehensive set of media conversion tools. Our <span class="highlight">Image Converter</span> supports all major formats including JPG, PNG, WEBP, and GIF. The <span class="highlight">Image Background Remover</span> uses advanced AI technology to isolate subjects from their backgrounds, creating professional-looking transparent images. For optimizing web content, the <span class="highlight">Image Compressor</span> reduces file sizes while maintaining visual quality.</p>
+                    
+                    <p>Video content continues to grow in importance, and our video tools help you work with various formats. The <span class="highlight">Video Converter</span> transforms files between MP4, AVI, MOV, and other popular formats. For creating engaging social media content, the <span class="highlight">Video to GIF Maker</span> converts video clips into animated GIFs. When file size is a concern, the <span class="highlight">Video Compressor</span> reduces video sizes without significant quality loss.</p>
+                    
+                    <p>Audio tools round out our media conversion offerings. The <span class="highlight">Audio Converter</span> supports MP3, WAV, OGG, and other common audio formats. For editing audio files, the <span class="highlight">Audio Cutter & Joiner</span> lets you trim audio clips or combine multiple files into one. These tools are perfect for podcasters, musicians, and audio enthusiasts.</p>
+                    
+                    <p>Our AI-powered tools represent the cutting edge of digital technology. The <span class="highlight">Text to Speech tool</span> converts written text into natural-sounding audio using advanced AI voices, perfect for creating audio content or assisting those with reading difficulties. The <span class="highlight">Speech to Text tool</span> does the reverse, transcribing spoken audio into written text with impressive accuracy.</p>
+                    
+                    <p>For ultimate convenience, our <span class="highlight">All-in-One Converter</span> provides a unified interface for converting between various document, image, audio, and video formats. This versatile tool eliminates the need to switch between different converters for different file types.</p>
+                    
+                    <p>All our tools are designed with user experience in mind. They feature intuitive interfaces, fast processing speeds, and reliable results. We prioritize your privacy and security by processing files entirely in your browser when possible, or on secure servers that automatically delete your files after processing.</p>
+                    
+                    <p>Whether you're a student preparing assignments, a professional handling business documents, or someone who occasionally needs to work with digital files, I Like PDF Tools provides everything you need in one convenient location. Our platform is constantly evolving with new tools and improvements based on user feedback and technological advancements.</p>
+                    
+                    <p>Best of all, every tool on our platform is completely free to use, with no hidden fees, watermarks, or limitations. We believe that powerful digital tools should be accessible to everyone, regardless of budget or technical expertise. Try our tools today and experience the convenience of comprehensive file conversion and editing capabilities right in your web browser.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="section faq-section" id="faq">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Find answers to common questions about our PDF tools</p>
+                </div>
+                
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Are these PDF tools really free to use?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Yes, all our PDF tools are completely free to use. We don't charge any fees, and there are no hidden costs. You can use our tools as much as you want without any limitations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Is my data secure when using your tools?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Absolutely. We take security seriously. All file processing happens on secure servers, and we automatically delete your files after processing. We don't store or access your files for any other purpose.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Do I need to create an account to use the tools?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No, you don't need to create an account or register to use our tools. They are available for immediate use without any sign-up process.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>What file formats do you support?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We support a wide range of file formats including PDF, DOCX, XLSX, PPTX, JPG, PNG, GIF, WEBP, MP4, AVI, MOV, MP3, WAV, and many more. Our all-in-one converter handles most common file types.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Is there a file size limit for uploads?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>We don't impose strict file size limits for most tools. However, very large files may take longer to process. For optimal performance, we recommend files under 100MB for most tools.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="section contact-section" id="contact">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Get In Touch</h2>
+                    <p>Have questions or need support? Reach out to our team</p>
+                </div>
+                
+                <div class="contact-container">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email Us</h4>
+                                <p>helpilikepdftools@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <h4>Response Time</h4>
+                                <p>We typically respond within 24 hours</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <h4>Support</h4>
+                                <p>Our support team is here to help you with any issues</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <h4>Suggestions</h4>
+                                <p>We welcome feedback and tool suggestions</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-form">
+                        <h3>Send us a Message</h3>
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <label for="name">Your Name</label>
+                                <input type="text" id="name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message">Your Message</label>
+                                <textarea id="message" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer>
@@ -1266,10 +1489,10 @@
                     <h4>I Like PDF Tools</h4>
                     <p>Your all-in-one solution for PDF and file conversion needs. Free, fast, and reliable tools for everyone.</p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
                 
@@ -1643,20 +1866,8 @@
             if (contactForm) {
                 contactForm.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    
-                    // Show loading state
-                    const submitBtn = this.querySelector('button[type="submit"]');
-                    const originalText = submitBtn.textContent;
-                    submitBtn.innerHTML = '<span class="loading-spinner"></span> Sending...';
-                    submitBtn.disabled = true;
-                    
-                    // Simulate form submission
-                    setTimeout(() => {
-                        alert('Thank you for your message! We will get back to you soon.');
-                        contactForm.reset();
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                    }, 1500);
+                    alert('Thank you for your message! We will get back to you soon.');
+                    contactForm.reset();
                 });
             }
             
@@ -1678,11 +1889,32 @@
                         // Close sidebar if open
                         sidebar.classList.remove('active');
                         sidebarOverlay.classList.remove('active');
-                        
-                        // Update URL
-                        history.pushState(null, null, targetId);
                     }
                 });
+            });
+            
+            // Dark mode toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference or respect OS preference
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.body.classList.add('dark-mode');
+                themeIcon.className = 'fas fa-sun';
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                }
             });
         });
 
