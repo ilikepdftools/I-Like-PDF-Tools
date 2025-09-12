@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - I Like PDF Tools</title>
+    <meta name="description" content="Terms of Service for I Like PDF Tools. Learn about our rules, restrictions, and terms for using our free online PDF tools.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --dark-blue: #1E1E2F;
+            --deep-red: #2B2D42;
+            --gold: #FFD700;
+            --dark-gold: #E6C200;
+            --dark-grayish-red: #3A3D5B;
+            --light-gray: #EAEAEA;
+            --white: #FFFFFF;
+            --card-bg: #3A3D5B;
+            --card-hover-bg: #FFD700;
+            --card-hover-text: #1E1E2F;
+            --section-bg: #25253B;
+            --shadow: rgba(255, 215, 0, 0.2);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--dark-blue);
+            color: var(--light-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gold);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--gold);
+            transition: var(--transition);
+        }
+
+        a:hover {
+            color: var(--dark-gold);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section {
+            padding: 60px 0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--gold);
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: var(--dark-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px var(--shadow);
+        }
+
+        /* Header */
+        header {
+            background: var(--deep-red);
+            color: var(--light-gray);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .logo:hover i {
+            transform: rotate(10deg);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            margin: 0;
+            background: linear-gradient(45deg, var(--gold), var(--dark-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .nav-toggle {
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gold);
+            display: none;
+            transition: var(--transition);
+        }
+
+        .nav-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: var(--deep-red);
+            color: var(--light-gray);
+            transition: var(--transition);
+            padding-top: 70px;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar.active {
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gold);
+            transition: var(--transition);
+        }
+
+        .sidebar-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: var(--light-gray);
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--deep-red) 0%, var(--dark-blue) 100%);
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,215,0,0.05)"/></svg>');
+            background-size: cover;
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--white);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: var(--light-gray);
+        }
+
+        /* Content Section */
+        .content-section {
+            background: var(--section-bg);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--gold);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+
+        .terms-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .terms-section {
+            margin-bottom: 30px;
+        }
+
+        .terms-section h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .terms-section p, .terms-section ul {
+            margin-bottom: 15px;
+        }
+
+        .terms-section ul {
+            padding-left: 20px;
+        }
+
+        .terms-section li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .terms-note {
+            background: rgba(255, 215, 0, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--deep-red);
+            padding: 50px 0 20px;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-col h4 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--gold);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .footer-col ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--gold);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--gold);
+            color: var(--dark-blue);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 15px 0;
+            background: rgba(255, 255, 255, 0.03);
+            margin-bottom: 30px;
+        }
+
+        .breadcrumb-container {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .breadcrumb-item:not(:last-child)::after {
+            content: '/';
+            margin: 0 10px;
+            color: var(--gold);
+        }
+
+        .breadcrumb-item a {
+            color: var(--light-gray);
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--gold);
+        }
+
+        /* Mobile Navigation Enhancements */
+        .mobile-nav-bottom {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--deep-red);
+            padding: 10px 0;
+            z-index: 990;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-nav-container {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: var(--light-gray);
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
+        .mobile-nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--gold);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+            
+            .hero {
+                padding: 80px 0;
+            }
+            
+            .hero h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+            
+            .section {
+                padding: 40px 0;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .mobile-nav-bottom {
+                display: block;
+            }
+            
+            .terms-content {
+                padding: 25px 20px;
+            }
+            
+            .sidebar {
+                width: 85%;
+                left: -85%;
+            }
+            
+            .breadcrumb-container {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 20px;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+            
+            .footer-container {
+                gap: 20px;
+            }
+            
+            .footer-col {
+                margin-bottom: 20px;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+            
+            .terms-section h3 {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Table of Contents */
+        .toc-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .toc-title {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .toc-list {
+            columns: 2;
+            column-gap: 20px;
+        }
+
+        .toc-list li {
+            margin-bottom: 8px;
+            break-inside: avoid;
+        }
+
+        .toc-list a {
+            color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .toc-list a:hover {
+            color: var(--gold);
+            padding-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .toc-list {
+                columns: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-close" id="sidebarClose">
+            <i class="fas fa-times"></i>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="index.html#all-tools"><i class="fas fa-tools"></i> All Tools</a></li>
+            <li><a href="index.html#about"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="index.html#faq"><i class="fas fa-question-circle"></i> FAQ</a></li>
+            <li><a href="index.html#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            <li><a href="privacy-policy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+            <li><a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
+            <hr>
+            <li><a href="index.html#pdf-conversion"><i class="fas fa-exchange-alt"></i> PDF Conversion</a></li>
+            <li><a href="index.html#pdf-editing"><i class="fas fa-edit"></i> PDF Editing</a></li>
+            <li><a href="index.html#pdf-security"><i class="fas fa-lock"></i> PDF Security</a></li>
+            <li><a href="index.html#pdf-compression"><i class="fas fa-compress"></i> PDF Compression</a></li>
+        </ul>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fa-solid fa-file-pdf"></i>
+                <h1>I Like PDF Tools</h1>
+            </div>
+            
+            <div class="nav-toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-nav-bottom">
+        <div class="mobile-nav-container">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="index.html#all-tools" class="mobile-nav-item">
+                <i class="fas fa-tools"></i>
+                <span>Tools</span>
+            </a>
+            <a href="index.html#faq" class="mobile-nav-item">
+                <i class="fas fa-question-circle"></i>
+                <span>FAQ</span>
+            </a>
+            <a href="index.html#contact" class="mobile-nav-item">
+                <i class="fas fa-envelope"></i>
+                <span>Contact</span>
+            </a>
+            <a href="javascript:void(0)" class="mobile-nav-item" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+                <span>Menu</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container breadcrumb-container">
+            <div class="breadcrumb-item">
+                <a href="index.html">Home</a>
+            </div>
+            <div class="breadcrumb-item">
+                <span>Terms of Service</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Terms of Service</h2>
+            <p>Please read these terms carefully before using our PDF tools. By using our services, you agree to these terms.</p>
+        </div>
+    </section>
+
+    <!-- Terms of Service Content -->
+    <section class="section content-section">
+        <div class="container">
+            <!-- Table of Contents -->
+            <div class="toc-container">
+                <h3 class="toc-title">Table of Contents</h3>
+                <ul class="toc-list">
+                    <li><a href="#acceptance">1. Acceptance of Terms</a></li>
+                    <li><a href="#services">2. Description of Services</a></li>
+                    <li><a href="#user-responsibilities">3. User Responsibilities</a></li>
+                    <li><a href="#prohibited">4. Prohibited Activities</a></li>
+                    <li><a href="#intellectual-property">5. Intellectual Property</a></li>
+                    <li><a href="#privacy">6. Privacy Policy</a></li>
+                    <li><a href="#disclaimer">7. Disclaimer of Warranties</a></li>
+                    <li><a href="#limitation">8. Limitation of Liability</a></li>
+                    <li><a href="#indemnification">9. Indemnification</a></li>
+                    <li><a href="#modifications">10. Modifications to Terms</a></li>
+                    <li><a href="#termination">11. Termination</a></li>
+                    <li><a href="#governing-law">12. Governing Law</a></li>
+                    <li><a href="#contact">13. Contact Information</a></li>
+                </ul>
+            </div>
+
+            <div class="terms-content">
+                <div class="terms-section" id="acceptance">
+                    <h3>1. Acceptance of Terms</h3>
+                    <p>By accessing or using I Like PDF Tools ("the Service"), you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this Service.</p>
+                    <p>The materials contained in this website are protected by applicable copyright and trademark law.</p>
+                </div>
+
+                <div class="terms-section" id="services">
+                    <h3>2. Description of Services</h3>
+                    <p>I Like PDF Tools provides a collection of online tools for working with PDF files and other document formats. Our services include but are not limited to:</p>
+                    <ul>
+                        <li>PDF conversion to and from various formats</li>
+                        <li>PDF editing and manipulation</li>
+                        <li>File compression and optimization</li>
+                        <li>Document security features</li>
+                        <li>Other related document processing tools</li>
+                    </ul>
+                    <p>We reserve the right to modify, suspend, or discontinue any part of our services at any time without prior notice.</p>
+                </div>
+
+                <div class="terms-section" id="user-responsibilities">
+                    <h3>3. User Responsibilities</h3>
+                    <p>As a user of our Service, you agree to:</p>
+                    <ul>
+                        <li>Use the Service only for lawful purposes</li>
+                        <li>Provide accurate information when contacting us</li>
+                        <li>Maintain the confidentiality of any account credentials</li>
+                        <li>Be responsible for all activities that occur under your account</li>
+                        <li>Notify us immediately of any unauthorized use of your account</li>
+                    </ul>
+                    <div class="terms-note">
+                        <p><strong>Note:</strong> Our Service is available to users who are at least 13 years old. If you are under 13, please do not use our Service.</p>
+                    </div>
+                </div>
+
+                <div class="terms-section" id="prohibited">
+                    <h3>4. Prohibited Activities</h3>
+                    <p>When using our Service, you must not:</p>
+                    <ul>
+                        <li>Violate any applicable laws or regulations</li>
+                        <li>Infringe upon the rights of others</li>
+                        <li>Upload or process malicious software or harmful content</li>
+                        <li>Attempt to gain unauthorized access to our systems</li>
+                        <li>Interfere with or disrupt the Service or servers</li>
+                        <li>Use the Service for any fraudulent or illegal purpose</li>
+                        <li>Automate excessive requests to our servers</li>
+                        <li>Process files that contain sensitive personal information without proper authorization</li>
+                    </ul>
+                    <p>We reserve the right to refuse service to anyone for any reason at any time.</p>
+                </div>
+
+                <div class="terms-section" id="intellectual-property">
+                    <h3>5. Intellectual Property</h3>
+                    <p>The Service and its original content, features, and functionality are owned by I Like PDF Tools and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+                    <p>You retain ownership of the files you upload and process through our Service. However, by using our Service, you grant us a worldwide, non-exclusive, royalty-free license to use, process, and transmit your files solely for the purpose of providing the Service to you.</p>
+                </div>
+
+                <div class="terms-section" id="privacy">
+                    <h3>6. Privacy Policy</h3>
+                    <p>Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your personal information. By using our Service, you agree to the collection and use of information in accordance with our Privacy Policy.</p>
+                    <p>Please review our <a href="privacy-policy.html">Privacy Policy</a> for more information.</p>
+                </div>
+
+                <div class="terms-section" id="disclaimer">
+                    <h3>7. Disclaimer of Warranties</h3>
+                    <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. I Like PDF Tools makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+                    <p>Further, I Like PDF Tools does not warrant or make any representations concerning the accuracy, likely results, or reliability of the use of the materials on its website or otherwise relating to such materials or on any sites linked to this site.</p>
+                </div>
+
+                <div class="terms-section" id="limitation">
+                    <h3>8. Limitation of Liability</h3>
+                    <p>In no event shall I Like PDF Tools or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on I Like PDF Tools' website, even if I Like PDF Tools or an authorized representative has been notified orally or in writing of the possibility of such damage.</p>
+                    <p>Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.</p>
+                </div>
+
+                <div class="terms-section" id="indemnification">
+                    <h3>9. Indemnification</h3>
+                    <p>You agree to indemnify and hold harmless I Like PDF Tools and its affiliates, directors, officers, employees, and agents from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to your violation of these Terms of Service or your use of the Service.</p>
+                </div>
+
+                <div class="terms-section" id="modifications">
+                    <h3>10. Modifications to Terms</h3>
+                    <p>We may revise these Terms of Service at any time without notice. By using this Service, you are agreeing to be bound by the then current version of these Terms of Service.</p>
+                    <p>We will notify users of any material changes to these terms by posting a notice on our website or through other communication channels.</p>
+                </div>
+
+                <div class="terms-section" id="termination">
+                    <h3>11. Termination</h3>
+                    <p>We may terminate or suspend your access to our Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+                    <p>All provisions of the Terms which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>
+                </div>
+
+                <div class="terms-section" id="governing-law">
+                    <h3>12. Governing Law</h3>
+                    <p>These terms and conditions are governed by and construed in accordance with the laws of the United States and you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>
+                    <p>If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect.</p>
+                </div>
+
+                <div class="terms-section" id="contact">
+                    <h3>13. Contact Information</h3>
+                    <p>If you have any questions about these Terms of Service, please contact us:</p>
+                    <ul>
+                        <li>By email: helpilikepdftools@gmail.com</li>
+                        <li>By visiting our contact page: <a href="index.html#contact">Contact Form</a></li>
+                    </ul>
+                    <p><strong>Last Updated:</strong> September 12, 2025</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h4>I Like PDF Tools</h4>
+                    <p>Your all-in-one solution for PDF and file conversion needs. Free, fast, and reliable tools for everyone.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>PDF Tools</h4>
+                    <ul>
+                        <li><a href="index.html#pdf-conversion">PDF Conversion</a></li>
+                        <li><a href="index.html#pdf-editing">PDF Editing</a></li>
+                        <li><a href="index.html#pdf-security">PDF Security</a></li>
+                        <li><a href="index.html#pdf-compression">PDF Compression</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="index.html#faq">FAQ</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="index.html#about">About Us</a></li>
+                        <li><a href="index.html#article">Article</a></li>
+                        <li><a href="index.html#faq">FAQ</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 I Like PDF Tools. All rights reserved.</p>
+            </div>
+        </div>
+        <div style="display: none;">
+            <h1>Terms of Service for PDF Tools</h1>
+            <h2>Online PDF Converter Terms</h2>
+            <h2>PDF Editor Service Agreement</h2>
+            <h2>Free PDF Tools Terms and Conditions</h2>
+            <p>Terms of service for using online PDF conversion tools, document editing services, and file processing utilities. Legal agreement for users of I Like PDF Tools website.</p>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup sidebar toggle
+            const navToggle = document.getElementById('navToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            
+            navToggle.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            sidebarClose.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Smooth scrolling for table of contents links
+            document.querySelectorAll('.toc-list a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 100,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Close sidebar when clicking on a link
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
